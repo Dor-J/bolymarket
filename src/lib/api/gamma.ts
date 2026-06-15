@@ -46,3 +46,47 @@ export async function fetchOpenEvents(
 
 /** Alias used by React Query helpers. */
 export const getOpenEvents = fetchOpenEvents;
+
+export interface FetchEventBySlugOptions {
+  /** Abort signal for request cancellation. */
+  signal?: AbortSignal;
+}
+
+/**
+ * Fetches a single event by slug from the Gamma API.
+ * Returns null when no matching event exists.
+ */
+export async function fetchEventBySlug(
+  slug: string,
+  options: FetchEventBySlugOptions = {},
+): Promise<Event | null> {
+  const params = new URLSearchParams({
+    slug,
+    closed: 'false',
+  });
+
+  const response = await fetch(
+    `${GAMMA_API_BASE}/events?${params.toString()}`,
+    {
+      headers: { Accept: 'application/json' },
+      signal: options.signal,
+      next: { revalidate: 60 },
+    },
+  );
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Gamma API error: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  const json: unknown = await response.json();
+  const parsed = gammaEventsResponseSchema.parse(json);
+  const events = normalizeEvents(parsed);
+
+  return events.find((event) => event.slug === slug) ?? events[0] ?? null;
+}

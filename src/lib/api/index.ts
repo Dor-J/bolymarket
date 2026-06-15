@@ -1,6 +1,6 @@
-export { fetchOpenEvents, getOpenEvents } from "./gamma";
-export { normalizeEvent, normalizeEvents, normalizeMarket } from "./normalize";
-export { eventsQueryOptions } from "./queries";
+export { fetchEventBySlug, fetchOpenEvents, getOpenEvents } from './gamma';
+export { normalizeEvent, normalizeEvents, normalizeMarket } from './normalize';
+export { eventQueryOptions, eventsQueryOptions } from './queries';
 export {
   gammaEventSchema,
   gammaEventsResponseSchema,
