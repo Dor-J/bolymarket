@@ -10,8 +10,9 @@ Custom React hooks for bolymarket. All paths are relative to `src/hooks/`.
 | `useFilteredEvents` | 1        | Reads `selectedCategoryAtom`; filters + sorts cached events by volume |
 | `useEvent`          | 3        | React Query wrapper — single event by slug, cache-first               |
 | `useChartTimeframe` | 3        | Local state for chart timeframe toggle (`1h` … `all`)                 |
-| `useLivePrices`     | 4 (stub) | Subscribe to live price updates for visible market IDs                |
-| `usePriceFlash`     | 4 (stub) | Flash styling on price direction change                               |
+| `useLivePrices`     | 4        | Seeds outcome atoms and runs price simulation for visible keys |
+| `usePriceFlash`     | 4        | Flash direction + CSS class from price delta                   |
+| `useReducedMotion`  | 4        | Reads `prefers-reduced-motion` for accessible price updates    |
 
 ## Data flow
 
@@ -40,9 +41,9 @@ Direct URL visits (`/event/my-slug`) hit the API when the events cache is cold.
 ### Realtime (Phase 4)
 
 ```text
-useLivePrices(marketIds)       → seeds + ticks marketPriceAtomFamily
+useLivePrices(priceSeeds)        → seed + simulationEngine for visible outcome keys
         ↓
-PriceDisplay                   → useAtomValue per market/outcome — leaf re-render only
+outcomePriceAtomFamily         → leaf subscribers only (PriceDisplay, bars, chips)
 ```
 
 ## Conventions
@@ -62,8 +63,9 @@ Hook tests colocate with source files and use the shared wrapper in
 | `useEvents.test.ts`         | Loading, success, error, query key                              |
 | `useFilteredEvents.test.ts` | Category filter, volume sort, error forwarding, category change |
 | `useEvent.test.ts`          | Cache-first slug lookup; cold-cache API fallback                 |
-| `useLivePrices.test.ts`     | Stub contract (Phase 4 `describe.todo` for live subscription)   |
-| `usePriceFlash.test.ts`     | Stub contract (Phase 4 `describe.todo` for flash styling)       |
+| `useLivePrices.test.ts`     | Seeds atoms, simulation ticks, cleanup                         |
+| `usePriceFlash.test.ts`     | Up/down/none flash classes                                     |
+| `usePriceFlash.reducedMotion.test.ts` | Reduced-motion neutral path                            |
 
 Related pure-function tests:
 
@@ -79,6 +81,9 @@ Related pure-function tests:
 | `src/lib/event/formatBreadcrumb.test.ts` | Detail breadcrumb labels |
 | `src/lib/event/flattenOutcomes.test.ts` | Detail outcome row flattening |
 | `src/lib/api/gamma.test.ts` | `fetchEventBySlug` happy path + errors |
+| `src/lib/prices/*.test.ts` | Outcome keys, coalescing, simulation step, visible seeds |
+| `src/lib/atoms/seedPrices.test.ts` | Seed + commit atom helpers |
+| `src/lib/realtime/simulationEngine.test.ts` | Simulation start/stop |
 
 Mock event fixtures: [`src/test/fixtures/events.ts`](../test/fixtures/events.ts)
 
