@@ -1,17 +1,16 @@
-"use client";
+'use client';
 
-import { memo } from "react";
-import { useAtom } from "jotai";
-import { CATEGORY_NAV_ITEMS } from "@/lib/constants/categories";
-import { selectedCategoryAtom } from "@/lib/atoms/category";
-import { cn } from "@/lib/cn";
-import type { CategoryFilter } from "@/types/polymarket";
+import { memo } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { CATEGORY_NAV_ITEMS } from '@/lib/constants/categories';
+import { cn } from '@/lib/cn';
 
 /**
- * Sticky category navigation — client-side filter via Jotai.
+ * Sticky category navigation with route-based active state.
  */
 export const CategoryNav = memo(function CategoryNav() {
-  const [selectedCategory, setSelectedCategory] = useAtom(selectedCategoryAtom);
+  const pathname = usePathname();
 
   return (
     <nav
@@ -21,22 +20,23 @@ export const CategoryNav = memo(function CategoryNav() {
       <div className="mx-auto max-w-[1350px] px-6">
         <div className="scrollbar-hide flex h-12 items-center gap-1 overflow-x-auto">
           {CATEGORY_NAV_ITEMS.map((item) => {
-            const isActive = selectedCategory === item.key;
+            const isActive =
+              item.href === '/'
+                ? pathname === '/'
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
             return (
               <div key={item.key} className="flex shrink-0 items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedCategory(item.key as CategoryFilter)
-                  }
+                <Link
+                  href={item.href}
                   className={cn(
-                    "inline-flex h-8 shrink-0 items-center gap-1 rounded-md px-2.5",
-                    "text-sm leading-5 font-semibold transition-colors",
-                    "hover:bg-black/5 dark:hover:bg-white/10",
-                    "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                    isActive ? "text-text" : "text-[#77808d]",
+                    'relative inline-flex h-8 shrink-0 items-center gap-1 rounded-md px-2.5',
+                    'text-sm leading-5 font-semibold transition-colors',
+                    'hover:bg-black/5 dark:hover:bg-white/10',
+                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+                    isActive ? 'text-text' : 'text-[#77808d]',
                   )}
+                  aria-current={isActive ? 'page' : undefined}
                 >
                   {item.icon ? (
                     <span aria-hidden className="text-xs">
@@ -44,7 +44,13 @@ export const CategoryNav = memo(function CategoryNav() {
                     </span>
                   ) : null}
                   {item.label}
-                </button>
+                  {isActive ? (
+                    <span
+                      aria-hidden
+                      className="absolute inset-x-1 -bottom-[13px] h-0.5 rounded-full bg-brand"
+                    />
+                  ) : null}
+                </Link>
 
                 {item.showDividerAfter ? (
                   <span

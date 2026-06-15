@@ -1,5 +1,10 @@
-import type { ReactNode } from "react";
-import { cn } from "@/lib/cn";
+'use client';
+
+import { motion } from 'motion/react';
+import { usePathname } from 'next/navigation';
+import type { ReactNode } from 'react';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { cn } from '@/lib/cn';
 
 export interface PageContainerProps {
   children: ReactNode;
@@ -7,12 +12,24 @@ export interface PageContainerProps {
 }
 
 /**
- * Centered page content wrapper — max 1350px, 24px gutters.
+ * Centered page container with subtle route transition fade.
  */
 export function PageContainer({ children, className }: PageContainerProps) {
+  const pathname = usePathname();
+  const reducedMotion = useReducedMotion();
+
   return (
-    <div className={cn("mx-auto w-full max-w-[1350px] px-6 py-6", className)}>
+    <motion.div
+      key={pathname}
+      initial={reducedMotion ? false : { opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reducedMotion ? 0 : 0.2 }}
+      className={cn(
+        'mx-auto w-full max-w-[1350px] px-6 py-6',
+        className,
+      )}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
