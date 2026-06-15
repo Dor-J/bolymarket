@@ -26,7 +26,7 @@ BoliMarket/           # workspace root
 - Zod for API validation
 - Lucide React for icons
 - Motion for subtle UI animation
-- Vitest + React Testing Library (from Phase 2 onward)
+- Vitest + React Testing Library (hook and lib unit tests)
 - Recharts (from Phase 3 onward — event detail chart)
 
 ## Development
@@ -52,13 +52,13 @@ bun run format:check
 
 ## Implementation progress
 
-| Phase | Status | Deliverable |
-| --- | --- | --- |
-| 0 — Foundation | Complete | Tokens, providers, Gamma API, types |
-| 1 — App shell | Complete | TopBar, CategoryNav, category filter |
-| 2 — Events grid | Planned | BinaryCard, MultiOutcomeCard, responsive grid |
-| 3 — Event detail | Planned | `/event/[slug]`, chart, outcome rows |
-| 4 — Realtime | Planned | Live prices, flash animations |
+| Phase            | Status   | Deliverable                                   |
+| ---------------- | -------- | --------------------------------------------- |
+| 0 — Foundation   | Complete | Tokens, providers, Gamma API, types           |
+| 1 — App shell    | Complete | TopBar, CategoryNav, category filter          |
+| 2 — Events grid  | Planned  | BinaryCard, MultiOutcomeCard, responsive grid |
+| 3 — Event detail | Planned  | `/event/[slug]`, chart, outcome rows          |
+| 4 — Realtime     | Planned  | Live prices, flash animations                 |
 
 ## Architecture (overview)
 
@@ -78,9 +78,9 @@ Gamma API → React Query cache → normalized Event / Market / Outcome types
 
 ## Routing
 
-| Route | Description |
-| --- | --- |
-| `/` | Home — events grid with category navigation |
+| Route           | Description                                          |
+| --------------- | ---------------------------------------------------- |
+| `/`             | Home — events grid with category navigation          |
 | `/event/[slug]` | Event detail — header, chart, outcome list (Phase 3) |
 
 Event detail uses a **cache-first** strategy: resolve from the open-events query when warm; fall
