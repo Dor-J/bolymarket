@@ -1,26 +1,136 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* raw palette — theme-independent */
+  --neutral-0: #ffffff;
+  --neutral-25: #f9fafb;
+  --neutral-50: #f4f5f6;
+  --neutral-100: #e6e8ea;
+  --neutral-200: #caced3;
+  --neutral-300: #aeb4bc;
+  --neutral-400: #939aa5;
+  --neutral-500: #77808d;
+  --neutral-600: #5f6772;
+  --neutral-700: #484e56;
+  --neutral-800: #31353a;
+  --neutral-900: #1a1c1f;
+  --neutral-950: #0e0f11;
+
+  --brand-50: #e7edfd;
+  --brand-100: #c4d3fb;
+  --brand-200: #a1b9f9;
+  --brand-300: #7d9ff6;
+  --brand-400: #4e7df3;
+  --brand-500: #1452f0;
+  --brand-600: #1249d8;
+  --brand-700: #1041c0;
+  --brand-800: #0e39a8;
+  --brand-900: #0c3190;
+
+  --green-50: #ecf9f1;
+  --green-100: #caefd8;
+  --green-500: #42c772;
+  --green-600: #30a159;
+  --green-700: #237641;
+
+  --red-50: #fcebeb;
+  --red-100: #f7c8c8;
+  --red-500: #e23939;
+  --red-600: #c61d1d;
+  --red-700: #951616;
+
+  /* semantic — light */
+  --bg-surface: #ffffff;
+  --card: #ffffff;
+  --surface-1: var(--neutral-0);
+  --surface-2: var(--neutral-50);
+  --muted: #f3f4f6;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --text: #18181b;
+  --card-foreground: #030712;
+  --muted-foreground: #6b7280;
+  --text-disabled: #9f9fa9;
+  --primary: #111827;
+  --primary-foreground: #f9fafb;
+  --ring: #030712;
+  --destructive: #ef4444;
+  --yes: #30a159;
+  --no: #e23939;
+  --brand: #1452f0;
+
+  /* radius scale */
+  --radius: 0.7rem;
+  --radius-chip: calc(var(--radius) - 6px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-card: calc(var(--radius) + 4px);
+  --radius-xl: 18px;
+
+  --navbar-height: 104px;
+}
+
+[data-theme="dark"] {
+  --bg-surface: #1a1f23;
+  --bg-surface-hover: #242b32;
+  --card: #030712;
+  --card-foreground: #f9fafb;
+  --border: #1f2937;
+  --input: #1f2937;
+  --muted: #1f2937;
+  --muted-foreground: #9ca3af;
+  --text: #e5e5e5;
+  --text-disabled: #9f9fa9;
+  --primary: #f9fafb;
+  --primary-foreground: #111827;
+  --neutral-0: #15191d;
+  --neutral-50: #1e2428;
+  --brand-500: #0093fd;
+  --brand: #0093fd;
+  --yes: #2bae4c;
+  --no: #f43437;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-surface: var(--bg-surface);
+  --color-card: var(--card);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted-foreground);
+  --color-brand: var(--brand);
+  --color-yes: var(--yes);
+  --color-no: var(--no);
+  --color-primary: var(--primary);
+  --color-destructive: var(--destructive);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --radius-chip: var(--radius-chip);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-card: var(--radius-card);
+  --radius-xl: var(--radius-xl);
+
+  --font-sans: var(--font-inter), Inter, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-surface);
+  color: var(--text);
+  font-family: var(--font-inter), Inter, sans-serif;
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1,
+    "cv01" 1,
+    "cv02" 1,
+    "cv03" 1,
+    "cv04" 1,
+    "cv09" 0,
+    "cv11" 1;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.price-text,
+[data-price] {
+  font-variant-numeric: tabular-nums;
 }
