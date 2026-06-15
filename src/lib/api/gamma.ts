@@ -62,13 +62,13 @@ export async function fetchEventBySlug(
 ): Promise<Event | null> {
   const params = new URLSearchParams({
     slug,
-    closed: 'false',
+    closed: "false",
   });
 
   const response = await fetch(
     `${GAMMA_API_BASE}/events?${params.toString()}`,
     {
-      headers: { Accept: 'application/json' },
+      headers: { Accept: "application/json" },
       signal: options.signal,
       next: { revalidate: 60 },
     },
