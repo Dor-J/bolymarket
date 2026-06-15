@@ -1,0 +1,62 @@
+/* Swagger UI theme overrides — align with bolymarket brand tokens. */
+
+.swagger-ui .topbar {
+  display: none;
+}
+
+.swagger-ui .info {
+  margin: 1.5rem 0 2rem;
+}
+
+.swagger-ui .info .title {
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.swagger-ui .info .title small {
+  background: #1452f0;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.swagger-ui .opblock-tag {
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+  font-size: 1.125rem;
+  border-bottom: 1px solid #e6e8ea;
+}
+
+.swagger-ui .opblock.opblock-get {
+  border-color: #1452f0;
+  background: rgb(20 82 240 / 0.04);
+}
+
+.swagger-ui .opblock.opblock-get .opblock-summary-method {
+  background: #1452f0;
+}
+
+.swagger-ui .btn.authorize,
+.swagger-ui .btn.execute {
+  background-color: #1452f0;
+  border-color: #1452f0;
+}
+
+.swagger-ui .btn.authorize:hover,
+.swagger-ui .btn.execute:hover {
+  background-color: #1249d8;
+  border-color: #1249d8;
+}
+
+.swagger-ui section.models {
+  border: 1px solid #e6e8ea;
+  border-radius: 12px;
+}
+
+[data-theme='dark'] .swagger-ui {
+  filter: invert(0.92) hue-rotate(180deg);
+}
+
+[data-theme='dark'] .swagger-ui img,
+[data-theme='dark'] .swagger-ui .model-box {
+  filter: invert(1) hue-rotate(180deg);
+}
