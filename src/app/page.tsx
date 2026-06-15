@@ -1,3 +1,11 @@
+import { PageContainer } from "@/components/layout/PageContainer";
+import { FilteredEventList } from "@/components/home/FilteredEventList";
+
 export default function Home() {
-  return <main className="mx-auto min-h-screen max-w-[1350px] px-6" />;
+  return (
+    <PageContainer>
+      <h1 className="sr-only">Markets</h1>
+      <FilteredEventList />
+    </PageContainer>
+  );
 }
