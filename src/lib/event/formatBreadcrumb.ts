@@ -1,4 +1,4 @@
-import type { Event } from '@/types/polymarket';
+import type { Event } from "@/types/polymarket";
 
 /**
  * Capitalizes the first character of a slug or label.
@@ -23,5 +23,5 @@ export function formatBreadcrumb(event: Event): string | null {
     return null;
   }
 
-  return parts.join(' · ');
+  return parts.join(" · ");
 }

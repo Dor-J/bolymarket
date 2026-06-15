@@ -1,5 +1,5 @@
-import { getYesNoFromMarket } from '@/lib/cards/mapEventToCardProps';
-import type { Event } from '@/types/polymarket';
+import { getYesNoFromMarket } from "@/lib/cards/mapEventToCardProps";
+import type { Event } from "@/types/polymarket";
 
 /** Flattened outcome row for the event detail list. */
 export interface DetailOutcomeRow {
