@@ -60,13 +60,13 @@ export const MultiOutcomeCard = memo(function MultiOutcomeCard({
                 side="yes"
                 price={outcome.yesPrice}
                 marketId={outcome.marketId}
-                outcomeId={`${outcome.outcomeId}-yes`}
+                outcomeId={outcome.outcomeId}
               />
               <YesNoChip
                 side="no"
                 price={outcome.noPrice}
                 marketId={outcome.marketId}
-                outcomeId={`${outcome.outcomeId}-no`}
+                outcomeId={outcome.outcomeId}
               />
             </div>
           </div>

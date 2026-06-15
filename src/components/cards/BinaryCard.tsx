@@ -26,7 +26,6 @@ export const BinaryCard = memo(function BinaryCard({
   volume,
   marketId,
   yesOutcomeId,
-  noOutcomeId,
   yesPrice,
   noPrice,
 }: BinaryCardProps) {
@@ -53,6 +52,7 @@ export const BinaryCard = memo(function BinaryCard({
 
       <ProbabilityBar
         marketId={marketId}
+        yesOutcomeId={yesOutcomeId}
         yesPrice={yesPrice}
         className="mt-2"
       />
@@ -69,7 +69,7 @@ export const BinaryCard = memo(function BinaryCard({
           side="no"
           price={noPrice}
           marketId={marketId}
-          outcomeId={noOutcomeId}
+          outcomeId={yesOutcomeId}
           fullWidth
         />
       </div>
