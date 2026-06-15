@@ -13,7 +13,7 @@ export interface YesNoChipProps {
 }
 
 /**
- * Yes/No trading chip with live-ready price display.
+ * Yes/No trading chip with live price display on the Yes outcome atom.
  */
 export function YesNoChip({
   side,
@@ -40,6 +40,7 @@ export function YesNoChip({
         marketId={marketId}
         outcomeId={outcomeId}
         initialPrice={price}
+        side={side}
         className="ml-0.5"
       />
     </Chip>
