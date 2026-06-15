@@ -1,16 +1,26 @@
 import type { Event } from '@/types/polymarket';
 
 export interface FetchEventsClientOptions {
+  /** Optional Gamma tag slug for category-specific lists. */
+  tag?: string;
   signal?: AbortSignal;
 }
 
 /**
- * Fetches aggregated open events from the Redis-backed API route.
+ * Fetches open events from the Redis-backed API route.
  */
 export async function fetchEventsClient(
   options: FetchEventsClientOptions = {},
 ): Promise<Event[]> {
-  const response = await fetch('/api/events', {
+  const params = new URLSearchParams();
+  if (options.tag) {
+    params.set('tag', options.tag);
+  }
+
+  const query = params.toString();
+  const url = query ? `/api/events?${query}` : '/api/events';
+
+  const response = await fetch(url, {
     headers: { Accept: 'application/json' },
     signal: options.signal,
   });

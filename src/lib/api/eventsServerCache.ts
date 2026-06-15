@@ -5,11 +5,14 @@ import {
   EVENTS_CACHE_TTL_MS,
   REDIS_EVENT_SLUG_PREFIX,
   REDIS_EVENTS_KEY,
+  REDIS_EVENTS_TAG_PREFIX,
 } from '@/lib/cache/constants';
+import { GAMMA_EVENTS_PAGE_LIMIT } from '@/lib/constants/gamma';
 import { readServerCache, writeServerCache } from "@/lib/cache/serverCache";
 import {
   fetchAggregatedOpenEvents,
   fetchEventBySlug,
+  fetchOpenEvents,
 } from "./gamma";
 
 /**
@@ -39,4 +42,23 @@ export async function getCachedEventBySlug(slug: string): Promise<Event | null> 
   const event = await fetchEventBySlug(slug);
   await writeServerCache(cacheKey, event, EVENTS_CACHE_TTL_MS);
   return event;
+}
+
+/**
+ * Server-side: loads open events for a Gamma tag slug with Redis + memory cache.
+ */
+export async function getCachedOpenEventsByTag(tagSlug: string): Promise<Event[]> {
+  const cacheKey = `${REDIS_EVENTS_TAG_PREFIX}${tagSlug}`;
+  const cached = await readServerCache<Event[]>(cacheKey);
+  if (cached) {
+    return cached.data;
+  }
+
+  const events = await fetchOpenEvents({
+    limit: GAMMA_EVENTS_PAGE_LIMIT,
+    tagSlug,
+    relatedTags: true,
+  });
+  await writeServerCache(cacheKey, events, EVENTS_CACHE_TTL_MS);
+  return events;
 }
