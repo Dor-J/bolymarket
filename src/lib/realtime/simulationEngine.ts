@@ -2,6 +2,7 @@ import type { Store } from "jotai/vanilla/store";
 import { outcomePriceAtomFamily } from "@/lib/atoms/prices";
 import { enqueuePriceTick } from "@/lib/prices/coalesceTicks";
 import { simulatePriceTick } from "@/lib/prices/simulatePriceTick";
+import type { OutcomePriceSeed } from "@/lib/prices/visibleOutcomeKeys";
 import type { PriceSource, SimulationConfig } from "./types";
 
 const DEFAULT_CONFIG: SimulationConfig = {
@@ -53,7 +54,7 @@ export function createSimulationEngine(
   }
 
   return {
-    start(outcomeKeys: string[], store: Store) {
+    start(outcomeKeys: string[], store: Store, _seeds?: OutcomePriceSeed[]) {
       if (
         intervalId !== null &&
         activeStore === store &&
