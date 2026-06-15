@@ -47,7 +47,7 @@ BoliMarket/           # workspace root
 - TypeScript (strict)
 - Tailwind CSS v4 + semantic design tokens
 - Jotai — UI filter state and live outcome prices
-- TanStack React Query — cached events via `/api/events` (localStorage + Redis)
+- TanStack React Query + `@tanstack/react-query-persist-client` — events cached in memory and IndexedDB
 - `@polymarket/real-time-data-client` — live trade WebSocket for outcome prices
 - Zod — API response validation
 - Recharts — event detail price chart
@@ -59,8 +59,10 @@ BoliMarket/           # workspace root
 Structural event data and live prices are intentionally split:
 
 - **React Query** fetches aggregated events (trending + crypto + sports + politics) via
-  `/api/events`, with **localStorage** on the client and **Redis** (or in-memory fallback) on the
-  server. Prices are read once at seed time — never written back into the query cache on tick.
+  `/api/events`, persisted to **IndexedDB** on the client and cached in **Redis** (or in-memory
+  fallback) on the server. Bump `QUERY_PERSIST_BUSTER` in `src/lib/cache/constants.ts` when the
+  `Event` shape changes. Prices are read once at seed time — never written back into the query cache
+  on tick.
 - **Jotai** holds `selectedCategoryAtom` and `outcomePriceAtomFamily` keyed by
   `${marketId}:${outcomeId}` so each outcome updates independently.
 - **Live prices** (`useLivePrices`) seed atoms from API snapshots, then subscribe to Polymarket
@@ -77,7 +79,7 @@ Structural event data and live prices are intentionally split:
                     │ /api/events         │
                     │ Redis + memory TTL  │
                     └──────────┬──────────┘
-                               │ localStorage (client)
+                               │ React Query persist (IndexedDB)
                                ▼
                     ┌─────────────────────┐
                     │   React Query       │

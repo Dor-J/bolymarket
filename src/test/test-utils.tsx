@@ -1,17 +1,17 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createStore, Provider as JotaiProvider } from "jotai";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createStore, Provider as JotaiProvider } from 'jotai';
 import {
   render,
   renderHook,
   type RenderHookOptions,
   type RenderHookResult,
   type RenderOptions,
-} from "@testing-library/react";
-import type { ReactNode } from "react";
-import { selectedCategoryAtom } from "@/lib/atoms/category";
-import type { CategoryFilter, Event } from "@/types/polymarket";
+} from '@testing-library/react';
+import type { ReactNode } from 'react';
+import { selectedCategoryAtom } from '@/lib/atoms/category';
+import type { CategoryFilter, Event } from '@/types/polymarket';
 
-export const EVENTS_QUERY_KEY = ["events", { closed: false, aggregated: true }] as const;
+export const EVENTS_QUERY_KEY = ['events', { closed: false, aggregated: true }] as const;
 
 /**
  * Creates a QueryClient tuned for deterministic hook tests.
@@ -20,8 +20,10 @@ export function createTestQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        retry: false,
+        staleTime: 60_000,
         gcTime: Infinity,
+        refetchOnWindowFocus: false,
+        retry: false,
       },
     },
   });
