@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-  "dev": "bun --bun next dev",
-  "build": "bun --bun next build",
-  "start": "bun --bun next start",
-  "lint": "eslint",
-  "format": "prettier --write .",
-  "format:check": "prettier --check ."
-},
+    "dev": "bun --bun next dev",
+    "build": "bun --bun next build",
+    "start": "bun --bun next start",
+    "lint": "eslint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
   "dependencies": {
     "@tanstack/react-query": "^5.101.0",
     "clsx": "^2.1.1",
