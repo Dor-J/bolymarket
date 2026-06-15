@@ -13,7 +13,7 @@ import {
   getOutcomeKeysFromSeeds,
   getOutcomeKeysSignature,
 } from "@/lib/prices/visibleOutcomeKeys";
-import { createSimulationEngine } from "@/lib/realtime/simulationEngine";
+import { createLivePriceEngine } from "@/lib/realtime/priceSourceFactory";
 
 function getSeedsSignature(seeds: OutcomePriceSeed[]): string {
   return seeds
@@ -27,7 +27,7 @@ function getSeedsSignature(seeds: OutcomePriceSeed[]): string {
  */
 export function useLivePrices(seeds: OutcomePriceSeed[]): void {
   const store = useStore();
-  const engineRef = useRef(createSimulationEngine());
+  const engineRef = useRef(createLivePriceEngine());
   const seedsRef = useRef(seeds);
   seedsRef.current = seeds;
 
@@ -60,7 +60,7 @@ export function useLivePrices(seeds: OutcomePriceSeed[]): void {
     pruneStaleOutcomePrices(activeKeys);
 
     const engine = engineRef.current;
-    engine.start(outcomeKeys, store);
+    engine.start(outcomeKeys, store, seedsRef.current);
 
     return () => {
       engine.stop();
