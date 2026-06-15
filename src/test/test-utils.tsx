@@ -11,7 +11,7 @@ import type { ReactNode } from "react";
 import { selectedCategoryAtom } from "@/lib/atoms/category";
 import type { CategoryFilter, Event } from "@/types/polymarket";
 
-export const EVENTS_QUERY_KEY = ["events", { closed: false }] as const;
+export const EVENTS_QUERY_KEY = ["events", { closed: false, aggregated: true }] as const;
 
 /**
  * Creates a QueryClient tuned for deterministic hook tests.
