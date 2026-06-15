@@ -15,7 +15,9 @@
   "dependencies": {
     "@polymarket/real-time-data-client": "^1.4.0",
     "@tanstack/react-query": "^5.101.0",
+    "@tanstack/react-query-persist-client": "^5.101.0",
     "clsx": "^2.1.1",
+    "idb-keyval": "^6.2.5",
     "jotai": "^2.20.1",
     "jotai-family": "^1.0.2",
     "lucide-react": "^1.18.0",
