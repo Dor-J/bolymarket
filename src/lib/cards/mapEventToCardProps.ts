@@ -1,7 +1,7 @@
-import { getYesDisplayPrice } from '@/lib/format/price';
-import type { Event, Market } from '@/types/polymarket';
-import type { BinaryCardProps, MultiOutcomeCardProps } from '@/lib/cards/types';
-import { resolveCardVariant } from './resolveCardVariant';
+import { getYesDisplayPrice } from "@/lib/format/price";
+import type { Event, Market } from "@/types/polymarket";
+import type { BinaryCardProps, MultiOutcomeCardProps } from "@/lib/cards/types";
+import { resolveCardVariant } from "./resolveCardVariant";
 
 export interface OutcomeRowProps {
   marketId: string;
@@ -21,10 +21,10 @@ export function getYesNoFromMarket(market: Market): {
   noOutcomeId: string;
 } {
   const yesOutcome =
-    market.outcomes.find((outcome) => outcome.name.toLowerCase() === 'yes') ??
+    market.outcomes.find((outcome) => outcome.name.toLowerCase() === "yes") ??
     market.outcomes[0];
   const noOutcome =
-    market.outcomes.find((outcome) => outcome.name.toLowerCase() === 'no') ??
+    market.outcomes.find((outcome) => outcome.name.toLowerCase() === "no") ??
     market.outcomes[1];
 
   const yesPrice = yesOutcome?.price ?? 0;
@@ -124,7 +124,7 @@ export function mapEventToMultiProps(event: Event): MultiOutcomeCardProps {
 export function mapEventToCardProps(event: Event) {
   const variant = resolveCardVariant(event);
 
-  if (variant === 'binary') {
+  if (variant === "binary") {
     return { variant, props: mapEventToBinaryProps(event) } as const;
   }
 

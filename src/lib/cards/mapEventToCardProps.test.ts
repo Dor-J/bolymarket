@@ -1,65 +1,65 @@
-import { describe, expect, it } from 'vitest';
-import { createMockEvent } from '@/test/fixtures/events';
+import { describe, expect, it } from "vitest";
+import { createMockEvent } from "@/test/fixtures/events";
 import {
   getBinaryChancePrice,
   getTopOutcomeRows,
   getYesNoFromMarket,
   mapEventToBinaryProps,
   mapEventToCardProps,
-} from './mapEventToCardProps';
-import { resolveCardVariant } from './resolveCardVariant';
+} from "./mapEventToCardProps";
+import { resolveCardVariant } from "./resolveCardVariant";
 
-describe('getYesNoFromMarket', () => {
-  it('extracts yes and no prices and outcome IDs', () => {
+describe("getYesNoFromMarket", () => {
+  it("extracts yes and no prices and outcome IDs", () => {
     const result = getYesNoFromMarket({
-      id: 'm1',
-      question: 'Will it happen?',
+      id: "m1",
+      question: "Will it happen?",
       volume: 100,
       outcomes: [
-        { id: 'yes-id', name: 'Yes', price: 0.28 },
-        { id: 'no-id', name: 'No', price: 0.72 },
+        { id: "yes-id", name: "Yes", price: 0.28 },
+        { id: "no-id", name: "No", price: 0.72 },
       ],
     });
 
     expect(result).toEqual({
       yesPrice: 0.28,
       noPrice: 0.72,
-      yesOutcomeId: 'yes-id',
-      noOutcomeId: 'no-id',
+      yesOutcomeId: "yes-id",
+      noOutcomeId: "no-id",
     });
   });
 
-  it('falls back to first two outcomes when Yes/No labels are absent', () => {
+  it("falls back to first two outcomes when Yes/No labels are absent", () => {
     const result = getYesNoFromMarket({
-      id: 'm2',
-      question: 'Candidate?',
+      id: "m2",
+      question: "Candidate?",
       volume: 50,
       outcomes: [
-        { id: 'a', name: 'Candidate A', price: 0.4 },
-        { id: 'b', name: 'Candidate B', price: 0.6 },
+        { id: "a", name: "Candidate A", price: 0.4 },
+        { id: "b", name: "Candidate B", price: 0.6 },
       ],
     });
 
     expect(result.yesPrice).toBe(0.4);
     expect(result.noPrice).toBe(0.6);
-    expect(result.yesOutcomeId).toBe('a');
+    expect(result.yesOutcomeId).toBe("a");
   });
 });
 
-describe('getBinaryChancePrice', () => {
-  it('returns the yes display price for a binary event', () => {
+describe("getBinaryChancePrice", () => {
+  it("returns the yes display price for a binary event", () => {
     const event = createMockEvent({
-      id: '1',
-      slug: 'binary',
-      title: 'Binary',
+      id: "1",
+      slug: "binary",
+      title: "Binary",
       markets: [
         {
-          id: 'm1',
-          question: 'Q?',
+          id: "m1",
+          question: "Q?",
           volume: 1,
           outcomes: [
-            { id: 'yes', name: 'Yes', price: 0.28 },
-            { id: 'no', name: 'No', price: 0.72 },
+            { id: "yes", name: "Yes", price: 0.28 },
+            { id: "no", name: "No", price: 0.72 },
           ],
         },
       ],
@@ -68,11 +68,11 @@ describe('getBinaryChancePrice', () => {
     expect(getBinaryChancePrice(event)).toBe(0.28);
   });
 
-  it('returns zero when the event has no markets', () => {
+  it("returns zero when the event has no markets", () => {
     const event = createMockEvent({
-      id: '2',
-      slug: 'empty',
-      title: 'Empty',
+      id: "2",
+      slug: "empty",
+      title: "Empty",
       markets: [],
     });
 
@@ -80,21 +80,21 @@ describe('getBinaryChancePrice', () => {
   });
 });
 
-describe('getTopOutcomeRows', () => {
-  it('returns top two outcomes by price from a multi-outcome market', () => {
+describe("getTopOutcomeRows", () => {
+  it("returns top two outcomes by price from a multi-outcome market", () => {
     const event = createMockEvent({
-      id: '1',
-      slug: 'world-cup',
-      title: 'World Cup',
+      id: "1",
+      slug: "world-cup",
+      title: "World Cup",
       markets: [
         {
-          id: 'm1',
-          question: 'Winner',
+          id: "m1",
+          question: "Winner",
           volume: 100,
           outcomes: [
-            { id: 'spain', name: 'Spain', price: 0.16 },
-            { id: 'france', name: 'France', price: 0.2 },
-            { id: 'brazil', name: 'Brazil', price: 0.1 },
+            { id: "spain", name: "Spain", price: 0.16 },
+            { id: "france", name: "France", price: 0.2 },
+            { id: "brazil", name: "Brazil", price: 0.1 },
           ],
         },
       ],
@@ -103,25 +103,25 @@ describe('getTopOutcomeRows', () => {
     const rows = getTopOutcomeRows(event, 2);
 
     expect(rows).toHaveLength(2);
-    expect(rows[0]?.name).toBe('France');
-    expect(rows[1]?.name).toBe('Spain');
+    expect(rows[0]?.name).toBe("France");
+    expect(rows[1]?.name).toBe("Spain");
   });
 });
 
-describe('mapEventToBinaryProps', () => {
-  it('maps yes and no prices from a binary market', () => {
+describe("mapEventToBinaryProps", () => {
+  it("maps yes and no prices from a binary market", () => {
     const event = createMockEvent({
-      id: '1',
-      slug: 'binary',
-      title: 'Binary Question',
+      id: "1",
+      slug: "binary",
+      title: "Binary Question",
       markets: [
         {
-          id: 'm1',
-          question: 'Will X happen?',
+          id: "m1",
+          question: "Will X happen?",
           volume: 100,
           outcomes: [
-            { id: 'yes', name: 'Yes', price: 0.28 },
-            { id: 'no', name: 'No', price: 0.72 },
+            { id: "yes", name: "Yes", price: 0.28 },
+            { id: "no", name: "No", price: 0.72 },
           ],
         },
       ],
@@ -131,24 +131,24 @@ describe('mapEventToBinaryProps', () => {
 
     expect(props.yesPrice).toBe(0.28);
     expect(props.noPrice).toBe(0.72);
-    expect(props.slug).toBe('binary');
+    expect(props.slug).toBe("binary");
   });
 });
 
-describe('mapEventToCardProps', () => {
-  it('routes binary events to binary props', () => {
+describe("mapEventToCardProps", () => {
+  it("routes binary events to binary props", () => {
     const event = createMockEvent({
-      id: '1',
-      slug: 'binary',
-      title: 'Binary',
+      id: "1",
+      slug: "binary",
+      title: "Binary",
       markets: [
         {
-          id: 'm1',
-          question: 'Q?',
+          id: "m1",
+          question: "Q?",
           volume: 1,
           outcomes: [
-            { id: 'yes', name: 'Yes', price: 0.5 },
-            { id: 'no', name: 'No', price: 0.5 },
+            { id: "yes", name: "Yes", price: 0.5 },
+            { id: "no", name: "No", price: 0.5 },
           ],
         },
       ],
@@ -156,24 +156,24 @@ describe('mapEventToCardProps', () => {
 
     const result = mapEventToCardProps(event);
 
-    expect(result.variant).toBe('binary');
-    expect(resolveCardVariant(event)).toBe('binary');
+    expect(result.variant).toBe("binary");
+    expect(resolveCardVariant(event)).toBe("binary");
   });
 
-  it('routes multi-outcome events to multi props', () => {
+  it("routes multi-outcome events to multi props", () => {
     const event = createMockEvent({
-      id: '2',
-      slug: 'multi',
-      title: 'Multi',
+      id: "2",
+      slug: "multi",
+      title: "Multi",
       markets: [
         {
-          id: 'm1',
-          question: 'A',
+          id: "m1",
+          question: "A",
           volume: 1,
           outcomes: [
-            { id: 'a', name: 'A', price: 0.3 },
-            { id: 'b', name: 'B', price: 0.3 },
-            { id: 'c', name: 'C', price: 0.4 },
+            { id: "a", name: "A", price: 0.3 },
+            { id: "b", name: "B", price: 0.3 },
+            { id: "c", name: "C", price: 0.4 },
           ],
         },
       ],
@@ -181,8 +181,8 @@ describe('mapEventToCardProps', () => {
 
     const result = mapEventToCardProps(event);
 
-    expect(result.variant).toBe('multi-outcome');
-    if (result.variant === 'multi-outcome') {
+    expect(result.variant).toBe("multi-outcome");
+    if (result.variant === "multi-outcome") {
       expect(result.props.outcomes.length).toBeLessThanOrEqual(2);
     }
   });

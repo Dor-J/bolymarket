@@ -1,6 +1,6 @@
-import type { Event } from '@/types/polymarket';
+import type { Event } from "@/types/polymarket";
 
-export type CardVariant = 'binary' | 'multi-outcome';
+export type CardVariant = "binary" | "multi-outcome";
 
 /**
  * Determines which card variant to render for an event.
@@ -10,9 +10,9 @@ export function resolveCardVariant(event: Event): CardVariant {
     const market = event.markets[0];
 
     if (market && market.outcomes.length === 2) {
-      return 'binary';
+      return "binary";
     }
   }
 
-  return 'multi-outcome';
+  return "multi-outcome";
 }
