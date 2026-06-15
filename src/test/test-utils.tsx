@@ -1,9 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createStore, Provider as JotaiProvider } from "jotai";
 import {
+  render,
   renderHook,
   type RenderHookOptions,
   type RenderHookResult,
+  type RenderOptions,
 } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { selectedCategoryAtom } from "@/lib/atoms/category";
@@ -93,5 +95,29 @@ export function renderHookWithProviders<Result, Props>(
     ...result,
     queryClient,
     jotaiStore,
+  };
+}
+
+interface RenderWithProvidersOptions extends ProviderWrapperOptions {
+  renderOptions?: Omit<RenderOptions, "wrapper">;
+}
+
+/**
+ * Renders a component tree wrapped with Jotai and React Query providers.
+ */
+export function renderWithProviders(
+  ui: ReactNode,
+  options: RenderWithProvidersOptions = {},
+) {
+  const queryClient = options.queryClient ?? createTestQueryClient();
+  const jotaiStore = options.jotaiStore ?? createJotaiStore();
+
+  return {
+    queryClient,
+    jotaiStore,
+    ...render(ui, {
+      ...options.renderOptions,
+      wrapper: createProviderWrapper({ queryClient, jotaiStore }),
+    }),
   };
 }
