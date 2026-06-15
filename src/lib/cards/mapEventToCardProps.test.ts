@@ -1,11 +1,84 @@
 import { describe, expect, it } from 'vitest';
 import { createMockEvent } from '@/test/fixtures/events';
 import {
+  getBinaryChancePrice,
   getTopOutcomeRows,
+  getYesNoFromMarket,
   mapEventToBinaryProps,
   mapEventToCardProps,
 } from './mapEventToCardProps';
 import { resolveCardVariant } from './resolveCardVariant';
+
+describe('getYesNoFromMarket', () => {
+  it('extracts yes and no prices and outcome IDs', () => {
+    const result = getYesNoFromMarket({
+      id: 'm1',
+      question: 'Will it happen?',
+      volume: 100,
+      outcomes: [
+        { id: 'yes-id', name: 'Yes', price: 0.28 },
+        { id: 'no-id', name: 'No', price: 0.72 },
+      ],
+    });
+
+    expect(result).toEqual({
+      yesPrice: 0.28,
+      noPrice: 0.72,
+      yesOutcomeId: 'yes-id',
+      noOutcomeId: 'no-id',
+    });
+  });
+
+  it('falls back to first two outcomes when Yes/No labels are absent', () => {
+    const result = getYesNoFromMarket({
+      id: 'm2',
+      question: 'Candidate?',
+      volume: 50,
+      outcomes: [
+        { id: 'a', name: 'Candidate A', price: 0.4 },
+        { id: 'b', name: 'Candidate B', price: 0.6 },
+      ],
+    });
+
+    expect(result.yesPrice).toBe(0.4);
+    expect(result.noPrice).toBe(0.6);
+    expect(result.yesOutcomeId).toBe('a');
+  });
+});
+
+describe('getBinaryChancePrice', () => {
+  it('returns the yes display price for a binary event', () => {
+    const event = createMockEvent({
+      id: '1',
+      slug: 'binary',
+      title: 'Binary',
+      markets: [
+        {
+          id: 'm1',
+          question: 'Q?',
+          volume: 1,
+          outcomes: [
+            { id: 'yes', name: 'Yes', price: 0.28 },
+            { id: 'no', name: 'No', price: 0.72 },
+          ],
+        },
+      ],
+    });
+
+    expect(getBinaryChancePrice(event)).toBe(0.28);
+  });
+
+  it('returns zero when the event has no markets', () => {
+    const event = createMockEvent({
+      id: '2',
+      slug: 'empty',
+      title: 'Empty',
+      markets: [],
+    });
+
+    expect(getBinaryChancePrice(event)).toBe(0);
+  });
+});
 
 describe('getTopOutcomeRows', () => {
   it('returns top two outcomes by price from a multi-outcome market', () => {

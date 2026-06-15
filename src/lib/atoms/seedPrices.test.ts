@@ -5,6 +5,7 @@ import {
   outcomePriceAtomFamily,
   seedOutcomePrice,
 } from './prices';
+import { seedOutcomePrices } from './seedPrices';
 
 describe('seedOutcomePrice', () => {
   it('seeds an atom once', () => {
@@ -47,5 +48,30 @@ describe('commitOutcomePriceTick', () => {
 
     expect(state?.value).toBe(0.4);
     expect(state?.previousValue).toBe(0.4);
+  });
+});
+
+describe('seedOutcomePrices', () => {
+  it('seeds multiple outcome atoms from seed payloads', () => {
+    const store = createStore();
+
+    seedOutcomePrices(store, [
+      { outcomeKey: 'm1:yes', price: 0.6 },
+      { outcomeKey: 'm2:yes', price: 0.3 },
+    ]);
+
+    expect(store.get(outcomePriceAtomFamily('m1:yes'))?.value).toBe(0.6);
+    expect(store.get(outcomePriceAtomFamily('m2:yes'))?.value).toBe(0.3);
+  });
+
+  it('supports force reseed for all payloads', () => {
+    const store = createStore();
+
+    seedOutcomePrices(store, [{ outcomeKey: 'm1:yes', price: 0.4 }]);
+    seedOutcomePrices(store, [{ outcomeKey: 'm1:yes', price: 0.55 }], {
+      force: true,
+    });
+
+    expect(store.get(outcomePriceAtomFamily('m1:yes'))?.value).toBe(0.55);
   });
 });

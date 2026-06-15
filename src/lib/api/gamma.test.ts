@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fetchEventBySlug } from './gamma';
+import { fetchEventBySlug, fetchOpenEvents, getOpenEvents } from './gamma';
 
 const mockGammaEvent = {
   id: '1',
@@ -15,6 +15,63 @@ const mockGammaEvent = {
     },
   ],
 };
+
+describe('fetchOpenEvents', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('returns normalized open events', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => [mockGammaEvent],
+      }),
+    );
+
+    const events = await fetchOpenEvents();
+
+    expect(events).toHaveLength(1);
+    expect(events[0]?.slug).toBe('test-slug');
+  });
+
+  it('passes limit query params when provided', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [],
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await fetchOpenEvents({ limit: 25 });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('limit=25'),
+      expect.any(Object),
+    );
+  });
+
+  it('throws on API errors', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      }),
+    );
+
+    await expect(fetchOpenEvents()).rejects.toThrow(
+      'Gamma API error: 500 Internal Server Error',
+    );
+  });
+
+  it('aliases getOpenEvents to fetchOpenEvents', () => {
+    expect(getOpenEvents).toBe(fetchOpenEvents);
+  });
+});
 
 describe('fetchEventBySlug', () => {
   afterEach(() => {

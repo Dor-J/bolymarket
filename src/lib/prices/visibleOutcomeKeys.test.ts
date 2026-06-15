@@ -1,9 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { createMockEvent } from '@/test/fixtures/events';
 import {
+  getOutcomeKeysFromSeeds,
   getOutcomeSeedsFromEvent,
   getVisibleOutcomeSeedsFromEvents,
 } from './visibleOutcomeKeys';
+
+describe('getOutcomeKeysFromSeeds', () => {
+  it('returns outcome keys from seed payloads', () => {
+    expect(
+      getOutcomeKeysFromSeeds([
+        { outcomeKey: 'm1:yes', price: 0.5 },
+        { outcomeKey: 'm2:france', price: 0.2 },
+      ]),
+    ).toEqual(['m1:yes', 'm2:france']);
+  });
+
+  it('returns an empty array for empty seeds', () => {
+    expect(getOutcomeKeysFromSeeds([])).toEqual([]);
+  });
+});
 
 describe('getVisibleOutcomeSeedsFromEvents', () => {
   it('returns yes outcome keys for binary events', () => {
