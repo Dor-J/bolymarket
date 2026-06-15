@@ -30,7 +30,7 @@ export function formatCents(price: number): string {
   const clamped = clampPrice(price);
   const cents = clamped * 100;
   const formatted =
-    cents % 1 === 0 ? cents.toFixed(0) : cents.toFixed(1).replace(/\.0$/, '');
+    cents % 1 === 0 ? cents.toFixed(0) : cents.toFixed(1).replace(/\.0$/, "");
 
   return `${formatted}¢`;
 }
@@ -42,7 +42,7 @@ export function getYesDisplayPrice(
   outcomes: Array<{ name: string; price: number }>,
 ): number {
   const yes =
-    outcomes.find((outcome) => outcome.name.toLowerCase() === 'yes') ??
+    outcomes.find((outcome) => outcome.name.toLowerCase() === "yes") ??
     outcomes[0];
 
   return yes ? clampPrice(yes.price) : 0;

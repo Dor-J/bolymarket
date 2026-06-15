@@ -1,7 +1,7 @@
 const DATE_FORMAT: Intl.DateTimeFormatOptions = {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
+  month: "short",
+  day: "numeric",
+  year: "numeric",
 };
 
 /**
@@ -9,14 +9,14 @@ const DATE_FORMAT: Intl.DateTimeFormatOptions = {
  */
 export function formatDate(iso?: string): string {
   if (!iso) {
-    return '—';
+    return "—";
   }
 
   const date = new Date(iso);
 
   if (Number.isNaN(date.getTime())) {
-    return '—';
+    return "—";
   }
 
-  return date.toLocaleDateString('en-US', DATE_FORMAT);
+  return date.toLocaleDateString("en-US", DATE_FORMAT);
 }
