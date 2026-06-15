@@ -42,7 +42,12 @@ describe("getVisibleOutcomeSeedsFromEvents", () => {
 
     const seeds = getVisibleOutcomeSeedsFromEvents([event]);
 
-    expect(seeds).toEqual([{ outcomeKey: "m1:yes", price: 0.28 }]);
+    expect(seeds[0]).toMatchObject({
+      outcomeKey: "m1:yes",
+      price: 0.28,
+      assetId: "yes",
+      eventSlug: "binary",
+    });
   });
 
   it("returns top outcome keys for multi-outcome cards", () => {

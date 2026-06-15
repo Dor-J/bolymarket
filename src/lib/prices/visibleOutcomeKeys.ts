@@ -11,6 +11,10 @@ import { getOutcomePriceKey } from "./outcomeKey";
 export interface OutcomePriceSeed {
   outcomeKey: string;
   price: number;
+  /** CLOB token id — used to map WebSocket trades to atoms. */
+  assetId?: string;
+  eventSlug?: string;
+  marketSlug?: string;
 }
 
 /**
@@ -19,36 +23,53 @@ export interface OutcomePriceSeed {
 export function getVisibleOutcomeSeedsFromEvents(
   events: Event[],
 ): OutcomePriceSeed[] {
-  const seeds = new Map<string, number>();
+  const seeds = new Map<string, OutcomePriceSeed>();
 
   for (const event of events) {
     if (resolveCardVariant(event) === "binary") {
       const props = mapEventToBinaryProps(event);
+      const market = event.markets[0];
       const outcomeKey = getOutcomePriceKey(props.marketId, props.yesOutcomeId);
-      seeds.set(outcomeKey, props.yesPrice);
+      seeds.set(outcomeKey, {
+        outcomeKey,
+        price: props.yesPrice,
+        assetId: props.yesOutcomeId,
+        eventSlug: event.slug,
+        marketSlug: market?.slug,
+      });
       continue;
     }
 
     for (const row of getTopOutcomeRows(event, 2)) {
+      const market = event.markets.find((item) => item.id === row.marketId);
       const outcomeKey = getOutcomePriceKey(row.marketId, row.outcomeId);
-      seeds.set(outcomeKey, row.yesPrice);
+      seeds.set(outcomeKey, {
+        outcomeKey,
+        price: row.yesPrice,
+        assetId: row.outcomeId,
+        eventSlug: event.slug,
+        marketSlug: market?.slug,
+      });
     }
   }
 
-  return Array.from(seeds.entries(), ([outcomeKey, price]) => ({
-    outcomeKey,
-    price,
-  }));
+  return Array.from(seeds.values());
 }
 
 /**
  * Returns price seeds for every outcome row on the event detail page.
  */
 export function getOutcomeSeedsFromEvent(event: Event): OutcomePriceSeed[] {
-  return flattenOutcomes(event).map((row) => ({
-    outcomeKey: getOutcomePriceKey(row.marketId, row.outcomeId),
-    price: row.yesPrice,
-  }));
+  return flattenOutcomes(event).map((row) => {
+    const market = event.markets.find((item) => item.id === row.marketId);
+    return {
+      outcomeKey: getOutcomePriceKey(row.marketId, row.outcomeId),
+      price: row.yesPrice,
+      assetId: row.outcomeId,
+      eventSlug: event.slug,
+      marketSlug: market?.slug,
+    };
+  });
 }
 
 /**
