@@ -31,12 +31,12 @@ components/
 
 ### `home/` — Phase 2 (complete)
 
-| Component            | Notes                                            |
-| -------------------- | ------------------------------------------------ |
-| `EventsGrid`         | Responsive card grid container                   |
-| `EventsGridSkeleton` | Skeleton grid matching card silhouette           |
-| `EventsGridError`    | Retry UI when events query fails                 |
-| `EventListEmpty`     | Empty category filter state                      |
+| Component            | Notes                                  |
+| -------------------- | -------------------------------------- |
+| `EventsGrid`         | Responsive card grid container         |
+| `EventsGridSkeleton` | Skeleton grid matching card silhouette |
+| `EventsGridError`    | Retry UI when events query fails       |
+| `EventListEmpty`     | Empty category filter state            |
 
 ### `cards/` — Phase 2 (complete)
 
@@ -49,12 +49,12 @@ components/
 
 ### `market/` — Phase 2 (complete, reused in Phase 3)
 
-| Component         | Notes                                     |
-| ----------------- | ----------------------------------------- |
+| Component         | Notes                                        |
+| ----------------- | -------------------------------------------- |
 | `PriceDisplay`    | Leaf — outcome-scoped atom + flash animation |
 | `YesNoChip`       | Green/red chip; derives No from Yes atom     |
 | `ProbabilityBar`  | §12.3 — live width from Yes outcome atom     |
-| `MarketThumbnail` | 24px circular image + initial fallback    |
+| `MarketThumbnail` | 24px circular image + initial fallback       |
 
 ### `chart/` — Phase 3 (complete)
 
@@ -78,12 +78,38 @@ components/
 
 ### `ui/` — Phase 1–2
 
-| Component        | Notes                          |
-| ---------------- | ------------------------------ |
-| `Button`         | ghost-brand, brand variants    |
-| `IconButton`     | Accessible icon-only control   |
-| `Chip`           | Shared Yes/No chip styling     |
-| `BookmarkButton` | Non-functional heart on cards  |
+| Component        | Notes                         |
+| ---------------- | ----------------------------- |
+| `Button`         | ghost-brand, brand variants   |
+| `IconButton`     | Accessible icon-only control  |
+| `Chip`           | Shared Yes/No chip styling    |
+| `BookmarkButton` | Non-functional heart on cards |
+
+## Phase 5 — polish & performance
+
+### Client vs server map
+
+| Area                                        | `'use client'` | Notes                       |
+| ------------------------------------------- | -------------- | --------------------------- |
+| `layout/AppShell`, `PageContainer`, `Logo`  | No             | Server shell                |
+| `layout/TopBar`, `CategoryNav`              | Yes            | Sticky nav + Jotai category |
+| `home/EventsGrid`, `EventsGridError`        | Yes            | Query + live prices         |
+| `home/EventsGridSkeleton`, `EventListEmpty` | No             | Static presentational       |
+| `cards/*`                                   | Yes            | Links + chip handlers       |
+| `market/*`                                  | Yes            | Jotai leaf subscriptions    |
+| `event/EventDetailPage`                     | Yes            | Detail orchestrator         |
+| `chart/*`                                   | Yes            | Recharts + timeframe state  |
+
+### Memoized list items
+
+`BinaryCard`, `MultiOutcomeCard`, `EventCard` (with memoized mapping), `OutcomeRow`, `CategoryNav`.
+
+Price subscriptions stay in **leaf** market components — never on card or row shells.
+
+### Shared layout constants
+
+`EVENTS_GRID_CLASSES` in `lib/constants/eventsGrid.ts` keeps skeleton and live grid column classes
+identical (no layout shift on hydrate).
 
 ## Conventions
 
@@ -96,6 +122,6 @@ components/
 
 ## Tests
 
-Component tests live next to source files (`*.test.tsx`) or under `__tests__/`. See
-`../plans/PLAN-Phase-2-Events-Grid.md` and `../plans/PLAN-Phase-3-Event-Detail.md` for required
-coverage.
+Component tests live next to source files (`*.test.tsx`) or under `__tests__/`. Phase 5 smoke
+tests cover `EventsGrid` states and `EventListEmpty`. See `../plans/PLAN-Phase-2-Events-Grid.md`
+and `../plans/PLAN-Phase-3-Event-Detail.md` for broader coverage scope.

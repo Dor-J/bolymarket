@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useMemo } from 'react';
+import { useMemo } from "react";
 import {
   CartesianGrid,
   Line,
@@ -9,12 +9,12 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts';
-import { getOutcomeColor } from '@/lib/chart/colors';
-import { generateChartData } from '@/lib/chart/generateChartData';
-import type { ChartOutcome, Timeframe } from '@/lib/chart/types';
-import { formatPercent } from '@/lib/format/price';
-import { cn } from '@/lib/cn';
+} from "recharts";
+import { getOutcomeColor } from "@/lib/chart/colors";
+import { generateChartData } from "@/lib/chart/generateChartData";
+import type { ChartOutcome, Timeframe } from "@/lib/chart/types";
+import { formatPercent } from "@/lib/format/price";
+import { cn } from "@/lib/cn";
 
 export interface PriceChartProps {
   outcomes: ChartOutcome[];
@@ -51,7 +51,7 @@ export function PriceChart({
   }
 
   return (
-    <div className={cn('relative w-full', className)}>
+    <div className={cn("relative w-full", className)}>
       <div className="pointer-events-none absolute right-4 top-1/2 z-10 -translate-y-1/2 text-xs font-semibold tracking-[0.2em] text-[#aeb4bc]/40 uppercase">
         bolymarket
       </div>
@@ -65,7 +65,7 @@ export function PriceChart({
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
               dataKey="label"
-              tick={{ fill: '#77808d', fontSize: 12 }}
+              tick={{ fill: "#77808d", fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               minTickGap={24}
@@ -74,7 +74,7 @@ export function PriceChart({
               orientation="right"
               domain={[0, 1]}
               tickFormatter={(value: number) => formatPercent(value)}
-              tick={{ fill: '#77808d', fontSize: 12 }}
+              tick={{ fill: "#77808d", fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               width={48}
@@ -82,7 +82,7 @@ export function PriceChart({
             <Tooltip
               formatter={(value, name) => {
                 const numericValue =
-                  typeof value === 'number' ? value : Number(value ?? 0);
+                  typeof value === "number" ? value : Number(value ?? 0);
                 const seriesName = String(name);
                 const outcome = outcomes.find((item) => item.id === seriesName);
 
@@ -93,9 +93,9 @@ export function PriceChart({
               }}
               labelFormatter={(label) => String(label)}
               contentStyle={{
-                borderRadius: '8px',
-                borderColor: 'var(--border)',
-                background: 'var(--card)',
+                borderRadius: "8px",
+                borderColor: "var(--border)",
+                background: "var(--card)",
               }}
             />
             {outcomes.map((outcome, index) => (
