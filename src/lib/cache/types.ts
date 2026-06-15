@@ -1,4 +1,4 @@
-/** Serialized cache envelope stored in Redis or localStorage. */
+/** Serialized cache envelope stored in Redis. */
 export interface CacheEnvelope<T> {
   data: T;
   cachedAt: number;
