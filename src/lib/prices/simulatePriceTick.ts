@@ -1,4 +1,4 @@
-import { clampSimPrice } from './clampSimPrice';
+import { clampSimPrice } from "./clampSimPrice";
 
 export interface SimulatePriceTickOptions {
   /** Maximum absolute step per tick (probability points). */

@@ -37,7 +37,10 @@ export function configureCoalesceFlush(handler: FlushHandler | null): void {
 export function enqueuePriceTick(outcomeKey: string, value: number): void {
   pendingTicks.set(outcomeKey, value);
 
-  if (animationFrameId === null && typeof requestAnimationFrame === 'function') {
+  if (
+    animationFrameId === null &&
+    typeof requestAnimationFrame === "function"
+  ) {
     animationFrameId = requestAnimationFrame(flushPendingTicks);
   } else if (animationFrameId === null) {
     flushPendingTicks();
@@ -48,7 +51,7 @@ export function enqueuePriceTick(outcomeKey: string, value: number): void {
  * Synchronously flushes pending ticks — for unit tests only.
  */
 export function flushPendingTicksForTests(): void {
-  if (animationFrameId !== null && typeof cancelAnimationFrame === 'function') {
+  if (animationFrameId !== null && typeof cancelAnimationFrame === "function") {
     cancelAnimationFrame(animationFrameId);
   }
 
@@ -60,7 +63,7 @@ export function flushPendingTicksForTests(): void {
  * Clears pending ticks and cancels a scheduled frame — for test teardown.
  */
 export function resetCoalesceTicksForTests(): void {
-  if (animationFrameId !== null && typeof cancelAnimationFrame === 'function') {
+  if (animationFrameId !== null && typeof cancelAnimationFrame === "function") {
     cancelAnimationFrame(animationFrameId);
   }
 

@@ -15,7 +15,7 @@ export function parseOutcomePriceKey(outcomeKey: string): {
   marketId: string;
   outcomeId: string;
 } {
-  const separatorIndex = outcomeKey.indexOf(':');
+  const separatorIndex = outcomeKey.indexOf(":");
 
   if (separatorIndex === -1) {
     return { marketId: outcomeKey, outcomeId: outcomeKey };

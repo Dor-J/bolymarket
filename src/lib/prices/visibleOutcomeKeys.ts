@@ -1,11 +1,11 @@
 import {
   getTopOutcomeRows,
   mapEventToBinaryProps,
-} from '@/lib/cards/mapEventToCardProps';
-import { resolveCardVariant } from '@/lib/cards/resolveCardVariant';
-import { flattenOutcomes } from '@/lib/event/flattenOutcomes';
-import type { Event } from '@/types/polymarket';
-import { getOutcomePriceKey } from './outcomeKey';
+} from "@/lib/cards/mapEventToCardProps";
+import { resolveCardVariant } from "@/lib/cards/resolveCardVariant";
+import { flattenOutcomes } from "@/lib/event/flattenOutcomes";
+import type { Event } from "@/types/polymarket";
+import { getOutcomePriceKey } from "./outcomeKey";
 
 /** Seed payload for a single outcome price atom. */
 export interface OutcomePriceSeed {
@@ -22,7 +22,7 @@ export function getVisibleOutcomeSeedsFromEvents(
   const seeds = new Map<string, number>();
 
   for (const event of events) {
-    if (resolveCardVariant(event) === 'binary') {
+    if (resolveCardVariant(event) === "binary") {
       const props = mapEventToBinaryProps(event);
       const outcomeKey = getOutcomePriceKey(props.marketId, props.yesOutcomeId);
       seeds.set(outcomeKey, props.yesPrice);
