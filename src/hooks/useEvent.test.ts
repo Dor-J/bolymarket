@@ -8,11 +8,11 @@ import {
 } from "@/test/test-utils";
 import { useEvent } from "./useEvent";
 
-vi.mock("@/lib/api/gamma", () => ({
-  fetchEventBySlug: vi.fn(),
+vi.mock("@/lib/api/eventsClient", () => ({
+  fetchEventBySlugClient: vi.fn(),
 }));
 
-import { fetchEventBySlug } from "@/lib/api/gamma";
+import { fetchEventBySlugClient } from "@/lib/api/eventsClient";
 
 describe("useEvent", () => {
   it("returns a cached event without calling the API", async () => {
@@ -34,7 +34,7 @@ describe("useEvent", () => {
     });
 
     expect(result.current.data?.slug).toBe("cached-slug");
-    expect(fetchEventBySlug).not.toHaveBeenCalled();
+    expect(fetchEventBySlugClient).not.toHaveBeenCalled();
   });
 
   it("falls back to fetchEventBySlug on a cold cache", async () => {
@@ -44,7 +44,7 @@ describe("useEvent", () => {
       title: "Cold Event",
     });
 
-    vi.mocked(fetchEventBySlug).mockResolvedValueOnce(fetchedEvent);
+    vi.mocked(fetchEventBySlugClient).mockResolvedValueOnce(fetchedEvent);
 
     const { result } = renderHookWithProviders(() => useEvent("cold-slug"));
 
@@ -52,7 +52,7 @@ describe("useEvent", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(fetchEventBySlug).toHaveBeenCalledWith("cold-slug");
+    expect(fetchEventBySlugClient).toHaveBeenCalledWith("cold-slug");
     expect(result.current.data?.title).toBe("Cold Event");
   });
 });

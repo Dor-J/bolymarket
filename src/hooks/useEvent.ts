@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { eventsQueryOptions } from "@/lib/api/queries";
-import { fetchEventBySlug } from "@/lib/api/gamma";
+import { fetchEventBySlugClient } from "@/lib/api/eventsClient";
 import type { Event } from "@/types/polymarket";
 
 /**
@@ -23,7 +23,7 @@ export function useEvent(slug: string) {
         return fromList;
       }
 
-      const event = await fetchEventBySlug(slug);
+      const event = await fetchEventBySlugClient(slug);
 
       if (!event) {
         throw new Error("Event not found");

@@ -1,18 +1,19 @@
 import { waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getOpenEvents } from "@/lib/api/gamma";
+import { fetchEventsClient } from "@/lib/api/eventsClient";
 import { mockEvents } from "@/test/fixtures/events";
 import {
   createTestQueryClient,
+  EVENTS_QUERY_KEY,
   renderHookWithProviders,
 } from "@/test/test-utils";
 import { useEvents } from "./useEvents";
 
-vi.mock("@/lib/api/gamma", () => ({
-  getOpenEvents: vi.fn(),
+vi.mock("@/lib/api/eventsClient", () => ({
+  fetchEventsClient: vi.fn(),
 }));
 
-const mockedGetOpenEvents = vi.mocked(getOpenEvents);
+const mockedFetchEventsClient = vi.mocked(fetchEventsClient);
 
 describe("useEvents", () => {
   beforeEach(() => {
@@ -20,7 +21,9 @@ describe("useEvents", () => {
   });
 
   it("returns loading state initially", () => {
-    mockedGetOpenEvents.mockImplementation(() => new Promise(() => undefined));
+    mockedFetchEventsClient.mockImplementation(
+      () => new Promise(() => undefined),
+    );
 
     const { result } = renderHookWithProviders(() => useEvents());
 
@@ -29,7 +32,7 @@ describe("useEvents", () => {
   });
 
   it("returns events on success", async () => {
-    mockedGetOpenEvents.mockResolvedValue(mockEvents);
+    mockedFetchEventsClient.mockResolvedValue(mockEvents);
 
     const { result } = renderHookWithProviders(() => useEvents());
 
@@ -38,11 +41,11 @@ describe("useEvents", () => {
     });
 
     expect(result.current.data).toEqual(mockEvents);
-    expect(mockedGetOpenEvents).toHaveBeenCalledTimes(1);
+    expect(mockedFetchEventsClient).toHaveBeenCalledTimes(1);
   });
 
   it("returns error on failure", async () => {
-    mockedGetOpenEvents.mockRejectedValue(new Error("Gamma API error"));
+    mockedFetchEventsClient.mockRejectedValue(new Error("Events API error"));
 
     const { result } = renderHookWithProviders(() => useEvents());
 
@@ -50,20 +53,18 @@ describe("useEvents", () => {
       expect(result.current.isError).toBe(true);
     });
 
-    expect(result.current.error).toEqual(new Error("Gamma API error"));
-    expect(mockedGetOpenEvents).toHaveBeenCalledTimes(1);
+    expect(result.current.error).toEqual(new Error("Events API error"));
+    expect(mockedFetchEventsClient).toHaveBeenCalledTimes(1);
   });
 
   it("uses the open events query key", async () => {
-    mockedGetOpenEvents.mockResolvedValue(mockEvents);
+    mockedFetchEventsClient.mockResolvedValue(mockEvents);
 
     const queryClient = createTestQueryClient();
     renderHookWithProviders(() => useEvents(), { queryClient });
 
     await waitFor(() => {
-      expect(queryClient.getQueryData(["events", { closed: false }])).toEqual(
-        mockEvents,
-      );
+      expect(queryClient.getQueryData(EVENTS_QUERY_KEY)).toEqual(mockEvents);
     });
   });
 });
