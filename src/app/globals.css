@@ -186,3 +186,40 @@ body {
 .route-progress-bar {
   animation: route-progress 600ms ease-out forwards;
 }
+
+@keyframes price-flash-up {
+  0% {
+    background-color: rgb(48 161 89 / 0.22);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes price-flash-down {
+  0% {
+    background-color: rgb(226 57 57 / 0.18);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+.price-flash-up {
+  animation: price-flash-up 700ms ease-out;
+  border-radius: 4px;
+}
+
+.price-flash-down {
+  animation: price-flash-down 700ms ease-out;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .price-flash-up,
+  .price-flash-down {
+    animation: none !important;
+  }
+}

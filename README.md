@@ -58,7 +58,7 @@ bun run format:check
 | 1 — App shell    | Complete | TopBar, CategoryNav, category filter          |
 | 2 — Events grid  | Complete | BinaryCard, MultiOutcomeCard, responsive grid |
 | 3 — Event detail | Complete | `/event/[slug]`, chart, outcome rows          |
-| 4 — Realtime     | Planned  | Live prices, flash animations                 |
+| 4 — Realtime     | Complete | Live simulation, flash, leaf-only updates     |
 
 ## Architecture (overview)
 
@@ -69,11 +69,12 @@ Gamma API → React Query cache → normalized Event / Market / Outcome types
                                       ↓
               useEvent(slug) → EventDetailPage
                                       ↓
-              marketPriceAtomFamily → PriceDisplay (Phase 4)
+              outcomePriceAtomFamily → PriceDisplay / ProbabilityBar / YesNoChip
 ```
 
 - **Structural data** lives in React Query (events list, single event by slug).
-- **UI filter state** (`selectedCategoryAtom`) and **live prices** (Phase 4) live in Jotai.
+- **Live prices** live in Jotai `outcomePriceAtomFamily` — one atom per `${marketId}:${outcomeId}`.
+- **UI filter state** (`selectedCategoryAtom`) lives in Jotai.
 - **Card variant:** single market with 2 outcomes → `BinaryCard`; otherwise → `MultiOutcomeCard`.
 
 ## Routing
@@ -90,7 +91,18 @@ back to Gamma API fetch by slug on direct URL visits.
 
 Historical chart lines use **simulated data** from `lib/chart/generateChartData.ts`, seeded from
 current outcome prices. This is sufficient for the assignment — prioritize accurate **current**
-prices over historical accuracy. Live ticks arrive in Phase 4.
+prices over historical accuracy.
+
+## Realtime approach
+
+- **Source:** Client-side random-walk simulation (±0.5–2% per tick, clamped 0.01–0.99), seeded from
+  Gamma API prices on mount — not Polymarket CLOB WebSocket data.
+- **State:** Jotai `outcomePriceAtomFamily` keyed by `${marketId}:${outcomeId}`; React Query holds
+  structural event data only.
+- **Updates:** Batched via `requestAnimationFrame` coalescing; only leaf components
+  (`PriceDisplay`, `ProbabilityBar`, `YesNoChip`) subscribe via `useAtomValue`.
+- **UX:** Green/red flash ~700ms on direction change; probability bars animate width over 300ms;
+  `prefers-reduced-motion` disables flash animations.
 
 ## Trading
 
@@ -105,6 +117,7 @@ Detailed implementation plans live in `../plans/`:
 - [PLAN-Phase-1-App-Shell-Category-Nav.md](../plans/PLAN-Phase-1-App-Shell-Category-Nav.md)
 - [PLAN-Phase-2-Events-Grid.md](../plans/PLAN-Phase-2-Events-Grid.md)
 - [PLAN-Phase-3-Event-Detail.md](../plans/PLAN-Phase-3-Event-Detail.md)
+- [PLAN-Phase-4-Realtime-Prices.md](../plans/PLAN-Phase-4-Realtime-Prices.md)
 
 ## Assignment scope
 
