@@ -4,6 +4,9 @@ export const REDIS_EVENTS_KEY = "bolymarket:events:open";
 /** Server-side Redis key prefix for single events. */
 export const REDIS_EVENT_SLUG_PREFIX = "bolymarket:event:";
 
+/** Server-side Redis key prefix for per-tag event lists. */
+export const REDIS_EVENTS_TAG_PREFIX = "bolymarket:events:tag:";
+
 /** Default TTL for events cache (1 minute). */
 export const EVENTS_CACHE_TTL_MS = 60_000;
 
