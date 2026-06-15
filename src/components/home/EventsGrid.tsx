@@ -1,16 +1,14 @@
-'use client';
+"use client";
 
-import { useMemo } from 'react';
-import { EventCard } from '@/components/cards/EventCard';
-import { useFilteredEvents } from '@/hooks/useFilteredEvents';
-import { useLivePrices } from '@/hooks/useLivePrices';
-import { getVisibleOutcomeSeedsFromEvents } from '@/lib/prices/visibleOutcomeKeys';
-import { EventListEmpty } from './EventListEmpty';
-import { EventsGridError } from './EventsGridError';
-import { EventsGridSkeleton } from './EventsGridSkeleton';
-
-const gridClasses =
-  'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 min-[1300px]:grid-cols-4';
+import { useMemo } from "react";
+import { EventCard } from "@/components/cards/EventCard";
+import { EVENTS_GRID_CLASSES } from "@/lib/constants/eventsGrid";
+import { useFilteredEvents } from "@/hooks/useFilteredEvents";
+import { useLivePrices } from "@/hooks/useLivePrices";
+import { getVisibleOutcomeSeedsFromEvents } from "@/lib/prices/visibleOutcomeKeys";
+import { EventListEmpty } from "./EventListEmpty";
+import { EventsGridError } from "./EventsGridError";
+import { EventsGridSkeleton } from "./EventsGridSkeleton";
 
 /**
  * Responsive home events grid with loading, empty, and error states.
@@ -56,7 +54,7 @@ export function EventsGrid() {
         All markets
       </h2>
 
-      <div className={gridClasses}>
+      <div className={EVENTS_GRID_CLASSES}>
         {events.map((event) => (
           <EventCard key={event.id} event={event} />
         ))}

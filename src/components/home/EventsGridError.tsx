@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/Button';
+import { useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/Button";
 
 export interface EventsGridErrorProps {
   message?: string;
@@ -17,13 +17,13 @@ export function EventsGridError({ message, onRetry }: EventsGridErrorProps) {
   return (
     <div className="rounded-card border border-border bg-card p-6 text-center">
       <p className="text-sm leading-5 text-text">
-        {message ?? 'Failed to load markets.'}
+        {message ?? "Failed to load markets."}
       </p>
       <Button
         variant="brand"
         className="mt-4"
         onClick={() => {
-          void queryClient.invalidateQueries({ queryKey: ['events'] });
+          void queryClient.invalidateQueries({ queryKey: ["events"] });
           onRetry?.();
         }}
       >
