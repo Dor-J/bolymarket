@@ -1,4 +1,7 @@
 import "@testing-library/jest-dom/vitest";
+import { vi } from "vitest";
+
+vi.mock("server-only", () => ({}));
 
 const localStorageMock = (() => {
   let store = new Map<string, string>();

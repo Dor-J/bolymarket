@@ -115,11 +115,15 @@ URLs fetch by slug.
 
 | Route           | Description                                                           |
 | --------------- | --------------------------------------------------------------------- |
-| `/`             | Home — category nav + responsive events grid                          |
-| `/event/[slug]` | Event detail — header, chart, outcome rows, order sidebar placeholder |
+| `/`             | Home — featured carousel, category nav, responsive events grid        |
+| `/crypto`       | Crypto markets — tag-specific fetch via `/api/events?tag=crypto`      |
+| `/sports`       | Sports markets — tag-specific fetch via `/api/events?tag=sports`      |
+| `/politics`     | Politics markets — tag-specific fetch via `/api/events?tag=politics` |
+| `/event/[slug]` | Event detail — header, CLOB chart, outcome rows, order ticket UI      |
+| `/api-docs`     | Interactive Swagger UI — OpenAPI explorer for REST routes           |
 
-Dedicated `/crypto` and `/sports` bonus routes were **not** implemented; filtering uses the home
-category nav only.
+Category nav uses Next.js links with URL-based active state. Home (`/`) still shows aggregated
+trending + category data; dedicated routes fetch per-tag lists from Gamma.
 
 ## Realtime approach
 
@@ -135,20 +139,42 @@ category nav only.
 
 ## Chart data
 
-Historical chart lines use **simulated data** from `lib/chart/generateChartData.ts`, seeded from
-current outcome prices. Only the **current** price reflects live simulation ticks; past points are
-for visualization only.
+Historical chart lines use the **Polymarket CLOB** `/prices-history` endpoint via
+`/api/prices/[tokenId]` (server-cached ~45s). When CLOB data is unavailable or empty, the chart
+falls back to simulated history from `lib/chart/generateChartData.ts`. The latest point is always
+synced to live Jotai price atoms.
+
+## Chrome & UX
+
+- **Search:** Debounced client filter (300ms) with `/` keyboard shortcut to focus the input.
+- **Auth:** Visual-only Log In / Sign Up modals (no real authentication).
+- **Mobile nav:** Slide-in drawer with category links and auth actions.
+- **Bookmarks:** Persisted to `localStorage` via `bookmarksAtom`.
+- **Share / Embed:** Web Share API with clipboard fallback; embed code popover on event detail.
+- **Dark mode:** Toggle in top bar; persisted theme with pre-hydration script to avoid flash.
+- **Motion:** Card hover lift, route progress bar, page fade, modal/drawer transitions; respects
+  `prefers-reduced-motion`.
 
 ## Limitations
 
 - **Prices:** Live via Polymarket activity WebSocket when connected; simulation fills gaps in `auto`
   mode. Not a full CLOB order-book feed.
-- **Chart:** Historical lines are generated for visualization; only the current price reflects live
-  ticks.
-- **Trading:** Order sidebar is a non-functional placeholder.
-- **Scope:** No wallet, authentication, portfolio, or order execution.
-- **Theme:** Light-theme polish is the priority; dark tokens exist but were not fully QA'd.
-- **Bonus pages:** No dedicated `/crypto` or `/sports` routes — category filter on `/` only.
+- **Chart:** CLOB history may be sparse or rate-limited; simulated fallback keeps UX intact.
+- **Trading:** Order ticket is visual-only — "Sign up to trade" CTA is disabled.
+- **Scope:** No wallet, real authentication, portfolio, or order execution.
+- **Search:** Client-side filter on cached events only (no Gamma `/public-search`).
+
+## API documentation
+
+Interactive **Swagger UI** is available at [`/api-docs`](http://localhost:3000/api-docs) when the
+dev server is running.
+
+| Endpoint | Description |
+| -------- | ----------- |
+| `GET /api/openapi` | OpenAPI 3.1 JSON specification |
+| `GET /api/events` | List open events (`?tag=crypto\|sports\|politics` optional) |
+| `GET /api/events/{slug}` | Single event by slug |
+| `GET /api/prices/{tokenId}` | CLOB price history (`?timeframe=1d` optional) |
 
 ## Performance
 
@@ -169,10 +195,12 @@ bun run test
 
 Coverage includes:
 
-- Gamma fetch/normalize, card mapping, category filters, price simulation utilities
-- Hooks: `useEvents`, `useFilteredEvents`, `useEvent`, `useLivePrices`, `usePriceFlash`,
-  `useReducedMotion`, `useChartTimeframe`
-- Component smoke tests: `EventsGrid` (loading / error / empty / success), `EventListEmpty`
+- Gamma fetch/normalize, CLOB chart normalizer, per-tag server cache, card mapping, category filters
+- Hooks: `useEvents`, `useFilteredEvents`, `useCategoryEvents`, `useEvent`, `useLivePrices`,
+  `usePriceFlash`, `useReducedMotion`, `useChartTimeframe`
+- Component tests: `EventsGrid`, `CategoryNav`, `CategoryPageView`, `FeaturedCarousel`, `OrderTicket`,
+  `EventListEmpty`
+- Atoms: bookmarks, category route validation
 
 Shared test helpers: `src/test/test-utils.tsx` (`renderHookWithProviders`, `renderWithProviders`).
 
