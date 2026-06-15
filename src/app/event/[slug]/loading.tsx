@@ -1,5 +1,5 @@
-import { PageContainer } from '@/components/layout/PageContainer';
-import { EventDetailSkeleton } from '@/components/event/EventDetailSkeleton';
+import { PageContainer } from "@/components/layout/PageContainer";
+import { EventDetailSkeleton } from "@/components/event/EventDetailSkeleton";
 
 export default function EventLoading() {
   return (

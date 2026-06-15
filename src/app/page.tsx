@@ -1,5 +1,5 @@
-import { PageContainer } from '@/components/layout/PageContainer';
-import { EventsGrid } from '@/components/home/EventsGrid';
+import { PageContainer } from "@/components/layout/PageContainer";
+import { EventsGrid } from "@/components/home/EventsGrid";
 
 export default function Home() {
   return (

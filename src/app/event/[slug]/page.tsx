@@ -1,5 +1,5 @@
-import { PageContainer } from '@/components/layout/PageContainer';
-import { EventDetailPage } from '@/components/event/EventDetailPage';
+import { PageContainer } from "@/components/layout/PageContainer";
+import { EventDetailPage } from "@/components/event/EventDetailPage";
 
 interface EventPageProps {
   params: Promise<{ slug: string }>;
