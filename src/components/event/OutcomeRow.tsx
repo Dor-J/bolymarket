@@ -55,6 +55,7 @@ export const OutcomeRow = memo(function OutcomeRow({
 
       <ProbabilityBar
         marketId={marketId}
+        yesOutcomeId={outcomeId}
         yesPrice={yesPrice}
         className="mt-3"
       />

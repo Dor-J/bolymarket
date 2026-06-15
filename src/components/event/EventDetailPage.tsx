@@ -6,8 +6,10 @@ import { TimeframeToggle } from '@/components/chart/TimeframeToggle';
 import { getOutcomeColor } from '@/lib/chart/colors';
 import type { ChartOutcome } from '@/lib/chart/types';
 import { getChartOutcomes } from '@/lib/event/flattenOutcomes';
+import { getOutcomeSeedsFromEvent } from '@/lib/prices/visibleOutcomeKeys';
 import { useChartTimeframe } from '@/hooks/useChartTimeframe';
 import { useEvent } from '@/hooks/useEvent';
+import { useLivePrices } from '@/hooks/useLivePrices';
 import { ChartMetaRow } from './ChartMetaRow';
 import { EventDetailError } from './EventDetailError';
 import { EventDetailSkeleton } from './EventDetailSkeleton';
@@ -40,6 +42,13 @@ export function EventDetailPage({ slug }: EventDetailPageProps) {
       color: getOutcomeColor(index),
     }));
   }, [event]);
+
+  const priceSeeds = useMemo(
+    () => (event ? getOutcomeSeedsFromEvent(event) : []),
+    [event],
+  );
+
+  useLivePrices(priceSeeds);
 
   if (isLoading) {
     return <EventDetailSkeleton />;
