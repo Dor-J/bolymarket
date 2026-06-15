@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
+import { useMemo } from 'react';
+import { useQueries } from '@tanstack/react-query';
 import {
   CartesianGrid,
   Line,
@@ -9,12 +10,14 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
-import { getOutcomeColor } from "@/lib/chart/colors";
-import { generateChartData } from "@/lib/chart/generateChartData";
-import type { ChartOutcome, Timeframe } from "@/lib/chart/types";
-import { formatPercent } from "@/lib/format/price";
-import { cn } from "@/lib/cn";
+} from 'recharts';
+import { getOutcomeColor } from '@/lib/chart/colors';
+import { generateChartData } from '@/lib/chart/generateChartData';
+import { mergeChartSeries } from '@/lib/api/clob';
+import { priceHistoryQueryOptions } from '@/lib/api/queries';
+import type { ChartOutcome, Timeframe } from '@/lib/chart/types';
+import { formatPercent } from '@/lib/format/price';
+import { cn } from '@/lib/cn';
 
 export interface PriceChartProps {
   outcomes: ChartOutcome[];
@@ -24,7 +27,7 @@ export interface PriceChartProps {
 }
 
 /**
- * Multi-line price chart with simulated historical data.
+ * Multi-line price chart with real CLOB history and simulated fallback.
  */
 export function PriceChart({
   outcomes,
@@ -32,9 +35,22 @@ export function PriceChart({
   timeframe,
   className,
 }: PriceChartProps) {
-  const chartData = useMemo(
-    () =>
-      generateChartData(
+  const historyQueries = useQueries({
+    queries: outcomes.map((outcome) =>
+      priceHistoryQueryOptions(outcome.id, timeframe),
+    ),
+  });
+
+  const chartData = useMemo(() => {
+    const allFailedOrEmpty = historyQueries.every(
+      (query) =>
+        query.isError ||
+        !query.data ||
+        (Array.isArray(query.data) && query.data.length === 0),
+    );
+
+    if (allFailedOrEmpty) {
+      return generateChartData(
         outcomes.map((outcome) => ({
           id: outcome.id,
           name: outcome.name,
@@ -42,17 +58,46 @@ export function PriceChart({
         })),
         timeframe,
         eventId,
-      ),
-    [eventId, outcomes, timeframe],
-  );
+      );
+    }
+
+    const series = historyQueries.map((query) => query.data ?? []);
+    const merged = mergeChartSeries(
+      series,
+      outcomes.map((outcome) => outcome.id),
+    );
+
+    if (merged.length === 0) {
+      return generateChartData(
+        outcomes.map((outcome) => ({
+          id: outcome.id,
+          name: outcome.name,
+          price: outcome.price,
+        })),
+        timeframe,
+        eventId,
+      );
+    }
+
+    const lastPoint = merged[merged.length - 1];
+    if (!lastPoint) {
+      return merged;
+    }
+
+    for (const outcome of outcomes) {
+      lastPoint[outcome.id] = outcome.price;
+    }
+
+    return merged;
+  }, [eventId, historyQueries, outcomes, timeframe]);
 
   if (outcomes.length === 0) {
     return null;
   }
 
   return (
-    <div className={cn("relative w-full", className)}>
-      <div className="pointer-events-none absolute right-4 top-1/2 z-10 -translate-y-1/2 text-xs font-semibold tracking-[0.2em] text-[#aeb4bc]/40 uppercase">
+    <div className={cn('relative w-full', className)}>
+      <div className="pointer-events-none absolute top-1/2 right-4 z-10 -translate-y-1/2 text-xs font-semibold tracking-[0.2em] text-[#aeb4bc]/40 uppercase">
         bolymarket
       </div>
 
@@ -65,7 +110,7 @@ export function PriceChart({
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
               dataKey="label"
-              tick={{ fill: "#77808d", fontSize: 12 }}
+              tick={{ fill: '#77808d', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               minTickGap={24}
@@ -74,7 +119,7 @@ export function PriceChart({
               orientation="right"
               domain={[0, 1]}
               tickFormatter={(value: number) => formatPercent(value)}
-              tick={{ fill: "#77808d", fontSize: 12 }}
+              tick={{ fill: '#77808d', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               width={48}
@@ -82,7 +127,7 @@ export function PriceChart({
             <Tooltip
               formatter={(value, name) => {
                 const numericValue =
-                  typeof value === "number" ? value : Number(value ?? 0);
+                  typeof value === 'number' ? value : Number(value ?? 0);
                 const seriesName = String(name);
                 const outcome = outcomes.find((item) => item.id === seriesName);
 
@@ -93,9 +138,9 @@ export function PriceChart({
               }}
               labelFormatter={(label) => String(label)}
               contentStyle={{
-                borderRadius: "8px",
-                borderColor: "var(--border)",
-                background: "var(--card)",
+                borderRadius: '8px',
+                borderColor: 'var(--border)',
+                background: 'var(--card)',
               }}
             />
             {outcomes.map((outcome, index) => (

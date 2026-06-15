@@ -10,11 +10,12 @@ import { getOutcomeSeedsFromEvent } from "@/lib/prices/visibleOutcomeKeys";
 import { useChartTimeframe } from "@/hooks/useChartTimeframe";
 import { useEvent } from "@/hooks/useEvent";
 import { useLivePrices } from "@/hooks/useLivePrices";
+import { getYesNoFromMarket } from "@/lib/cards/mapEventToCardProps";
 import { ChartMetaRow } from "./ChartMetaRow";
 import { EventDetailError } from "./EventDetailError";
 import { EventDetailSkeleton } from "./EventDetailSkeleton";
 import { EventHeader } from "./EventHeader";
-import { OrderSidebarPlaceholder } from "./OrderSidebarPlaceholder";
+import { OrderTicket } from "./OrderTicket";
 import { OutcomeLegend } from "./OutcomeLegend";
 import { OutcomeList } from "./OutcomeList";
 
@@ -47,6 +48,16 @@ export function EventDetailPage({ slug }: EventDetailPageProps) {
     () => (event ? getOutcomeSeedsFromEvent(event) : []),
     [event],
   );
+
+  const primaryMarket = useMemo(() => {
+    if (!event || event.markets.length === 0) {
+      return null;
+    }
+
+    const market = event.markets[0];
+    const { yesPrice, noPrice, yesOutcomeId } = getYesNoFromMarket(market);
+    return { marketId: market.id, yesOutcomeId, yesPrice, noPrice };
+  }, [event]);
 
   useLivePrices(priceSeeds);
 
@@ -82,7 +93,15 @@ export function EventDetailPage({ slug }: EventDetailPageProps) {
         <OutcomeList event={event} />
       </div>
 
-      <OrderSidebarPlaceholder className="w-full shrink-0 lg:sticky lg:top-[calc(var(--navbar-height)+1rem)] lg:w-[360px]" />
+      {primaryMarket ? (
+        <OrderTicket
+          marketId={primaryMarket.marketId}
+          yesOutcomeId={primaryMarket.yesOutcomeId}
+          yesPrice={primaryMarket.yesPrice}
+          noPrice={primaryMarket.noPrice}
+          className="w-full shrink-0 lg:sticky lg:top-[calc(var(--navbar-height)+1rem)] lg:w-[360px]"
+        />
+      ) : null}
     </div>
   );
 }
