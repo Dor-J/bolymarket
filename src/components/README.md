@@ -51,9 +51,9 @@ components/
 
 | Component         | Notes                                     |
 | ----------------- | ----------------------------------------- |
-| `PriceDisplay`    | Leaf — atom-ready % display; tabular nums |
-| `YesNoChip`       | Green/red chip; stopPropagation on card   |
-| `ProbabilityBar`  | §12.3 — animated width (Phase 4 ticks)    |
+| `PriceDisplay`    | Leaf — outcome-scoped atom + flash animation |
+| `YesNoChip`       | Green/red chip; derives No from Yes atom     |
+| `ProbabilityBar`  | §12.3 — live width from Yes outcome atom     |
 | `MarketThumbnail` | 24px circular image + initial fallback    |
 
 ### `chart/` — Phase 3 (complete)

@@ -1,7 +1,10 @@
 'use client';
 
+import { useMemo } from 'react';
 import { EventCard } from '@/components/cards/EventCard';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
+import { useLivePrices } from '@/hooks/useLivePrices';
+import { getVisibleOutcomeSeedsFromEvents } from '@/lib/prices/visibleOutcomeKeys';
 import { EventListEmpty } from './EventListEmpty';
 import { EventsGridError } from './EventsGridError';
 import { EventsGridSkeleton } from './EventsGridSkeleton';
@@ -15,6 +18,12 @@ const gridClasses =
 export function EventsGrid() {
   const { events, isLoading, isError, error, refetch, isFetching } =
     useFilteredEvents();
+  const priceSeeds = useMemo(
+    () => getVisibleOutcomeSeedsFromEvents(events),
+    [events],
+  );
+
+  useLivePrices(priceSeeds);
 
   if (isLoading) {
     return <EventsGridSkeleton />;
