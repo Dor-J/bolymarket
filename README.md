@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# bolymarket
 
-## Getting Started
+bolymarket is a Next.js App Router implementation of the PLAEE frontend assignment. The goal is to
+replicate the core Polymarket experience with high UI fidelity, responsive layouts, live price
+updates, and clean state management.
 
-First, run the development server:
+## Repository layout
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+This app is the git repository. It lives inside the broader `BoliMarket/` workspace, which also
+contains `design-system/` and `plans/` reference material at the workspace root.
+
+```text
+BoliMarket/           # workspace root
+├── design-system/
+├── plans/
+└── bolymarket/       # this repo — run all commands here
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js 16
+- TypeScript
+- Tailwind CSS v4
+- Jotai for UI and realtime price state
+- TanStack React Query for API data caching
+- Zod for API validation
+- Lucide React for icons
+- Motion for subtle UI animation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Development
 
-## Learn More
+From `bolymarket/`:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+bun install
+bun run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open `http://localhost:3000`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Quality commands
 
-## Deploy on Vercel
+```bash
+bun run lint
+bun run build
+bun run format:check
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Planning
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Implementation starts with Phase 0: foundation setup before product UI.
+
+See `../plans/PLAN-Phase-0-Foundation.md` for the detailed foundation plan covering tokens, Inter
+font setup, Tailwind theme mapping, providers, the Gamma API layer, normalized types, atoms, and
+exit criteria.
+
+## Assignment scope
+
+The app will focus on:
+
+- Events grid matching the Polymarket homepage layout
+- Category navigation with client-side filtering
+- Event detail page with markets, prices, and probability bars
+- Live price updates through WebSocket or convincing simulation
+- Loading, empty, and error states
+- Performance-conscious state boundaries using React Query and Jotai
+
+Trading, wallet connection, auth, portfolio features, and order execution are intentionally out of
+scope for this assignment.
