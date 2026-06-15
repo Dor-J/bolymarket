@@ -9,6 +9,20 @@ const DEFAULT_CONFIG: SimulationConfig = {
   maxStep: 0.015,
 };
 
+function areOutcomeKeysEqual(current: string[], next: string[]): boolean {
+  if (current.length !== next.length) {
+    return false;
+  }
+
+  for (let index = 0; index < current.length; index += 1) {
+    if (current[index] !== next[index]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 /**
  * Creates a random-walk simulation engine for visible outcome price keys.
  */
@@ -40,6 +54,14 @@ export function createSimulationEngine(
 
   return {
     start(outcomeKeys: string[], store: Store) {
+      if (
+        intervalId !== null &&
+        activeStore === store &&
+        areOutcomeKeysEqual(activeKeys, outcomeKeys)
+      ) {
+        return;
+      }
+
       this.stop();
       activeKeys = outcomeKeys;
       activeStore = store;

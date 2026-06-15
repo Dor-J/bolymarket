@@ -41,6 +41,25 @@ describe("createSimulationEngine", () => {
     expect(store.get(outcomePriceAtomFamily("m1:yes"))?.value).not.toBe(0.5);
   });
 
+  it("does not restart when outcome keys are unchanged", () => {
+    const store = createStore();
+    const setIntervalSpy = vi.spyOn(globalThis, "setInterval");
+    const clearIntervalSpy = vi.spyOn(globalThis, "clearInterval");
+
+    const engine = createSimulationEngine({ intervalMs: 1000, maxStep: 0.02 });
+    engine.start(["m1:yes"], store);
+    const intervalCallsAfterFirstStart = setIntervalSpy.mock.calls.length;
+
+    engine.start(["m1:yes"], store);
+
+    expect(setIntervalSpy.mock.calls.length).toBe(intervalCallsAfterFirstStart);
+    expect(clearIntervalSpy).not.toHaveBeenCalled();
+
+    engine.stop();
+    setIntervalSpy.mockRestore();
+    clearIntervalSpy.mockRestore();
+  });
+
   it("stops scheduling ticks after stop()", () => {
     const store = createStore();
     seedOutcomePrice(store, "m1:yes", 0.5);

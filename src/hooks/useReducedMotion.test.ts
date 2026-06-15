@@ -1,6 +1,9 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { useReducedMotion } from "./useReducedMotion";
+import {
+  resetReducedMotionListenerForTests,
+  useReducedMotion,
+} from "./useReducedMotion";
 
 function createMatchMedia(matches: boolean) {
   const listeners = new Set<() => void>();
@@ -24,6 +27,7 @@ function createMatchMedia(matches: boolean) {
 
 describe("useReducedMotion", () => {
   afterEach(() => {
+    resetReducedMotionListenerForTests();
     vi.unstubAllGlobals();
   });
 

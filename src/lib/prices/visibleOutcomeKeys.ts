@@ -57,3 +57,13 @@ export function getOutcomeSeedsFromEvent(event: Event): OutcomePriceSeed[] {
 export function getOutcomeKeysFromSeeds(seeds: OutcomePriceSeed[]): string[] {
   return seeds.map((seed) => seed.outcomeKey);
 }
+
+/**
+ * Stable signature of outcome keys (order-independent) for effect dependencies.
+ */
+export function getOutcomeKeysSignature(seeds: OutcomePriceSeed[]): string {
+  return getOutcomeKeysFromSeeds(seeds)
+    .slice()
+    .sort()
+    .join("|");
+}

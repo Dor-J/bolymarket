@@ -81,4 +81,28 @@ describe("useLivePrices", () => {
 
     expect(clearIntervalSpy).toHaveBeenCalled();
   });
+
+  it("does not restart the engine when seeds get a new array reference with the same keys", async () => {
+    const clearIntervalSpy = vi.spyOn(globalThis, "clearInterval");
+    const seeds = [{ outcomeKey: "market-1:outcome-yes", price: 0.6 }];
+    const { rerender } = renderHookWithProviders(
+      ({ nextSeeds }) => useLivePrices(nextSeeds),
+      { initialProps: { nextSeeds: seeds } },
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    clearIntervalSpy.mockClear();
+
+    rerender({ nextSeeds: [...seeds] });
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(clearIntervalSpy).not.toHaveBeenCalled();
+    clearIntervalSpy.mockRestore();
+  });
 });

@@ -65,5 +65,5 @@ export function useLivePrices(seeds: OutcomePriceSeed[]): void {
     return () => {
       engine.stop();
     };
-  }, [store, outcomeKeys, outcomeKeysSignature]);
+  }, [store, outcomeKeys]);
 }
