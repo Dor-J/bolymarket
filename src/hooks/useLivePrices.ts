@@ -1,35 +1,32 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef } from "react";
-import { useStore } from "jotai";
+import { useEffect, useMemo } from 'react';
+import { useStore } from 'jotai';
 import {
   commitOutcomePriceTick,
   pruneStaleOutcomePrices,
-} from "@/lib/atoms/prices";
-import { seedOutcomePrices } from "@/lib/atoms/seedPrices";
-import { configureCoalesceFlush } from "@/lib/prices/coalesceTicks";
-import type { OutcomePriceSeed } from "@/lib/prices/visibleOutcomeKeys";
+} from '@/lib/atoms/prices';
+import { seedOutcomePrices } from '@/lib/atoms/seedPrices';
+import { configureCoalesceFlush } from '@/lib/prices/coalesceTicks';
+import type { OutcomePriceSeed } from '@/lib/prices/visibleOutcomeKeys';
 import {
   getOutcomeKeysFromSeeds,
   getOutcomeKeysSignature,
-} from "@/lib/prices/visibleOutcomeKeys";
-import { createLivePriceEngine } from "@/lib/realtime/priceSourceFactory";
+} from '@/lib/prices/visibleOutcomeKeys';
+import { acquireLivePriceEngine } from '@/lib/realtime/livePriceEngineManager';
 
 function getSeedsSignature(seeds: OutcomePriceSeed[]): string {
   return seeds
     .map((seed) => `${seed.outcomeKey}:${seed.price.toFixed(6)}`)
     .sort()
-    .join("|");
+    .join('|');
 }
 
 /**
- * Seeds outcome price atoms and starts the simulation engine for visible keys.
+ * Seeds outcome price atoms and starts the shared live price engine for visible keys.
  */
 export function useLivePrices(seeds: OutcomePriceSeed[]): void {
   const store = useStore();
-  const engineRef = useRef(createLivePriceEngine());
-  const seedsRef = useRef(seeds);
-  seedsRef.current = seeds;
 
   const seedsSignature = useMemo(() => getSeedsSignature(seeds), [seeds]);
   const outcomeKeysSignature = useMemo(
@@ -52,18 +49,17 @@ export function useLivePrices(seeds: OutcomePriceSeed[]): void {
   }, [store]);
 
   useEffect(() => {
-    seedOutcomePrices(store, seedsRef.current);
-  }, [store, seedsSignature]);
+    seedOutcomePrices(store, seeds);
+  }, [store, seeds, seedsSignature]);
 
   useEffect(() => {
     const activeKeys = new Set(outcomeKeys);
     pruneStaleOutcomePrices(activeKeys);
 
-    const engine = engineRef.current;
-    engine.start(outcomeKeys, store, seedsRef.current);
+    const lease = acquireLivePriceEngine(store, outcomeKeys, seeds);
 
     return () => {
-      engine.stop();
+      lease.release();
     };
-  }, [store, outcomeKeys]);
+  }, [store, outcomeKeys, seedsSignature]);
 }

@@ -1,6 +1,7 @@
 import { act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { outcomePriceAtomFamily } from "@/lib/atoms/prices";
+import { resetLivePriceEngineForTests } from "@/lib/realtime/livePriceEngineManager";
 import { createJotaiStore, renderHookWithProviders } from "@/test/test-utils";
 import { useLivePrices } from "./useLivePrices";
 
@@ -23,6 +24,7 @@ describe("useLivePrices", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    resetLivePriceEngineForTests();
   });
 
   it("accepts empty seeds without throwing", () => {
@@ -87,6 +89,10 @@ describe("useLivePrices", () => {
     });
 
     unmount();
+
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
 
     expect(mockStop).toHaveBeenCalled();
   });

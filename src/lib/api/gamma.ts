@@ -29,9 +29,9 @@ async function fetchGammaEvents(
   const response = await fetch(
     `${GAMMA_API_BASE}/events?${params.toString()}`,
     {
-      headers: { Accept: "application/json" },
+      headers: { Accept: 'application/json' },
       signal,
-      next: { revalidate: 60 },
+      cache: 'no-store',
     },
   );
 
@@ -150,9 +150,9 @@ export async function fetchEventBySlug(
   const response = await fetch(
     `${GAMMA_API_BASE}/events?${params.toString()}`,
     {
-      headers: { Accept: "application/json" },
+      headers: { Accept: 'application/json' },
       signal: options.signal,
-      next: { revalidate: 60 },
+      cache: 'no-store',
     },
   );
 

@@ -2,19 +2,45 @@ import {
   ConnectionStatus,
   RealTimeDataClient,
   type Message,
-} from "@polymarket/real-time-data-client";
-import type { Store } from "jotai/vanilla/store";
-import { enqueuePriceTick } from "@/lib/prices/coalesceTicks";
-import type { OutcomePriceSeed } from "@/lib/prices/visibleOutcomeKeys";
+} from '@polymarket/real-time-data-client';
+import type { Store } from 'jotai/vanilla/store';
+import { enqueuePriceTick } from '@/lib/prices/coalesceTicks';
+import type { OutcomePriceSeed } from '@/lib/prices/visibleOutcomeKeys';
 import {
   buildRealtimeSubscriptionIndex,
   getRealtimeSubscriptionSignature,
-} from "./subscriptionIndex";
-import { clampTradePrice, parseTradePayload } from "./tradePayload";
-import type { PriceSource } from "./types";
+} from './subscriptionIndex';
+import { clampTradePrice, parseTradePayload } from './tradePayload';
+import type { PriceSource } from './types';
 
-const ACTIVITY_TOPIC = "activity";
-const TRADE_TYPES = new Set(["trades", "orders_matched"]);
+const ACTIVITY_TOPIC = 'activity';
+const TRADE_TYPES = new Set(['trades', 'orders_matched']);
+
+/**
+ * Suppresses the Polymarket client's noisy 1005 log on intentional disconnects.
+ */
+function disconnectClientQuietly(client: RealTimeDataClient): void {
+  const originalError = console.error;
+
+  console.error = (...args: unknown[]) => {
+    const isIntentionalClose =
+      args[0] === 'disconnected' &&
+      (args[2] === 1005 || args[2] === 1000) &&
+      (args[4] === '' || args[4] === 'Client shutdown');
+
+    if (isIntentionalClose) {
+      return;
+    }
+
+    originalError.apply(console, args);
+  };
+
+  try {
+    client.disconnect();
+  } finally {
+    console.error = originalError;
+  }
+}
 
 export interface WebSocketEngineOptions {
   /** When true, falls back to no-op ticks when disconnected. */
@@ -111,7 +137,7 @@ export function createWebSocketEngine(
       return;
     }
 
-    client.disconnect();
+    disconnectClientQuietly(client);
     client = null;
     connected = false;
   }
