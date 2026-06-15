@@ -61,6 +61,7 @@ Hook tests colocate with source files and use the shared wrapper in
 | --------------------------- | --------------------------------------------------------------- |
 | `useEvents.test.ts`         | Loading, success, error, query key                              |
 | `useFilteredEvents.test.ts` | Category filter, volume sort, error forwarding, category change |
+| `useEvent.test.ts`          | Cache-first slug lookup; cold-cache API fallback                 |
 | `useLivePrices.test.ts`     | Stub contract (Phase 4 `describe.todo` for live subscription)   |
 | `usePriceFlash.test.ts`     | Stub contract (Phase 4 `describe.todo` for flash styling)       |
 
@@ -73,6 +74,11 @@ Related pure-function tests:
 | `src/lib/format/volume.test.ts` | Volume abbreviations |
 | `src/lib/cards/resolveCardVariant.test.ts` | Binary vs multi-outcome routing |
 | `src/lib/cards/mapEventToCardProps.test.ts` | Event → card prop mapping |
+| `src/lib/format/date.test.ts` | ISO date formatting |
+| `src/lib/chart/generateChartData.test.ts` | Simulated chart series |
+| `src/lib/event/formatBreadcrumb.test.ts` | Detail breadcrumb labels |
+| `src/lib/event/flattenOutcomes.test.ts` | Detail outcome row flattening |
+| `src/lib/api/gamma.test.ts` | `fetchEventBySlug` happy path + errors |
 
 Mock event fixtures: [`src/test/fixtures/events.ts`](../test/fixtures/events.ts)
 
