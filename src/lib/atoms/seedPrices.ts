@@ -1,6 +1,6 @@
-import type { Store } from 'jotai/vanilla/store';
-import type { OutcomePriceSeed } from '@/lib/prices/visibleOutcomeKeys';
-import { seedOutcomePrice } from './prices';
+import type { Store } from "jotai/vanilla/store";
+import type { OutcomePriceSeed } from "@/lib/prices/visibleOutcomeKeys";
+import { seedOutcomePrice } from "./prices";
 
 /**
  * Seeds multiple outcome price atoms from API snapshot values.

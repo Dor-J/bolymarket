@@ -1,7 +1,7 @@
-import { atom } from 'jotai';
-import type { Store } from 'jotai/vanilla/store';
-import { atomFamily } from 'jotai/utils';
-import type { MarketPriceState } from '@/types/polymarket';
+import { atom } from "jotai";
+import type { Store } from "jotai/vanilla/store";
+import { atomFamily } from "jotai/utils";
+import type { MarketPriceState } from "@/types/polymarket";
 
 const PRICE_EPSILON = 1e-6;
 
