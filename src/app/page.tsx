@@ -1,11 +1,11 @@
-import { PageContainer } from "@/components/layout/PageContainer";
-import { FilteredEventList } from "@/components/home/FilteredEventList";
+import { PageContainer } from '@/components/layout/PageContainer';
+import { EventsGrid } from '@/components/home/EventsGrid';
 
 export default function Home() {
   return (
     <PageContainer>
       <h1 className="sr-only">Markets</h1>
-      <FilteredEventList />
+      <EventsGrid />
     </PageContainer>
   );
 }

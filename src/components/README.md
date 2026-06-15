@@ -29,17 +29,16 @@ components/
 | `PageContainer` | Server       | max-w 1350px, px-6 gutters               |
 | `Logo`          | Server       | bolymarket wordmark                      |
 
-### `home/` — Phase 1–2
+### `home/` — Phase 2 (complete)
 
-| Component            | Phase | Notes                                            |
-| -------------------- | ----- | ------------------------------------------------ |
-| `FilteredEventList`  | 1     | **Replace** with `EventsGrid` in Phase 2         |
-| `EventListSkeleton`  | 1     | **Replace** with `EventsGridSkeleton` in Phase 2 |
-| `EventListEmpty`     | 1     | Reuse for empty category filter                  |
-| `EventsGrid`         | 2     | Responsive card grid container                   |
-| `EventsGridSkeleton` | 2     | Skeleton grid matching card silhouette           |
+| Component            | Notes                                            |
+| -------------------- | ------------------------------------------------ |
+| `EventsGrid`         | Responsive card grid container                   |
+| `EventsGridSkeleton` | Skeleton grid matching card silhouette           |
+| `EventsGridError`    | Retry UI when events query fails                 |
+| `EventListEmpty`     | Empty category filter state                      |
 
-### `cards/` — Phase 2
+### `cards/` — Phase 2 (complete)
 
 | Component          | Notes                                                 |
 | ------------------ | ----------------------------------------------------- |
@@ -48,7 +47,7 @@ components/
 | `EventCard`        | Variant router: binary vs multi-outcome               |
 | `CardSkeleton`     | Shimmer placeholder matching card anatomy             |
 
-### `market/` — Phase 2 (reused in Phase 3)
+### `market/` — Phase 2 (complete, reused in Phase 3)
 
 | Component         | Notes                                     |
 | ----------------- | ----------------------------------------- |
@@ -82,8 +81,8 @@ components/
 | ---------------- | ------------------------------ |
 | `Button`         | ghost-brand, brand variants    |
 | `IconButton`     | Accessible icon-only control   |
-| `Chip`           | Phase 2 — shared chip styling  |
-| `BookmarkButton` | Phase 2 — non-functional heart |
+| `Chip`           | Shared Yes/No chip styling     |
+| `BookmarkButton` | Non-functional heart on cards  |
 
 ## Conventions
 

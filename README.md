@@ -56,7 +56,7 @@ bun run format:check
 | ---------------- | -------- | --------------------------------------------- |
 | 0 — Foundation   | Complete | Tokens, providers, Gamma API, types           |
 | 1 — App shell    | Complete | TopBar, CategoryNav, category filter          |
-| 2 — Events grid  | Planned  | BinaryCard, MultiOutcomeCard, responsive grid |
+| 2 — Events grid  | Complete | BinaryCard, MultiOutcomeCard, responsive grid |
 | 3 — Event detail | Planned  | `/event/[slug]`, chart, outcome rows          |
 | 4 — Realtime     | Planned  | Live prices, flash animations                 |
 
@@ -65,7 +65,7 @@ bun run format:check
 ```text
 Gamma API → React Query cache → normalized Event / Market / Outcome types
                                       ↓
-              useFilteredEvents + selectedCategoryAtom → EventsGrid (Phase 2)
+              useFilteredEvents + selectedCategoryAtom → EventsGrid
                                       ↓
               useEvent(slug) → EventDetailPage (Phase 3)
                                       ↓
