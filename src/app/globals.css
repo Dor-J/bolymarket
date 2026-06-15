@@ -222,4 +222,10 @@ body {
   .price-flash-down {
     animation: none !important;
   }
+
+  .route-progress-bar {
+    animation: none !important;
+    width: 100%;
+    opacity: 0;
+  }
 }
