@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useAtomValue } from 'jotai';
-import { outcomePriceAtomFamily } from '@/lib/atoms/prices';
-import { getOutcomePriceKey } from '@/lib/prices/outcomeKey';
-import { cn } from '@/lib/cn';
+import { useAtomValue } from "jotai";
+import { outcomePriceAtomFamily } from "@/lib/atoms/prices";
+import { getOutcomePriceKey } from "@/lib/prices/outcomeKey";
+import { cn } from "@/lib/cn";
 
 export interface ProbabilityBarProps {
   marketId: string;
@@ -30,7 +30,7 @@ export function ProbabilityBar({
   return (
     <div
       className={cn(
-        'flex h-2 w-full overflow-hidden rounded-full bg-surface-2',
+        "flex h-2 w-full overflow-hidden rounded-full bg-surface-2",
         className,
       )}
       role="presentation"

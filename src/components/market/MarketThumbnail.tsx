@@ -1,5 +1,5 @@
-import Image from 'next/image';
-import { cn } from '@/lib/cn';
+import Image from "next/image";
+import { cn } from "@/lib/cn";
 
 export interface MarketThumbnailProps {
   title: string;
@@ -17,7 +17,7 @@ export function MarketThumbnail({
   size = 24,
   className,
 }: MarketThumbnailProps) {
-  const initial = title.trim().charAt(0).toUpperCase() || '?';
+  const initial = title.trim().charAt(0).toUpperCase() || "?";
 
   if (image) {
     return (
@@ -26,7 +26,7 @@ export function MarketThumbnail({
         alt=""
         width={size}
         height={size}
-        className={cn('shrink-0 rounded-full object-cover', className)}
+        className={cn("shrink-0 rounded-full object-cover", className)}
         style={{ width: size, height: size }}
       />
     );
@@ -35,8 +35,8 @@ export function MarketThumbnail({
   return (
     <span
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-full bg-surface-2',
-        'text-[11px] leading-none font-semibold text-muted',
+        "inline-flex shrink-0 items-center justify-center rounded-full bg-surface-2",
+        "text-[11px] leading-none font-semibold text-muted",
         className,
       )}
       style={{ width: size, height: size }}

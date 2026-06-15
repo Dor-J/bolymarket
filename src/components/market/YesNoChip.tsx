@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Chip, type ChipVariant } from '@/components/ui/Chip';
-import { PriceDisplay } from './PriceDisplay';
+import { Chip, type ChipVariant } from "@/components/ui/Chip";
+import { PriceDisplay } from "./PriceDisplay";
 
 export interface YesNoChipProps {
   side: ChipVariant;
@@ -23,7 +23,7 @@ export function YesNoChip({
   fullWidth = false,
   onClick,
 }: YesNoChipProps) {
-  const label = side === 'yes' ? 'Yes' : 'No';
+  const label = side === "yes" ? "Yes" : "No";
 
   return (
     <Chip
@@ -35,7 +35,7 @@ export function YesNoChip({
         onClick?.();
       }}
     >
-      {label}{' '}
+      {label}{" "}
       <PriceDisplay
         marketId={marketId}
         outcomeId={outcomeId}
