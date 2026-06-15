@@ -4,15 +4,15 @@ Custom React hooks for bolymarket. All paths are relative to `src/hooks/`.
 
 ## Hook reference
 
-| Hook                | Phase    | Purpose                                                               |
-| ------------------- | -------- | --------------------------------------------------------------------- |
-| `useEvents`         | 1        | React Query wrapper — fetches open events via `eventsQueryOptions`    |
-| `useFilteredEvents` | 1        | Reads `selectedCategoryAtom`; filters + sorts cached events by volume |
-| `useEvent`          | 3        | React Query wrapper — single event by slug, cache-first               |
-| `useChartTimeframe` | 3        | Local state for chart timeframe toggle (`1h` … `all`)                 |
-| `useLivePrices`     | 4        | Seeds outcome atoms and runs price simulation for visible keys |
-| `usePriceFlash`     | 4        | Flash direction + CSS class from price delta                   |
-| `useReducedMotion`  | 4        | Reads `prefers-reduced-motion` for accessible price updates    |
+| Hook                | Phase | Purpose                                                               |
+| ------------------- | ----- | --------------------------------------------------------------------- |
+| `useEvents`         | 1     | React Query wrapper — fetches open events via `eventsQueryOptions`    |
+| `useFilteredEvents` | 1     | Reads `selectedCategoryAtom`; filters + sorts cached events by volume |
+| `useEvent`          | 3     | React Query wrapper — single event by slug, cache-first               |
+| `useChartTimeframe` | 3     | Local state for chart timeframe toggle (`1h` … `all`)                 |
+| `useLivePrices`     | 4     | Seeds outcome atoms and runs price simulation for visible keys        |
+| `usePriceFlash`     | 4     | Flash direction + CSS class from price delta                          |
+| `useReducedMotion`  | 4     | Reads `prefers-reduced-motion` for accessible price updates           |
 
 ## Data flow
 
@@ -58,37 +58,44 @@ outcomePriceAtomFamily         → leaf subscribers only (PriceDisplay, bars, ch
 Hook tests colocate with source files and use the shared wrapper in
 [`src/test/test-utils.tsx`](../test/test-utils.tsx):
 
-| Test file                   | Hook / scope                                                    |
-| --------------------------- | --------------------------------------------------------------- |
-| `useEvents.test.ts`         | Loading, success, error, query key                              |
-| `useFilteredEvents.test.ts` | Category filter, volume sort, error forwarding, category change |
-| `useEvent.test.ts`          | Cache-first slug lookup; cold-cache API fallback                 |
-| `useLivePrices.test.ts`     | Seeds atoms, simulation ticks, cleanup                         |
-| `usePriceFlash.test.ts`     | Up/down/none flash classes                                     |
-| `usePriceFlash.reducedMotion.test.ts` | Reduced-motion neutral path via usePriceFlash          |
-| `useChartTimeframe.test.ts` | Initial timeframe + selectTimeframe updates                  |
-| `useReducedMotion.test.ts`  | matchMedia preference + change listener                      |
+| Test file                             | Hook / scope                                                    |
+| ------------------------------------- | --------------------------------------------------------------- |
+| `useEvents.test.ts`                   | Loading, success, error, query key                              |
+| `useFilteredEvents.test.ts`           | Category filter, volume sort, error forwarding, category change |
+| `useEvent.test.ts`                    | Cache-first slug lookup; cold-cache API fallback                |
+| `useLivePrices.test.ts`               | Seeds atoms, simulation ticks, cleanup                          |
+| `usePriceFlash.test.ts`               | Up/down/none flash classes                                      |
+| `usePriceFlash.reducedMotion.test.ts` | Reduced-motion neutral path via usePriceFlash                   |
+| `useChartTimeframe.test.ts`           | Initial timeframe + selectTimeframe updates                     |
+| `useReducedMotion.test.ts`            | matchMedia preference + change listener                         |
+
+Component smoke tests:
+
+| Test file                                     | Scope                                   |
+| --------------------------------------------- | --------------------------------------- |
+| `src/components/home/EventsGrid.test.tsx`     | Loading skeleton, error, empty, success |
+| `src/components/home/EventListEmpty.test.tsx` | Empty copy                              |
 
 Related pure-function tests:
 
-| Test file | Scope |
-| --- | --- |
-| `src/lib/filters/category.test.ts` | Category filter + sort |
-| `src/lib/format/price.test.ts` | Percent and cents formatting |
-| `src/lib/format/volume.test.ts` | Volume abbreviations |
-| `src/lib/format/detailVolume.test.ts` | Full-precision detail volume |
-| `src/lib/format/date.test.ts` | ISO date formatting |
-| `src/lib/cards/resolveCardVariant.test.ts` | Binary vs multi-outcome routing |
-| `src/lib/cards/mapEventToCardProps.test.ts` | Event → card prop mapping + yes/no helpers |
-| `src/lib/chart/generateChartData.test.ts` | Simulated chart series |
-| `src/lib/chart/colors.test.ts` | Outcome color palette indexing |
-| `src/lib/event/formatBreadcrumb.test.ts` | Detail breadcrumb labels |
-| `src/lib/event/flattenOutcomes.test.ts` | Detail outcome row flattening |
-| `src/lib/api/normalize.test.ts` | Gamma event/market normalization |
-| `src/lib/api/gamma.test.ts` | `fetchOpenEvents` + `fetchEventBySlug` |
-| `src/lib/prices/*.test.ts` | Outcome keys, coalescing, simulation step, visible seeds |
-| `src/lib/atoms/seedPrices.test.ts` | Seed + commit atom helpers |
-| `src/lib/realtime/simulationEngine.test.ts` | Simulation start/stop |
+| Test file                                   | Scope                                                    |
+| ------------------------------------------- | -------------------------------------------------------- |
+| `src/lib/filters/category.test.ts`          | Category filter + sort                                   |
+| `src/lib/format/price.test.ts`              | Percent and cents formatting                             |
+| `src/lib/format/volume.test.ts`             | Volume abbreviations                                     |
+| `src/lib/format/detailVolume.test.ts`       | Full-precision detail volume                             |
+| `src/lib/format/date.test.ts`               | ISO date formatting                                      |
+| `src/lib/cards/resolveCardVariant.test.ts`  | Binary vs multi-outcome routing                          |
+| `src/lib/cards/mapEventToCardProps.test.ts` | Event → card prop mapping + yes/no helpers               |
+| `src/lib/chart/generateChartData.test.ts`   | Simulated chart series                                   |
+| `src/lib/chart/colors.test.ts`              | Outcome color palette indexing                           |
+| `src/lib/event/formatBreadcrumb.test.ts`    | Detail breadcrumb labels                                 |
+| `src/lib/event/flattenOutcomes.test.ts`     | Detail outcome row flattening                            |
+| `src/lib/api/normalize.test.ts`             | Gamma event/market normalization                         |
+| `src/lib/api/gamma.test.ts`                 | `fetchOpenEvents` + `fetchEventBySlug`                   |
+| `src/lib/prices/*.test.ts`                  | Outcome keys, coalescing, simulation step, visible seeds |
+| `src/lib/atoms/seedPrices.test.ts`          | Seed + commit atom helpers                               |
+| `src/lib/realtime/simulationEngine.test.ts` | Simulation start/stop                                    |
 
 Mock event fixtures: [`src/test/fixtures/events.ts`](../test/fixtures/events.ts)
 
@@ -97,6 +104,6 @@ bun run test          # run once
 bun run test:watch    # watch mode
 ```
 
-Use `renderHookWithProviders()` from `src/test/test-utils.tsx` for hooks that need React Query
-and/or Jotai. Pass `queryClient`, `jotaiStore`, and call `seedEventsQuery()` to preload the events
-cache without hitting the Gamma API.
+Use `renderHookWithProviders()` or `renderWithProviders()` from `src/test/test-utils.tsx` for hooks
+and components that need React Query and/or Jotai. Pass `queryClient`, `jotaiStore`, and call
+`seedEventsQuery()` to preload the events cache without hitting the Gamma API.

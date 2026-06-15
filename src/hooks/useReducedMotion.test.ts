@@ -1,6 +1,6 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { useReducedMotion } from './useReducedMotion';
+import { renderHook, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { useReducedMotion } from "./useReducedMotion";
 
 function createMatchMedia(matches: boolean) {
   const listeners = new Set<() => void>();
@@ -22,14 +22,14 @@ function createMatchMedia(matches: boolean) {
   };
 }
 
-describe('useReducedMotion', () => {
+describe("useReducedMotion", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('returns false when reduced motion is not preferred', async () => {
+  it("returns false when reduced motion is not preferred", async () => {
     vi.stubGlobal(
-      'matchMedia',
+      "matchMedia",
       vi.fn().mockReturnValue(createMatchMedia(false)),
     );
 
@@ -40,9 +40,9 @@ describe('useReducedMotion', () => {
     });
   });
 
-  it('returns true when reduced motion is preferred', async () => {
+  it("returns true when reduced motion is preferred", async () => {
     vi.stubGlobal(
-      'matchMedia',
+      "matchMedia",
       vi.fn().mockReturnValue(createMatchMedia(true)),
     );
 
@@ -53,9 +53,9 @@ describe('useReducedMotion', () => {
     });
   });
 
-  it('updates when the media query preference changes', async () => {
+  it("updates when the media query preference changes", async () => {
     const mediaQuery = createMatchMedia(false);
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue(mediaQuery));
+    vi.stubGlobal("matchMedia", vi.fn().mockReturnValue(mediaQuery));
 
     const { result } = renderHook(() => useReducedMotion());
 
