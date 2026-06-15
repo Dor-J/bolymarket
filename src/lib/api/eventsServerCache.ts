@@ -3,11 +3,9 @@ import "server-only";
 import type { Event } from "@/types/polymarket";
 import {
   EVENTS_CACHE_TTL_MS,
-  LOCAL_EVENT_SLUG_PREFIX,
-  LOCAL_EVENTS_CACHE_KEY,
   REDIS_EVENT_SLUG_PREFIX,
   REDIS_EVENTS_KEY,
-} from "@/lib/cache/constants";
+} from '@/lib/cache/constants';
 import { readServerCache, writeServerCache } from "@/lib/cache/serverCache";
 import {
   fetchAggregatedOpenEvents,

@@ -1,5 +1,5 @@
-import { waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getOpenEvents } from "@/lib/api/gamma";
 import { mockEvents } from "@/test/fixtures/events";
 import {
@@ -8,8 +8,10 @@ import {
   renderHookWithProviders,
   seedEventsQuery,
 } from "@/test/test-utils";
-import { selectedCategoryAtom } from "@/lib/atoms/category";
-import { useFilteredEvents } from "./useFilteredEvents";
+import { selectedCategoryAtom } from '@/lib/atoms/category';
+import { searchQueryAtom } from '@/lib/atoms/search';
+import { useFilteredEvents } from './useFilteredEvents';
+import { SEARCH_DEBOUNCE_MS } from './useDebouncedValue';
 
 vi.mock("@/lib/api/gamma", () => ({
   getOpenEvents: vi.fn(),
@@ -17,7 +19,7 @@ vi.mock("@/lib/api/gamma", () => ({
 
 const mockedGetOpenEvents = vi.mocked(getOpenEvents);
 
-describe("useFilteredEvents", () => {
+describe('useFilteredEvents', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -143,6 +145,42 @@ describe("useFilteredEvents", () => {
     });
 
     expect(result.current.events[0]?.slug).toBe("sports-event");
-    expect(result.current.category).toBe("sports");
+    expect(result.current.category).toBe('sports');
+  });
+
+  it('filters by debounced search query', async () => {
+    vi.useFakeTimers();
+
+    const queryClient = createTestQueryClient();
+    seedEventsQuery(queryClient, mockEvents);
+    mockedGetOpenEvents.mockResolvedValue(mockEvents);
+    const jotaiStore = createJotaiStore('trending');
+
+    const { result } = renderHookWithProviders(() => useFilteredEvents(), {
+      queryClient,
+      jotaiStore,
+    });
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(result.current.events.length).toBe(4);
+
+    act(() => {
+      jotaiStore.set(searchQueryAtom, 'crypto');
+    });
+
+    expect(result.current.events.length).toBe(4);
+
+    act(() => {
+      vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
+    });
+
+    expect(result.current.events.length).toBe(1);
+    expect(result.current.events[0]?.slug).toBe('crypto-event');
+    expect(result.current.debouncedSearch).toBe('crypto');
+
+    vi.useRealTimers();
   });
 });

@@ -1,15 +1,19 @@
-"use client";
+'use client';
 
-import { Info, Menu, Search } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { IconButton } from "@/components/ui/IconButton";
-import { cn } from "@/lib/cn";
-import { Logo } from "./Logo";
+import { Info, Menu, Search } from 'lucide-react';
+import { useAtom } from 'jotai';
+import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
+import { searchQueryAtom } from '@/lib/atoms/search';
+import { cn } from '@/lib/cn';
+import { Logo } from './Logo';
 
 /**
  * Sticky top navigation bar — logo, search, auth actions.
  */
 export function TopBar() {
+  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface">
       <div className="mx-auto flex h-16 w-full max-w-[1350px] items-center gap-3 px-6">
@@ -22,13 +26,16 @@ export function TopBar() {
           />
           <input
             type="search"
-            readOnly
+            value={searchQuery}
+            onChange={(event) => {
+              setSearchQuery(event.target.value);
+            }}
             aria-label="Search polymarkets"
             placeholder="Search polymarkets…"
             className={cn(
-              "h-10 w-full rounded-md bg-surface-2 pr-10 pl-11",
-              "text-sm leading-5 text-text placeholder:text-muted",
-              "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+              'h-10 w-full rounded-md bg-surface-2 pr-10 pl-11',
+              'text-sm leading-5 text-text placeholder:text-muted',
+              'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
             )}
           />
           <kbd

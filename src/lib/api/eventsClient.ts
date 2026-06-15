@@ -1,32 +1,17 @@
-import type { Event } from "@/types/polymarket";
-import {
-  EVENTS_CACHE_TTL_MS,
-  LOCAL_EVENT_SLUG_PREFIX,
-  LOCAL_EVENTS_CACHE_KEY,
-} from "@/lib/cache/constants";
-import { readLocalCache, writeLocalCache } from "@/lib/cache/localStorage";
-
-function getLocalEventKey(slug: string): string {
-  return `${LOCAL_EVENT_SLUG_PREFIX}${slug}`;
-}
+import type { Event } from '@/types/polymarket';
 
 export interface FetchEventsClientOptions {
   signal?: AbortSignal;
 }
 
 /**
- * Browser: reads localStorage first, then `/api/events` (Redis-backed on server).
+ * Fetches aggregated open events from the Redis-backed API route.
  */
 export async function fetchEventsClient(
   options: FetchEventsClientOptions = {},
 ): Promise<Event[]> {
-  const local = readLocalCache<Event[]>(LOCAL_EVENTS_CACHE_KEY);
-  if (local) {
-    return local.data;
-  }
-
-  const response = await fetch("/api/events", {
-    headers: { Accept: "application/json" },
+  const response = await fetch('/api/events', {
+    headers: { Accept: 'application/json' },
     signal: options.signal,
   });
 
@@ -36,9 +21,7 @@ export async function fetchEventsClient(
     );
   }
 
-  const events = (await response.json()) as Event[];
-  writeLocalCache(LOCAL_EVENTS_CACHE_KEY, events, EVENTS_CACHE_TTL_MS);
-  return events;
+  return (await response.json()) as Event[];
 }
 
 export interface FetchEventBySlugClientOptions {
@@ -46,25 +29,18 @@ export interface FetchEventBySlugClientOptions {
 }
 
 /**
- * Browser: reads localStorage first, then `/api/events/[slug]`.
+ * Fetches a single event by slug from the Redis-backed API route.
  */
 export async function fetchEventBySlugClient(
   slug: string,
   options: FetchEventBySlugClientOptions = {},
 ): Promise<Event | null> {
-  const localKey = getLocalEventKey(slug);
-  const local = readLocalCache<Event | null>(localKey);
-  if (local) {
-    return local.data;
-  }
-
   const response = await fetch(`/api/events/${encodeURIComponent(slug)}`, {
-    headers: { Accept: "application/json" },
+    headers: { Accept: 'application/json' },
     signal: options.signal,
   });
 
   if (response.status === 404) {
-    writeLocalCache(localKey, null, EVENTS_CACHE_TTL_MS);
     return null;
   }
 
@@ -74,7 +50,5 @@ export async function fetchEventBySlugClient(
     );
   }
 
-  const event = (await response.json()) as Event | null;
-  writeLocalCache(localKey, event, EVENTS_CACHE_TTL_MS);
-  return event;
+  return (await response.json()) as Event | null;
 }
