@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { ExternalLink } from 'lucide-react';
-import Link from 'next/link';
-import { memo } from 'react';
-import { BookmarkButton } from '@/components/ui/BookmarkButton';
-import { MarketThumbnail } from '@/components/market/MarketThumbnail';
-import { PriceDisplay } from '@/components/market/PriceDisplay';
-import { YesNoChip } from '@/components/market/YesNoChip';
-import { formatVolume } from '@/lib/format/volume';
-import type { MultiOutcomeCardProps } from '@/lib/cards/types';
-import { cn } from '@/lib/cn';
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { memo } from "react";
+import { BookmarkButton } from "@/components/ui/BookmarkButton";
+import { MarketThumbnail } from "@/components/market/MarketThumbnail";
+import { PriceDisplay } from "@/components/market/PriceDisplay";
+import { YesNoChip } from "@/components/market/YesNoChip";
+import { formatVolume } from "@/lib/format/volume";
+import type { MultiOutcomeCardProps } from "@/lib/cards/types";
+import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
-  'group flex min-h-[180px] flex-col rounded-card border border-[#e6e8ea] bg-card pt-3',
-  'transition-colors hover:border-[#caced3] hover:bg-surface-2',
-  'focus-within:ring-2 focus-within:ring-ring focus-within:outline-none',
+  "group flex min-h-[180px] flex-col rounded-card border border-[#e6e8ea] bg-card pt-3",
+  "transition-colors hover:border-[#caced3] hover:bg-surface-2",
+  "focus-within:ring-2 focus-within:ring-ring focus-within:outline-none",
 );
 
 /**
@@ -28,7 +28,7 @@ export const MultiOutcomeCard = memo(function MultiOutcomeCard({
   outcomes,
 }: MultiOutcomeCardProps) {
   return (
-    <Link href={`/event/${slug}`} className={cn(cardShellClasses, 'px-3 pb-3')}>
+    <Link href={`/event/${slug}`} className={cn(cardShellClasses, "px-3 pb-3")}>
       <div className="flex items-start gap-2">
         <MarketThumbnail title={title} image={image} />
         <h3 className="line-clamp-2 min-w-0 flex-1 text-sm leading-5 font-semibold text-text">
