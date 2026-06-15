@@ -4,14 +4,14 @@ Custom React hooks for bolymarket. All paths are relative to `src/hooks/`.
 
 ## Hook reference
 
-| Hook | Phase | Purpose |
-| --- | --- | --- |
-| `useEvents` | 1 | React Query wrapper — fetches open events via `eventsQueryOptions` |
-| `useFilteredEvents` | 1 | Reads `selectedCategoryAtom`; filters + sorts cached events by volume |
-| `useEvent` | 3 | React Query wrapper — single event by slug, cache-first |
-| `useChartTimeframe` | 3 | Local state for chart timeframe toggle (`1h` … `all`) |
-| `useLivePrices` | 4 (stub) | Subscribe to live price updates for visible market IDs |
-| `usePriceFlash` | 4 (stub) | Flash styling on price direction change |
+| Hook                | Phase    | Purpose                                                               |
+| ------------------- | -------- | --------------------------------------------------------------------- |
+| `useEvents`         | 1        | React Query wrapper — fetches open events via `eventsQueryOptions`    |
+| `useFilteredEvents` | 1        | Reads `selectedCategoryAtom`; filters + sorts cached events by volume |
+| `useEvent`          | 3        | React Query wrapper — single event by slug, cache-first               |
+| `useChartTimeframe` | 3        | Local state for chart timeframe toggle (`1h` … `all`)                 |
+| `useLivePrices`     | 4 (stub) | Subscribe to live price updates for visible market IDs                |
+| `usePriceFlash`     | 4 (stub) | Flash styling on price direction change                               |
 
 ## Data flow
 
@@ -54,20 +54,25 @@ PriceDisplay                   → useAtomValue per market/outcome — leaf re-r
 
 ## Tests
 
-Hook tests use `@testing-library/react` with a test wrapper:
+Hook tests colocate with source files and use the shared wrapper in
+[`src/test/test-utils.tsx`](../test/test-utils.tsx):
 
-```tsx
-function createWrapper() {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return function Wrapper({ children }: { children: React.ReactNode }) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <Provider>{children}</Provider>
-      </QueryClientProvider>
-    );
-  };
-}
+| Test file                   | Hook / scope                                                    |
+| --------------------------- | --------------------------------------------------------------- |
+| `useEvents.test.ts`         | Loading, success, error, query key                              |
+| `useFilteredEvents.test.ts` | Category filter, volume sort, error forwarding, category change |
+| `useLivePrices.test.ts`     | Stub contract (Phase 4 `describe.todo` for live subscription)   |
+| `usePriceFlash.test.ts`     | Stub contract (Phase 4 `describe.todo` for flash styling)       |
+
+Related pure-function tests: [`src/lib/filters/category.test.ts`](../lib/filters/category.test.ts)
+
+Mock event fixtures: [`src/test/fixtures/events.ts`](../test/fixtures/events.ts)
+
+```bash
+bun run test          # run once
+bun run test:watch    # watch mode
 ```
 
-See `../../plans/PLAN-Phase-2-Events-Grid.md` and `../../plans/PLAN-Phase-3-Event-Detail.md` for
-required test coverage per phase.
+Use `renderHookWithProviders()` from `src/test/test-utils.tsx` for hooks that need React Query
+and/or Jotai. Pass `queryClient`, `jotaiStore`, and call `seedEventsQuery()` to preload the events
+cache without hitting the Gamma API.
