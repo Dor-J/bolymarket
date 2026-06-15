@@ -1,8 +1,27 @@
 # bolymarket
 
-bolymarket is a Next.js App Router implementation of the PLAEE frontend assignment. The goal is to
-replicate the core Polymarket experience with high UI fidelity, responsive layouts, live price
-updates, and clean state management.
+bolymarket is a Next.js App Router clone of the [Polymarket](https://polymarket.com) homepage and
+event detail experience, built for the PLAEE frontend assignment. It focuses on UI fidelity,
+responsive layouts, client-side category filtering, simulated live prices, and deliberate loading /
+empty / error states — without trading, wallet, or auth.
+
+## Setup
+
+**Prerequisites:** [Bun](https://bun.sh) (recommended) or Node.js 20+.
+
+No environment variables are required — the app reads public Gamma API data at build/runtime.
+
+From the `bolymarket/` directory:
+
+```bash
+bun install
+bun run dev        # http://localhost:3000
+bun run build      # production build
+bun run start      # serve production build
+bun run test       # Vitest unit + component tests
+bun run lint
+bun run format:check
+```
 
 ## Repository layout
 
@@ -18,96 +37,146 @@ BoliMarket/           # workspace root
 
 ## Stack
 
-- Next.js 16
-- TypeScript
-- Tailwind CSS v4
-- Jotai for UI and realtime price state
-- TanStack React Query for API data caching
-- Zod for API validation
-- Lucide React for icons
-- Motion for subtle UI animation
-- Vitest + React Testing Library (hook and lib unit tests)
-- Recharts (from Phase 3 onward — event detail chart)
+- Next.js 16 (App Router)
+- TypeScript (strict)
+- Tailwind CSS v4 + semantic design tokens
+- Jotai — UI filter state and live outcome prices
+- TanStack React Query — Gamma API structural cache
+- Zod — API response validation
+- Recharts — event detail price chart
+- Lucide React — icons
+- Vitest + React Testing Library
 
-## Development
+## Architecture
 
-From `bolymarket/`:
+Structural event data and live prices are intentionally split:
 
-```bash
-bun install
-bun run dev
-```
-
-Open `http://localhost:3000`.
-
-## Quality commands
-
-```bash
-bun run lint
-bun run test          # unit tests (Vitest)
-bun run test:watch    # watch mode
-bun run build
-bun run format:check
-```
-
-## Implementation progress
-
-| Phase            | Status   | Deliverable                                   |
-| ---------------- | -------- | --------------------------------------------- |
-| 0 — Foundation   | Complete | Tokens, providers, Gamma API, types           |
-| 1 — App shell    | Complete | TopBar, CategoryNav, category filter          |
-| 2 — Events grid  | Complete | BinaryCard, MultiOutcomeCard, responsive grid |
-| 3 — Event detail | Complete | `/event/[slug]`, chart, outcome rows          |
-| 4 — Realtime     | Complete | Live simulation, flash, leaf-only updates     |
-
-## Architecture (overview)
+- **React Query** caches normalized events from the Gamma REST API (`staleTime` 60s). Prices are
+  read once at seed time — never written back into the query cache on tick.
+- **Jotai** holds `selectedCategoryAtom` and `outcomePriceAtomFamily` keyed by
+  `${marketId}:${outcomeId}` so each outcome updates independently.
+- **Simulation** (`useLivePrices`) seeds atoms from API snapshots, then applies a client-side
+  random walk with rAF-coalesced commits.
 
 ```text
-Gamma API → React Query cache → normalized Event / Market / Outcome types
-                                      ↓
-              useFilteredEvents + selectedCategoryAtom → EventsGrid
-                                      ↓
-              useEvent(slug) → EventDetailPage
-                                      ↓
-              outcomePriceAtomFamily → PriceDisplay / ProbabilityBar / YesNoChip
+                    ┌─────────────────────┐
+                    │   Gamma REST API    │
+                    └──────────┬──────────┘
+                               │ fetch (staleTime 60s)
+                               ▼
+                    ┌─────────────────────┐
+                    │   React Query       │
+                    │ events · event/slug │
+                    └──────────┬──────────┘
+                               │ normalized Event[]
+           ┌───────────────────┼───────────────────┐
+           ▼                   ▼                   ▼
+    useFilteredEvents     useEvent(slug)     (no price writes)
+           │                   │
+           ▼                   ▼
+      EventsGrid         EventDetailPage
+           │                   │
+           └─────────┬─────────┘
+                     │ useLivePrices(outcomeKeys)
+                     ▼ seed + simulation
+           ┌─────────────────────┐
+           │ Jotai price atoms   │
+           │ per outcome key     │
+           └──────────┬──────────┘
+                      │ useAtomValue (leaves only)
+                      ▼
+              PriceDisplay · ProbabilityBar · YesNoChip
 ```
 
-- **Structural data** lives in React Query (events list, single event by slug).
-- **Live prices** live in Jotai `outcomePriceAtomFamily` — one atom per `${marketId}:${outcomeId}`.
-- **UI filter state** (`selectedCategoryAtom`) lives in Jotai.
-- **Card variant:** single market with 2 outcomes → `BinaryCard`; otherwise → `MultiOutcomeCard`.
+**Card routing:** a single market with exactly two outcomes → `BinaryCard`; otherwise →
+`MultiOutcomeCard`. Mapping runs in memoized `EventCard` via `mapEventToCardProps`.
+
+**Event detail:** cache-first — warm navigations resolve from the open-events query; cold direct
+URLs fetch by slug.
 
 ## Routing
 
-| Route           | Description                                          |
-| --------------- | ---------------------------------------------------- |
-| `/`             | Home — events grid with category navigation          |
-| `/event/[slug]` | Event detail — header, chart, outcome list, order sidebar placeholder |
+| Route           | Description                                                           |
+| --------------- | --------------------------------------------------------------------- |
+| `/`             | Home — category nav + responsive events grid                          |
+| `/event/[slug]` | Event detail — header, chart, outcome rows, order sidebar placeholder |
 
-Event detail uses a **cache-first** strategy: resolve from the open-events query when warm; fall
-back to Gamma API fetch by slug on direct URL visits.
-
-## Chart data
-
-Historical chart lines use **simulated data** from `lib/chart/generateChartData.ts`, seeded from
-current outcome prices. This is sufficient for the assignment — prioritize accurate **current**
-prices over historical accuracy.
+Dedicated `/crypto` and `/sports` bonus routes were **not** implemented; filtering uses the home
+category nav only.
 
 ## Realtime approach
 
 - **Source:** Client-side random-walk simulation (±0.5–2% per tick, clamped 0.01–0.99), seeded from
   Gamma API prices on mount — not Polymarket CLOB WebSocket data.
-- **State:** Jotai `outcomePriceAtomFamily` keyed by `${marketId}:${outcomeId}`; React Query holds
-  structural event data only.
-- **Updates:** Batched via `requestAnimationFrame` coalescing; only leaf components
-  (`PriceDisplay`, `ProbabilityBar`, `YesNoChip`) subscribe via `useAtomValue`.
-- **UX:** Green/red flash ~700ms on direction change; probability bars animate width over 300ms;
-  `prefers-reduced-motion` disables flash animations.
+- **State:** Jotai `outcomePriceAtomFamily`; React Query holds structural event data only.
+- **Updates:** Batched via `requestAnimationFrame` coalescing; only leaf components subscribe.
+- **UX:** Green/red flash ~700ms on direction change; probability bars animate over 300ms;
+  `prefers-reduced-motion` disables flash (see `useReducedMotion`).
 
-## Trading
+## Chart data
 
-Order sidebar on the detail page is a **static/disabled placeholder**. Wallet connection, auth,
-portfolio, and order execution are out of scope.
+Historical chart lines use **simulated data** from `lib/chart/generateChartData.ts`, seeded from
+current outcome prices. Only the **current** price reflects live simulation ticks; past points are
+for visualization only.
+
+## Limitations
+
+- **Prices:** Updated via client-side simulation seeded from Gamma API snapshots; not production
+  CLOB WebSocket data.
+- **Chart:** Historical lines are generated for visualization; only the current price reflects live
+  ticks.
+- **Trading:** Order sidebar is a non-functional placeholder.
+- **Scope:** No wallet, authentication, portfolio, or order execution.
+- **Theme:** Light-theme polish is the priority; dark tokens exist but were not fully QA'd.
+- **Bonus pages:** No dedicated `/crypto` or `/sports` routes — category filter on `/` only.
+
+## Performance
+
+- `outcomePriceAtomFamily` — one atom per outcome, not a monolithic price map.
+- `React.memo` on cards, outcome rows, and category nav; `EventCard` memoizes mapped props.
+- `useAtomValue` only in price leaf components — card shells do not re-render on tick.
+- React Query: `refetchOnWindowFocus: false` to avoid grid flicker; category filter is client-side.
+- Virtualization skipped at assignment scale (see [docs/PERFORMANCE.md](docs/PERFORMANCE.md)).
+
+Profiler expectation: with 20+ cards visible, a single tick re-renders only the matching price
+leaves, not the full grid.
+
+## Testing
+
+```bash
+bun run test
+```
+
+Coverage includes:
+
+- Gamma fetch/normalize, card mapping, category filters, price simulation utilities
+- Hooks: `useEvents`, `useFilteredEvents`, `useEvent`, `useLivePrices`, `usePriceFlash`,
+  `useReducedMotion`, `useChartTimeframe`
+- Component smoke tests: `EventsGrid` (loading / error / empty / success), `EventListEmpty`
+
+Shared test helpers: `src/test/test-utils.tsx` (`renderHookWithProviders`, `renderWithProviders`).
+
+## Project structure
+
+```text
+src/
+├── app/              Routes, layout, providers
+├── components/       UI by feature (see src/components/README.md)
+├── hooks/            Data + realtime hooks (see src/hooks/README.md)
+├── lib/              API, atoms, prices, chart, formatters
+└── types/            Polymarket domain types
+```
+
+## Implementation progress
+
+| Phase               | Status   | Deliverable                                   |
+| ------------------- | -------- | --------------------------------------------- |
+| 0 — Foundation      | Complete | Tokens, providers, Gamma API, types           |
+| 1 — App shell       | Complete | TopBar, CategoryNav, category filter          |
+| 2 — Events grid     | Complete | BinaryCard, MultiOutcomeCard, responsive grid |
+| 3 — Event detail    | Complete | `/event/[slug]`, chart, outcome rows          |
+| 4 — Realtime        | Complete | Live simulation, flash, leaf-only updates     |
+| 5 — Polish & README | Complete | UX audit, performance docs, submission README |
 
 ## Planning
 
@@ -118,23 +187,10 @@ Detailed implementation plans live in `../plans/`:
 - [PLAN-Phase-2-Events-Grid.md](../plans/PLAN-Phase-2-Events-Grid.md)
 - [PLAN-Phase-3-Event-Detail.md](../plans/PLAN-Phase-3-Event-Detail.md)
 - [PLAN-Phase-4-Realtime-Prices.md](../plans/PLAN-Phase-4-Realtime-Prices.md)
-
-## Assignment scope
-
-The app will focus on:
-
-- Events grid matching the Polymarket homepage layout
-- Category navigation with client-side filtering
-- Event detail page with markets, prices, and probability bars
-- Live price updates through WebSocket or convincing simulation
-- Loading, empty, and error states
-- Performance-conscious state boundaries using React Query and Jotai
-- Unit tests for public library functions and critical UI behavior
-
-Trading, wallet connection, auth, portfolio features, and order execution are intentionally out of
-scope for this assignment.
+- [PLAN-Phase-5-Polish-Performance-README.md](../plans/PLAN-Phase-5-Polish-Performance-README.md)
 
 ## Further reading
 
-- Component directory map: [src/components/README.md](src/components/README.md)
-- Hooks reference: [src/hooks/README.md](src/hooks/README.md)
+- [src/components/README.md](src/components/README.md) — component map and conventions
+- [src/hooks/README.md](src/hooks/README.md) — hook reference and data flow
+- [docs/PERFORMANCE.md](docs/PERFORMANCE.md) — profiling notes and virtualization decision
