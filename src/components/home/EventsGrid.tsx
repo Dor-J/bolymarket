@@ -1,14 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { EventCard } from "@/components/cards/EventCard";
-import { EVENTS_GRID_CLASSES } from "@/lib/constants/eventsGrid";
 import { useFilteredEvents } from "@/hooks/useFilteredEvents";
-import { useLivePrices } from "@/hooks/useLivePrices";
-import { getVisibleOutcomeSeedsFromEvents } from "@/lib/prices/visibleOutcomeKeys";
-import { EventListEmpty } from "./EventListEmpty";
-import { EventsGridError } from "./EventsGridError";
-import { EventsGridSkeleton } from "./EventsGridSkeleton";
+import { EventsGridView } from "./EventsGridView";
+import { FeaturedCarousel } from "./FeaturedCarousel";
 
 /**
  * Responsive home events grid with loading, empty, and error states.
@@ -16,49 +11,24 @@ import { EventsGridSkeleton } from "./EventsGridSkeleton";
 export function EventsGrid() {
   const { events, isLoading, isError, error, refetch, isFetching } =
     useFilteredEvents();
-  const priceSeeds = useMemo(
-    () => getVisibleOutcomeSeedsFromEvents(events),
-    [events],
-  );
 
-  useLivePrices(priceSeeds);
+  const featuredEvents = useMemo(() => events.slice(0, 6), [events]);
 
-  if (isLoading) {
-    return <EventsGridSkeleton />;
-  }
-
-  if (isError) {
-    return (
-      <EventsGridError
-        message={error instanceof Error ? error.message : undefined}
+  return (
+    <>
+      {!isLoading && !isError && featuredEvents.length > 0 ? (
+        <FeaturedCarousel events={featuredEvents} />
+      ) : null}
+      <EventsGridView
+        events={events}
+        isLoading={isLoading}
+        isError={isError}
+        isFetching={isFetching}
+        error={error}
         onRetry={() => {
           void refetch();
         }}
       />
-    );
-  }
-
-  if (events.length === 0) {
-    return <EventListEmpty />;
-  }
-
-  return (
-    <div>
-      {isFetching ? (
-        <p className="sr-only" aria-live="polite">
-          Refreshing markets
-        </p>
-      ) : null}
-
-      <h2 className="mb-4 text-xl leading-6 font-semibold text-text">
-        All markets
-      </h2>
-
-      <div className={EVENTS_GRID_CLASSES}>
-        {events.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
-      </div>
-    </div>
+    </>
   );
 }

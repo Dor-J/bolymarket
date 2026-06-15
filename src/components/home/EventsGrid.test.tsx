@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { cleanup, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mockEvents } from "@/test/fixtures/events";
 import { renderWithProviders } from "@/test/test-utils";
@@ -12,6 +12,10 @@ vi.mock("@/hooks/useFilteredEvents", () => ({
 
 vi.mock("@/hooks/useLivePrices", () => ({
   useLivePrices: vi.fn(),
+}));
+
+vi.mock("./FeaturedCarousel", () => ({
+  FeaturedCarousel: () => null,
 }));
 
 import { useFilteredEvents } from "@/hooks/useFilteredEvents";
@@ -35,6 +39,7 @@ function mockFilteredEvents(
 
 describe("EventsGrid", () => {
   beforeEach(() => {
+    cleanup();
     vi.clearAllMocks();
   });
 
