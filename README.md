@@ -9,7 +9,13 @@ empty / error states — without trading, wallet, or auth.
 
 **Prerequisites:** [Bun](https://bun.sh) (recommended) or Node.js 20+.
 
-No environment variables are required — the app reads public Gamma API data at build/runtime.
+No environment variables are required for local dev — the app reads public Gamma API data through
+cached API routes. Optional:
+
+| Variable | Purpose |
+| -------- | ------- |
+| `REDIS_URL` | Server-side cache for Gamma responses (e.g. `redis://localhost:6379`). Without it, an in-memory fallback is used. |
+| `NEXT_PUBLIC_LIVE_PRICE_MODE` | `auto` (default) · `websocket` · `simulation` |
 
 From the `bolymarket/` directory:
 
@@ -41,7 +47,8 @@ BoliMarket/           # workspace root
 - TypeScript (strict)
 - Tailwind CSS v4 + semantic design tokens
 - Jotai — UI filter state and live outcome prices
-- TanStack React Query — Gamma API structural cache
+- TanStack React Query — cached events via `/api/events` (localStorage + Redis)
+- `@polymarket/real-time-data-client` — live trade WebSocket for outcome prices
 - Zod — API response validation
 - Recharts — event detail price chart
 - Lucide React — icons
@@ -51,18 +58,26 @@ BoliMarket/           # workspace root
 
 Structural event data and live prices are intentionally split:
 
-- **React Query** caches normalized events from the Gamma REST API (`staleTime` 60s). Prices are
-  read once at seed time — never written back into the query cache on tick.
+- **React Query** fetches aggregated events (trending + crypto + sports + politics) via
+  `/api/events`, with **localStorage** on the client and **Redis** (or in-memory fallback) on the
+  server. Prices are read once at seed time — never written back into the query cache on tick.
 - **Jotai** holds `selectedCategoryAtom` and `outcomePriceAtomFamily` keyed by
   `${marketId}:${outcomeId}` so each outcome updates independently.
-- **Simulation** (`useLivePrices`) seeds atoms from API snapshots, then applies a client-side
-  random walk with rAF-coalesced commits.
+- **Live prices** (`useLivePrices`) seed atoms from API snapshots, then subscribe to Polymarket
+  `activity` trades via `@polymarket/real-time-data-client`, with simulation fallback in `auto`
+  mode when the socket is unavailable.
 
 ```text
                     ┌─────────────────────┐
                     │   Gamma REST API    │
                     └──────────┬──────────┘
-                               │ fetch (staleTime 60s)
+                               │ aggregated fetch (4 parallel)
+                               ▼
+                    ┌─────────────────────┐
+                    │ /api/events         │
+                    │ Redis + memory TTL  │
+                    └──────────┬──────────┘
+                               │ localStorage (client)
                                ▼
                     ┌─────────────────────┐
                     │   React Query       │
@@ -77,8 +92,8 @@ Structural event data and live prices are intentionally split:
       EventsGrid         EventDetailPage
            │                   │
            └─────────┬─────────┘
-                     │ useLivePrices(outcomeKeys)
-                     ▼ seed + simulation
+                     │ useLivePrices(seeds)
+                     ▼ WebSocket trades + optional simulation
            ┌─────────────────────┐
            │ Jotai price atoms   │
            │ per outcome key     │
@@ -106,8 +121,11 @@ category nav only.
 
 ## Realtime approach
 
-- **Source:** Client-side random-walk simulation (±0.5–2% per tick, clamped 0.01–0.99), seeded from
-  Gamma API prices on mount — not Polymarket CLOB WebSocket data.
+- **Primary source:** `@polymarket/real-time-data-client` WebSocket — subscribes to `activity`
+  `trades` / `orders_matched` filtered by visible `event_slug`, maps `asset` (CLOB token id) to
+  Jotai outcome atoms.
+- **Fallback:** Client-side random-walk simulation when `NEXT_PUBLIC_LIVE_PRICE_MODE=auto` and the
+  socket is not connected within 2s (or always when mode is `simulation`).
 - **State:** Jotai `outcomePriceAtomFamily`; React Query holds structural event data only.
 - **Updates:** Batched via `requestAnimationFrame` coalescing; only leaf components subscribe.
 - **UX:** Green/red flash ~700ms on direction change; probability bars animate over 300ms;
@@ -121,8 +139,8 @@ for visualization only.
 
 ## Limitations
 
-- **Prices:** Updated via client-side simulation seeded from Gamma API snapshots; not production
-  CLOB WebSocket data.
+- **Prices:** Live via Polymarket activity WebSocket when connected; simulation fills gaps in `auto`
+  mode. Not a full CLOB order-book feed.
 - **Chart:** Historical lines are generated for visualization; only the current price reflects live
   ticks.
 - **Trading:** Order sidebar is a non-functional placeholder.
