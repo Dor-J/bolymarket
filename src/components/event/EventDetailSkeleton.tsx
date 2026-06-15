@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from "@/lib/cn";
 
 export interface EventDetailSkeletonProps {
   className?: string;
@@ -9,7 +9,7 @@ export interface EventDetailSkeletonProps {
  */
 export function EventDetailSkeleton({ className }: EventDetailSkeletonProps) {
   return (
-    <div className={cn('space-y-6', className)} aria-busy="true">
+    <div className={cn("space-y-6", className)} aria-busy="true">
       <div className="space-y-3">
         <div className="h-4 w-32 rounded-sm shimmer" />
         <div className="flex items-start gap-3">
@@ -45,7 +45,10 @@ export function EventDetailSkeleton({ className }: EventDetailSkeletonProps) {
 
       <div className="space-y-4">
         {Array.from({ length: 5 }, (_, index) => (
-          <div key={`row-${index}`} className="space-y-3 border-b border-border pb-4">
+          <div
+            key={`row-${index}`}
+            className="space-y-3 border-b border-border pb-4"
+          >
             <div className="flex justify-between gap-4">
               <div className="flex flex-1 items-center gap-3">
                 <div className="h-8 w-8 rounded-full shimmer" />

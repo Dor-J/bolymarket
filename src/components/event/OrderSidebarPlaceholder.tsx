@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from "@/lib/cn";
 
 export interface OrderSidebarPlaceholderProps {
   className?: string;
@@ -12,10 +12,7 @@ export function OrderSidebarPlaceholder({
 }: OrderSidebarPlaceholderProps) {
   return (
     <aside
-      className={cn(
-        'rounded-card border border-border bg-card p-4',
-        className,
-      )}
+      className={cn("rounded-card border border-border bg-card p-4", className)}
       aria-label="Trading panel placeholder"
     >
       <div className="flex rounded-md bg-surface-2 p-1">

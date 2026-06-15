@@ -1,5 +1,5 @@
-import { formatDate } from '@/lib/format/date';
-import { formatDetailVolume } from '@/lib/format/detailVolume';
+import { formatDate } from "@/lib/format/date";
+import { formatDetailVolume } from "@/lib/format/detailVolume";
 
 export interface ChartMetaRowProps {
   volume: number;

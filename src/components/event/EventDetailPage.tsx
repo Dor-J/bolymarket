@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import { useMemo } from 'react';
-import { PriceChart } from '@/components/chart/PriceChart';
-import { TimeframeToggle } from '@/components/chart/TimeframeToggle';
-import { getOutcomeColor } from '@/lib/chart/colors';
-import type { ChartOutcome } from '@/lib/chart/types';
-import { getChartOutcomes } from '@/lib/event/flattenOutcomes';
-import { getOutcomeSeedsFromEvent } from '@/lib/prices/visibleOutcomeKeys';
-import { useChartTimeframe } from '@/hooks/useChartTimeframe';
-import { useEvent } from '@/hooks/useEvent';
-import { useLivePrices } from '@/hooks/useLivePrices';
-import { ChartMetaRow } from './ChartMetaRow';
-import { EventDetailError } from './EventDetailError';
-import { EventDetailSkeleton } from './EventDetailSkeleton';
-import { EventHeader } from './EventHeader';
-import { OrderSidebarPlaceholder } from './OrderSidebarPlaceholder';
-import { OutcomeLegend } from './OutcomeLegend';
-import { OutcomeList } from './OutcomeList';
+import { useMemo } from "react";
+import { PriceChart } from "@/components/chart/PriceChart";
+import { TimeframeToggle } from "@/components/chart/TimeframeToggle";
+import { getOutcomeColor } from "@/lib/chart/colors";
+import type { ChartOutcome } from "@/lib/chart/types";
+import { getChartOutcomes } from "@/lib/event/flattenOutcomes";
+import { getOutcomeSeedsFromEvent } from "@/lib/prices/visibleOutcomeKeys";
+import { useChartTimeframe } from "@/hooks/useChartTimeframe";
+import { useEvent } from "@/hooks/useEvent";
+import { useLivePrices } from "@/hooks/useLivePrices";
+import { ChartMetaRow } from "./ChartMetaRow";
+import { EventDetailError } from "./EventDetailError";
+import { EventDetailSkeleton } from "./EventDetailSkeleton";
+import { EventHeader } from "./EventHeader";
+import { OrderSidebarPlaceholder } from "./OrderSidebarPlaceholder";
+import { OutcomeLegend } from "./OutcomeLegend";
+import { OutcomeList } from "./OutcomeList";
 
 export interface EventDetailPageProps {
   slug: string;

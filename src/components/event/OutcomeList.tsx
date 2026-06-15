@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import type { Event } from '@/types/polymarket';
-import { flattenOutcomes } from '@/lib/event/flattenOutcomes';
-import { OutcomeRow } from './OutcomeRow';
+import type { Event } from "@/types/polymarket";
+import { flattenOutcomes } from "@/lib/event/flattenOutcomes";
+import { OutcomeRow } from "./OutcomeRow";
 
 export interface OutcomeListProps {
   event: Event;

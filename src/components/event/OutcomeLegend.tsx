@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { PriceDisplay } from '@/components/market/PriceDisplay';
-import type { ChartOutcome } from '@/lib/chart/types';
-import { cn } from '@/lib/cn';
+import { PriceDisplay } from "@/components/market/PriceDisplay";
+import type { ChartOutcome } from "@/lib/chart/types";
+import { cn } from "@/lib/cn";
 
 export interface OutcomeLegendProps {
   outcomes: ChartOutcome[];
@@ -18,7 +18,7 @@ export function OutcomeLegend({ outcomes, className }: OutcomeLegendProps) {
   }
 
   return (
-    <div className={cn('flex flex-wrap gap-x-4 gap-y-2', className)}>
+    <div className={cn("flex flex-wrap gap-x-4 gap-y-2", className)}>
       {outcomes.map((outcome) => (
         <div
           key={outcome.id}

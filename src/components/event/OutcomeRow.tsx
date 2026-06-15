@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { memo } from 'react';
-import { MarketThumbnail } from '@/components/market/MarketThumbnail';
-import { PriceDisplay } from '@/components/market/PriceDisplay';
-import { ProbabilityBar } from '@/components/market/ProbabilityBar';
-import { formatCents } from '@/lib/format/price';
-import { formatDetailVolume } from '@/lib/format/detailVolume';
-import { cn } from '@/lib/cn';
+import { memo } from "react";
+import { MarketThumbnail } from "@/components/market/MarketThumbnail";
+import { PriceDisplay } from "@/components/market/PriceDisplay";
+import { ProbabilityBar } from "@/components/market/ProbabilityBar";
+import { formatCents } from "@/lib/format/price";
+import { formatDetailVolume } from "@/lib/format/detailVolume";
+import { cn } from "@/lib/cn";
 
 export interface OutcomeRowProps {
   marketId: string;
@@ -65,8 +65,8 @@ export const OutcomeRow = memo(function OutcomeRow({
           type="button"
           disabled
           className={cn(
-            'inline-flex h-12 min-w-[136px] flex-1 items-center justify-center rounded-[7.2px]',
-            'bg-yes text-sm leading-5 font-semibold text-white opacity-100',
+            "inline-flex h-12 min-w-[136px] flex-1 items-center justify-center rounded-[7.2px]",
+            "bg-yes text-sm leading-5 font-semibold text-white opacity-100",
           )}
         >
           Buy Yes {formatCents(yesPrice)}
@@ -75,8 +75,8 @@ export const OutcomeRow = memo(function OutcomeRow({
           type="button"
           disabled
           className={cn(
-            'inline-flex h-12 min-w-[136px] flex-1 items-center justify-center rounded-[7.2px]',
-            'bg-no/10 text-sm leading-5 font-semibold text-no',
+            "inline-flex h-12 min-w-[136px] flex-1 items-center justify-center rounded-[7.2px]",
+            "bg-no/10 text-sm leading-5 font-semibold text-no",
           )}
         >
           Buy No {formatCents(noPrice)}

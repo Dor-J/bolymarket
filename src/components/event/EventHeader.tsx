@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { Code2, Share2 } from 'lucide-react';
-import type { Event } from '@/types/polymarket';
-import { BookmarkButton } from '@/components/ui/BookmarkButton';
-import { IconButton } from '@/components/ui/IconButton';
-import { MarketThumbnail } from '@/components/market/MarketThumbnail';
-import { formatBreadcrumb } from '@/lib/event/formatBreadcrumb';
+import { Code2, Share2 } from "lucide-react";
+import type { Event } from "@/types/polymarket";
+import { BookmarkButton } from "@/components/ui/BookmarkButton";
+import { IconButton } from "@/components/ui/IconButton";
+import { MarketThumbnail } from "@/components/market/MarketThumbnail";
+import { formatBreadcrumb } from "@/lib/event/formatBreadcrumb";
 
 export interface EventHeaderProps {
   event: Event;
