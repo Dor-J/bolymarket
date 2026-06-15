@@ -1,3 +1,3 @@
 export { selectedCategoryAtom } from "./category";
-export { outcomePriceAtomFamily, marketPriceAtomFamily } from "./prices";
+export { outcomePriceAtomFamily, pruneStaleOutcomePrices } from "./prices";
 export { themeAtom } from "./theme";

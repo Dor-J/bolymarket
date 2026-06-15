@@ -2,11 +2,17 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useStore } from "jotai";
-import { commitOutcomePriceTick } from "@/lib/atoms/prices";
+import {
+  commitOutcomePriceTick,
+  pruneStaleOutcomePrices,
+} from "@/lib/atoms/prices";
 import { seedOutcomePrices } from "@/lib/atoms/seedPrices";
 import { configureCoalesceFlush } from "@/lib/prices/coalesceTicks";
 import type { OutcomePriceSeed } from "@/lib/prices/visibleOutcomeKeys";
-import { getOutcomeKeysFromSeeds } from "@/lib/prices/visibleOutcomeKeys";
+import {
+  getOutcomeKeysFromSeeds,
+  getOutcomeKeysSignature,
+} from "@/lib/prices/visibleOutcomeKeys";
 import { createSimulationEngine } from "@/lib/realtime/simulationEngine";
 
 function getSeedsSignature(seeds: OutcomePriceSeed[]): string {
@@ -22,8 +28,18 @@ function getSeedsSignature(seeds: OutcomePriceSeed[]): string {
 export function useLivePrices(seeds: OutcomePriceSeed[]): void {
   const store = useStore();
   const engineRef = useRef(createSimulationEngine());
+  const seedsRef = useRef(seeds);
+  seedsRef.current = seeds;
+
   const seedsSignature = useMemo(() => getSeedsSignature(seeds), [seeds]);
-  const outcomeKeys = useMemo(() => getOutcomeKeysFromSeeds(seeds), [seeds]);
+  const outcomeKeysSignature = useMemo(
+    () => getOutcomeKeysSignature(seeds),
+    [seeds],
+  );
+  const outcomeKeys = useMemo(
+    () => getOutcomeKeysFromSeeds(seeds).slice().sort(),
+    [outcomeKeysSignature],
+  );
 
   useEffect(() => {
     configureCoalesceFlush(({ outcomeKey, value }) => {
@@ -36,15 +52,18 @@ export function useLivePrices(seeds: OutcomePriceSeed[]): void {
   }, [store]);
 
   useEffect(() => {
-    seedOutcomePrices(store, seeds);
-  }, [store, seedsSignature, seeds]);
+    seedOutcomePrices(store, seedsRef.current);
+  }, [store, seedsSignature]);
 
   useEffect(() => {
+    const activeKeys = new Set(outcomeKeys);
+    pruneStaleOutcomePrices(activeKeys);
+
     const engine = engineRef.current;
     engine.start(outcomeKeys, store);
 
     return () => {
       engine.stop();
     };
-  }, [store, outcomeKeys, seedsSignature]);
+  }, [store, outcomeKeys, outcomeKeysSignature]);
 }
