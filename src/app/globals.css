@@ -68,6 +68,7 @@
   --radius-xl: 18px;
 
   --navbar-height: 104px;
+  --bprogress-height: 2px;
 }
 
 [data-theme="dark"] {
@@ -133,4 +134,55 @@ body {
 .price-text,
 [data-price] {
   font-variant-numeric: tabular-nums;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 0%,
+    var(--neutral-100) 50%,
+    var(--surface-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes route-progress {
+  0% {
+    width: 0%;
+    opacity: 1;
+  }
+
+  80% {
+    width: 90%;
+    opacity: 1;
+  }
+
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+.route-progress-bar {
+  animation: route-progress 600ms ease-out forwards;
 }
