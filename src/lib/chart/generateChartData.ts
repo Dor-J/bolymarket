@@ -1,15 +1,15 @@
-import type { Outcome } from '@/types/polymarket';
-import type { ChartPoint, Timeframe } from './types';
+import type { Outcome } from "@/types/polymarket";
+import type { ChartPoint, Timeframe } from "./types";
 
 const TIMEFRAME_CONFIG: Record<
   Timeframe,
   { points: number; durationMs: number }
 > = {
-  '1h': { points: 60, durationMs: 60 * 60 * 1000 },
-  '6h': { points: 72, durationMs: 6 * 60 * 60 * 1000 },
-  '1d': { points: 96, durationMs: 24 * 60 * 60 * 1000 },
-  '1w': { points: 168, durationMs: 7 * 24 * 60 * 60 * 1000 },
-  '1m': { points: 30, durationMs: 30 * 24 * 60 * 60 * 1000 },
+  "1h": { points: 60, durationMs: 60 * 60 * 1000 },
+  "6h": { points: 72, durationMs: 6 * 60 * 60 * 1000 },
+  "1d": { points: 96, durationMs: 24 * 60 * 60 * 1000 },
+  "1w": { points: 168, durationMs: 7 * 24 * 60 * 60 * 1000 },
+  "1m": { points: 30, durationMs: 30 * 24 * 60 * 60 * 1000 },
   all: { points: 90, durationMs: 90 * 24 * 60 * 60 * 1000 },
 };
 
@@ -40,22 +40,22 @@ function clampPrice(price: number): number {
 function formatAxisLabel(timestamp: number, timeframe: Timeframe): string {
   const date = new Date(timestamp);
 
-  if (timeframe === '1h' || timeframe === '6h') {
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
+  if (timeframe === "1h" || timeframe === "6h") {
+    return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
     });
   }
 
-  if (timeframe === '1d') {
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
+  if (timeframe === "1d") {
+    return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
     });
   }
 
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
   });
 }
 
@@ -95,7 +95,11 @@ export function generateChartData(
       break;
     }
 
-    for (let seriesIndex = 0; seriesIndex < workingPrices.length; seriesIndex += 1) {
+    for (
+      let seriesIndex = 0;
+      seriesIndex < workingPrices.length;
+      seriesIndex += 1
+    ) {
       const delta = (random() - 0.5) * 0.04;
       workingPrices[seriesIndex] = clampPrice(
         (workingPrices[seriesIndex] ?? 0) - delta,

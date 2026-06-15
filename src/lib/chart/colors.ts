@@ -1,11 +1,11 @@
 /** Shared palette for chart lines and outcome legend dots. */
 export const OUTCOME_COLORS = [
-  '#1452f0',
-  '#30a159',
-  '#e23939',
-  '#f8d743',
-  '#bd8de7',
-  '#06b3d6',
+  "#1452f0",
+  "#30a159",
+  "#e23939",
+  "#f8d743",
+  "#bd8de7",
+  "#06b3d6",
 ] as const;
 
 /**
