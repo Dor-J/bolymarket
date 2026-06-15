@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fetchEventBySlug, fetchOpenEvents, getOpenEvents } from "./gamma";
+import {
+  fetchAggregatedOpenEvents,
+  fetchEventBySlug,
+  fetchOpenEvents,
+  mergeEventsById,
+} from "./gamma";
 
 const mockGammaEvent = {
   id: "1",
@@ -68,8 +73,74 @@ describe("fetchOpenEvents", () => {
     );
   });
 
-  it("aliases getOpenEvents to fetchOpenEvents", () => {
-    expect(getOpenEvents).toBe(fetchOpenEvents);
+  it("passes tag_slug when filtering by category", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [],
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await fetchOpenEvents({ tagSlug: "crypto", relatedTags: true });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("tag_slug=crypto"),
+      expect.any(Object),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("related_tags=true"),
+      expect.any(Object),
+    );
+  });
+});
+
+describe("mergeEventsById", () => {
+  it("deduplicates by id and keeps the highest volume copy", () => {
+    const merged = mergeEventsById(
+      [
+        {
+          id: "1",
+          slug: "a",
+          title: "A",
+          tags: [],
+          volume: 10,
+          markets: [],
+        },
+      ],
+      [
+        {
+          id: "1",
+          slug: "a",
+          title: "A updated",
+          tags: [],
+          volume: 20,
+          markets: [],
+        },
+      ],
+    );
+
+    expect(merged).toHaveLength(1);
+    expect(merged[0]?.volume).toBe(20);
+  });
+});
+
+describe("fetchAggregatedOpenEvents", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("fetches trending plus crypto, sports, and politics", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [mockGammaEvent],
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const events = await fetchAggregatedOpenEvents();
+
+    expect(events).toHaveLength(1);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
   });
 });
 
