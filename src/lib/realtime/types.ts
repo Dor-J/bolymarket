@@ -1,4 +1,4 @@
-import type { Store } from 'jotai/vanilla/store';
+import type { Store } from "jotai/vanilla/store";
 
 /** Configuration for the client-side price simulation engine. */
 export interface SimulationConfig {

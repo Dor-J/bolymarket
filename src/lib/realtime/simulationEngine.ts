@@ -1,8 +1,8 @@
-import type { Store } from 'jotai/vanilla/store';
-import { outcomePriceAtomFamily } from '@/lib/atoms/prices';
-import { enqueuePriceTick } from '@/lib/prices/coalesceTicks';
-import { simulatePriceTick } from '@/lib/prices/simulatePriceTick';
-import type { PriceSource, SimulationConfig } from './types';
+import type { Store } from "jotai/vanilla/store";
+import { outcomePriceAtomFamily } from "@/lib/atoms/prices";
+import { enqueuePriceTick } from "@/lib/prices/coalesceTicks";
+import { simulatePriceTick } from "@/lib/prices/simulatePriceTick";
+import type { PriceSource, SimulationConfig } from "./types";
 
 const DEFAULT_CONFIG: SimulationConfig = {
   intervalMs: 1200,
@@ -26,7 +26,8 @@ export function createSimulationEngine(
     }
 
     const outcomeKey =
-      activeKeys[Math.floor(Math.random() * activeKeys.length)] ?? activeKeys[0];
+      activeKeys[Math.floor(Math.random() * activeKeys.length)] ??
+      activeKeys[0];
     const atom = outcomePriceAtomFamily(outcomeKey);
     const currentState = activeStore.get(atom);
     const currentValue = currentState?.value ?? 0.5;
