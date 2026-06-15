@@ -64,7 +64,15 @@ Hook tests colocate with source files and use the shared wrapper in
 | `useLivePrices.test.ts`     | Stub contract (Phase 4 `describe.todo` for live subscription)   |
 | `usePriceFlash.test.ts`     | Stub contract (Phase 4 `describe.todo` for flash styling)       |
 
-Related pure-function tests: [`src/lib/filters/category.test.ts`](../lib/filters/category.test.ts)
+Related pure-function tests:
+
+| Test file | Scope |
+| --- | --- |
+| `src/lib/filters/category.test.ts` | Category filter + sort |
+| `src/lib/format/price.test.ts` | Percent and cents formatting |
+| `src/lib/format/volume.test.ts` | Volume abbreviations |
+| `src/lib/cards/resolveCardVariant.test.ts` | Binary vs multi-outcome routing |
+| `src/lib/cards/mapEventToCardProps.test.ts` | Event → card prop mapping |
 
 Mock event fixtures: [`src/test/fixtures/events.ts`](../test/fixtures/events.ts)
 
