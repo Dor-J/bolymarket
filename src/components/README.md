@@ -56,14 +56,14 @@ components/
 | `ProbabilityBar`  | §12.3 — animated width (Phase 4 ticks)    |
 | `MarketThumbnail` | 24px circular image + initial fallback    |
 
-### `chart/` — Phase 3
+### `chart/` — Phase 3 (complete)
 
 | Component         | Notes                                           |
 | ----------------- | ----------------------------------------------- |
 | `PriceChart`      | Client — Recharts line chart, simulated history |
 | `TimeframeToggle` | Client — 1H 6H 1D 1W 1M ALL                     |
 
-### `event/` — Phase 3
+### `event/` — Phase 3 (complete)
 
 | Component                    | Notes                                 |
 | ---------------------------- | ------------------------------------- |
@@ -74,6 +74,7 @@ components/
 | `ChartMetaRow`               | Volume + end date                     |
 | `OrderSidebarPlaceholder`    | Static disabled trading panel         |
 | `EventDetailSkeleton`        | Detail page loading state             |
+| `EventDetailError`           | Retry + back link on fetch failure    |
 
 ### `ui/` — Phase 1–2
 

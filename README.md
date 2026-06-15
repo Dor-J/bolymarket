@@ -57,7 +57,7 @@ bun run format:check
 | 0 — Foundation   | Complete | Tokens, providers, Gamma API, types           |
 | 1 — App shell    | Complete | TopBar, CategoryNav, category filter          |
 | 2 — Events grid  | Complete | BinaryCard, MultiOutcomeCard, responsive grid |
-| 3 — Event detail | Planned  | `/event/[slug]`, chart, outcome rows          |
+| 3 — Event detail | Complete | `/event/[slug]`, chart, outcome rows          |
 | 4 — Realtime     | Planned  | Live prices, flash animations                 |
 
 ## Architecture (overview)
@@ -67,7 +67,7 @@ Gamma API → React Query cache → normalized Event / Market / Outcome types
                                       ↓
               useFilteredEvents + selectedCategoryAtom → EventsGrid
                                       ↓
-              useEvent(slug) → EventDetailPage (Phase 3)
+              useEvent(slug) → EventDetailPage
                                       ↓
               marketPriceAtomFamily → PriceDisplay (Phase 4)
 ```
@@ -81,15 +81,16 @@ Gamma API → React Query cache → normalized Event / Market / Outcome types
 | Route           | Description                                          |
 | --------------- | ---------------------------------------------------- |
 | `/`             | Home — events grid with category navigation          |
-| `/event/[slug]` | Event detail — header, chart, outcome list (Phase 3) |
+| `/event/[slug]` | Event detail — header, chart, outcome list, order sidebar placeholder |
 
 Event detail uses a **cache-first** strategy: resolve from the open-events query when warm; fall
 back to Gamma API fetch by slug on direct URL visits.
 
-## Chart data (Phase 3)
+## Chart data
 
-Historical chart lines use **simulated data** generated from current outcome prices. This is
-sufficient for the assignment — prioritize accurate **current** prices over historical accuracy.
+Historical chart lines use **simulated data** from `lib/chart/generateChartData.ts`, seeded from
+current outcome prices. This is sufficient for the assignment — prioritize accurate **current**
+prices over historical accuracy. Live ticks arrive in Phase 4.
 
 ## Trading
 
