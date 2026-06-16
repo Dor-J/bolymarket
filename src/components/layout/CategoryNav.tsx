@@ -37,9 +37,9 @@ export const CategoryNav = memo(function CategoryNav() {
                 ) : null}
               </div>
             ))}
-          </div>
 
-          <CategoryNavMore />
+            <CategoryNavMore />
+          </div>
         </div>
       </div>
     </nav>

@@ -228,7 +228,7 @@ export function UserMenu() {
   }
 
   return (
-    <div ref={containerRef} className="relative hidden md:block">
+    <div ref={containerRef} className="relative hidden xl:block">
       <IconButton
         label="Open user menu"
         aria-expanded={open}

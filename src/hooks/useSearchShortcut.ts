@@ -7,8 +7,13 @@ import { useEffect } from 'react';
  */
 export function useSearchShortcut(
   inputRef: React.RefObject<HTMLInputElement | null>,
+  enabled: boolean = true,
 ) {
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     function handleKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
       const isEditable =
@@ -24,5 +29,5 @@ export function useSearchShortcut(
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputRef]);
+  }, [inputRef, enabled]);
 }
