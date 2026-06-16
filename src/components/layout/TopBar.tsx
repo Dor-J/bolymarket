@@ -2,7 +2,7 @@
 
 import { Info, Search } from 'lucide-react';
 import { useAtom } from 'jotai';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { AuthModal, HowItWorksModal } from '@/components/ui/Modal';
 import { UserMenu } from '@/components/layout/UserMenu';
@@ -17,10 +17,23 @@ import { Logo } from './Logo';
 export function TopBar() {
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const searchRef = useRef<HTMLInputElement>(null);
+  const [isXlUp, setIsXlUp] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null);
   const [howItWorksOpen, setHowItWorksOpen] = useState(false);
 
-  useSearchShortcut(searchRef);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1280px)');
+    setIsXlUp(mq.matches);
+
+    function handleChange() {
+      setIsXlUp(mq.matches);
+    }
+
+    mq.addEventListener('change', handleChange);
+    return () => mq.removeEventListener('change', handleChange);
+  }, []);
+
+  useSearchShortcut(searchRef, isXlUp);
 
   return (
     <>
@@ -33,7 +46,7 @@ export function TopBar() {
         >
           <Logo className="shrink-0" />
 
-          <div className="relative hidden min-w-0 flex-1 justify-center md:flex">
+          <div className="relative hidden min-w-0 flex-1 justify-center xl:flex">
             <div className="relative w-full max-w-[600px]">
               <Search
               aria-hidden
@@ -59,7 +72,7 @@ export function TopBar() {
               className={cn(
                 'pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2',
                 'rounded border border-border bg-surface px-1.5 py-0.5',
-                'text-xs text-[#77808d] lg:inline',
+                'text-xs text-[#77808d] xl:inline',
               )}
             >
               /
@@ -70,7 +83,7 @@ export function TopBar() {
           <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
             <Button
               variant="ghost-brand"
-              className="hidden h-9 px-3 lg:inline-flex"
+              className="hidden h-9 px-3 xl:inline-flex"
               aria-label="How it works"
               onClick={() => setHowItWorksOpen(true)}
             >
@@ -80,7 +93,7 @@ export function TopBar() {
 
             <Button
               variant="ghost-brand"
-              className="hidden h-9 sm:inline-flex"
+              className="hidden h-9 xl:inline-flex"
               onClick={() => setAuthMode('login')}
             >
               Log In

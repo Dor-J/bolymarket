@@ -7,6 +7,7 @@ import { Footer } from './Footer';
 import { CategoryNav } from './CategoryNav';
 import { CategoryPathSync } from './CategoryPathSync';
 import { TopBar } from './TopBar';
+import { MarketSearchToolbar } from './MarketSearchToolbar';
 
 export interface AppShellProps {
   children: ReactNode;
@@ -32,6 +33,7 @@ export function AppShell({ children }: AppShellProps) {
       <CategoryPathSync />
       <TopBar />
       <CategoryNav />
+      <MarketSearchToolbar />
       <main className="flex-1">{children}</main>
       <Footer />
     </>
