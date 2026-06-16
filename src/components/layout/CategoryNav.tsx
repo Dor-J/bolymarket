@@ -47,7 +47,7 @@ export const CategoryNav = memo(function CategoryNav() {
                   {isActive ? (
                     <span
                       aria-hidden
-                      className="absolute inset-x-1 -bottom-[13px] h-0.5 rounded-full bg-brand"
+                      className="absolute inset-x-1 bottom-[-13px] h-0.5 rounded-full bg-brand"
                     />
                   ) : null}
                 </Link>

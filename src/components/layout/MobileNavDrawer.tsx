@@ -31,7 +31,7 @@ export function MobileNavDrawer({
   return (
     <AnimatePresence>
       {open ? (
-        <div className="fixed inset-0 z-[110] lg:hidden">
+        <div className="fixed inset-0 z-110 lg:hidden">
           <motion.button
             type="button"
             aria-label="Close menu"
