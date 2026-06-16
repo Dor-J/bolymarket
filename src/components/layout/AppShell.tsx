@@ -3,9 +3,11 @@
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { RouteProgress } from '@/components/navigation/RouteProgress';
+import { BackToTopButton } from './BackToTopButton';
 import { Footer } from './Footer';
 import { CategoryNav } from './CategoryNav';
 import { CategoryPathSync } from './CategoryPathSync';
+import { MobileBottomNav } from './MobileBottomNav';
 import { TopBar } from './TopBar';
 import { MarketSearchToolbar } from './MarketSearchToolbar';
 
@@ -36,6 +38,8 @@ export function AppShell({ children }: AppShellProps) {
       <MarketSearchToolbar />
       <main className="flex-1">{children}</main>
       <Footer />
+      <BackToTopButton />
+      <MobileBottomNav />
     </>
   );
 }
