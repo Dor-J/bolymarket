@@ -11,36 +11,14 @@ import {
   getRealtimeSubscriptionSignature,
 } from './subscriptionIndex';
 import { clampTradePrice, parseTradePayload } from './tradePayload';
+import {
+  disablePolymarketWsLogSuppression,
+  enablePolymarketWsLogSuppression,
+} from './suppressPolymarketWsLogs';
 import type { PriceSource } from './types';
 
 const ACTIVITY_TOPIC = 'activity';
 const TRADE_TYPES = new Set(['trades', 'orders_matched']);
-
-/**
- * Suppresses the Polymarket client's noisy 1005 log on intentional disconnects.
- */
-function disconnectClientQuietly(client: RealTimeDataClient): void {
-  const originalError = console.error;
-
-  console.error = (...args: unknown[]) => {
-    const isIntentionalClose =
-      args[0] === 'disconnected' &&
-      (args[2] === 1005 || args[2] === 1000) &&
-      (args[4] === '' || args[4] === 'Client shutdown');
-
-    if (isIntentionalClose) {
-      return;
-    }
-
-    originalError.apply(console, args);
-  };
-
-  try {
-    client.disconnect();
-  } finally {
-    console.error = originalError;
-  }
-}
 
 export interface WebSocketEngineOptions {
   /** When true, falls back to no-op ticks when disconnected. */
@@ -59,6 +37,22 @@ export function createWebSocketEngine(
   let subscribedEventSlugs: string[] = [];
   let subscriptionSignature = "";
   let connected = false;
+  let disableLogTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function cancelPendingLogSuppressionDisable(): void {
+    if (disableLogTimer) {
+      clearTimeout(disableLogTimer);
+      disableLogTimer = null;
+    }
+  }
+
+  function scheduleLogSuppressionDisable(): void {
+    cancelPendingLogSuppressionDisable();
+    disableLogTimer = setTimeout(() => {
+      disableLogTimer = null;
+      disablePolymarketWsLogSuppression();
+    }, 500);
+  }
 
   function subscribeToVisibleEvents(nextClient: RealTimeDataClient): void {
     if (subscribedEventSlugs.length === 0) {
@@ -129,6 +123,8 @@ export function createWebSocketEngine(
       },
     });
 
+    cancelPendingLogSuppressionDisable();
+    enablePolymarketWsLogSuppression();
     client.connect();
   }
 
@@ -137,9 +133,10 @@ export function createWebSocketEngine(
       return;
     }
 
-    disconnectClientQuietly(client);
+    client.disconnect();
     client = null;
     connected = false;
+    scheduleLogSuppressionDisable();
   }
 
   function updateSubscriptions(seeds: OutcomePriceSeed[]): void {
@@ -171,6 +168,7 @@ export function createWebSocketEngine(
     },
 
     stop() {
+      cancelPendingLogSuppressionDisable();
       disconnectClient();
       activeStore = null;
       assetToOutcomeKey = new Map();
