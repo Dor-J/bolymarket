@@ -68,7 +68,16 @@
   --radius-xl: 18px;
 
   --navbar-height: 104px;
+  --header-height: 56px;
+  --category-nav-height: 48px;
   --bprogress-height: 2px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --navbar-height: 116px;
+    --header-height: 68px;
+  }
 }
 
 [data-theme="dark"] {
@@ -112,6 +121,15 @@
   --radius-xl: var(--radius-xl);
 
   --font-sans: var(--font-inter), Inter, sans-serif;
+}
+
+html {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 body {
