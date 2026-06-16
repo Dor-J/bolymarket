@@ -37,18 +37,21 @@ export function CategoryNavLink({ item }: CategoryNavLinkProps) {
       ? pathname === '/'
       : pathname === item.href || pathname.startsWith(`${item.href}/`));
 
+  const isWorldCup = item.icon === 'world-cup';
+
   const className = cn(
     'inline-flex h-12 shrink-0 items-center gap-1.5 px-2.5',
     'text-sm leading-5 font-semibold whitespace-nowrap transition-colors',
     'hover:text-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
     isActive ? 'text-text' : 'text-[#77808d]',
-    !isActive && item.accentClass,
+    !isActive && !isWorldCup && item.accentClass,
+    isWorldCup ? 'rich-nav-world-cup' : '',
   );
 
   const content = (
     <>
       {renderIcon(item.icon, isActive)}
-      <span>{item.label}</span>
+      <span className={isWorldCup ? 'rich-nav-label' : undefined}>{item.label}</span>
     </>
   );
 

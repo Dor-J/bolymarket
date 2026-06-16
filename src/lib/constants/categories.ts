@@ -39,7 +39,6 @@ export const CATEGORY_NAV_ITEMS: CategoryNavItem[] = [
     href: '#',
     functional: false,
     icon: 'world-cup',
-    accentClass: 'text-[#9a6b2f]',
   },
   {
     key: 'breaking',

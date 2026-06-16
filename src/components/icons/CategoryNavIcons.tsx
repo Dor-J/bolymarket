@@ -34,14 +34,6 @@ export interface WorldCupIconProps {
  */
 export function WorldCupIcon({ className }: WorldCupIconProps) {
   return (
-    <span
-      aria-hidden
-      className={cn(
-        'inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center text-base leading-none',
-        className,
-      )}
-    >
-      ⚽
-    </span>
+    <span aria-hidden className={cn('rich-nav-icon size-4.5', className)} />
   );
 }

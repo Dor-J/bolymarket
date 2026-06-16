@@ -163,6 +163,55 @@ body {
   display: none;
 }
 
+/* Polymarket World Cup nav shine */
+.size-4\.5 {
+  width: 18px;
+  height: 18px;
+}
+
+.rich-nav-icon {
+  display: inline-block;
+}
+
+.rich-nav-icon,
+.rich-nav-label {
+  background-repeat: no-repeat;
+  background-position: -60px 0, 0 0;
+  animation: 5s cubic-bezier(.85, 0, .15, 1) infinite rich-nav-shine;
+}
+
+.rich-nav-world-cup .rich-nav-icon {
+  -webkit-mask: url('/WorldCupBall.svg') 50% / contain no-repeat;
+  mask: url('/WorldCupBall.svg') 50% / contain no-repeat;
+}
+
+.rich-nav-world-cup .rich-nav-icon,
+.rich-nav-world-cup .rich-nav-label {
+  background-image:
+    linear-gradient(110deg, transparent, #ffffffd9 50%, transparent),
+    linear-gradient(#cd9d00 0%, #997500 100%);
+  background-size: 40px 100%, 100% 100%;
+}
+
+.rich-nav-world-cup .rich-nav-label {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+@keyframes rich-nav-shine {
+  0%,
+  55% {
+    background-position: -60px 0, 0 0;
+  }
+
+  70%,
+  100% {
+    background-position: 120px 0, 0 0;
+  }
+}
+
 @keyframes shimmer {
   0% {
     background-position: 200% 0;
@@ -238,6 +287,11 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .price-flash-up,
   .price-flash-down {
+    animation: none !important;
+  }
+
+  .rich-nav-icon,
+  .rich-nav-label {
     animation: none !important;
   }
 
