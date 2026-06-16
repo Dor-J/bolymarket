@@ -1,6 +1,6 @@
 # Performance notes
 
-This document records performance decisions for bolymarket (PLAEE assignment). It complements the
+This document records performance decisions for bolymarket. It complements the
 **Performance** section in the root [README](../README.md).
 
 ## State boundaries
@@ -62,7 +62,7 @@ interval callbacks in one frame produce one Jotai write batch.
 
 ## Virtualization
 
-**Decision: skip** `@tanstack/react-virtual` for the assignment.
+**Decision: skip** `@tanstack/react-virtual` at the current payload scale.
 
 - Typical open-events payload is well under 100 cards.
 - Scroll and tick updates remain smooth on a mid-tier laptop without virtualizing.

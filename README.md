@@ -1,7 +1,7 @@
 # bolymarket
 
 bolymarket is a Next.js App Router clone of the [Polymarket](https://polymarket.com) homepage and
-event detail experience, built for the PLAEE frontend assignment. It focuses on UI fidelity
+event detail experience. It focuses on UI fidelity
 (responsive chrome, category navigation, footer, mobile bottom nav), client-side category filtering,
 live outcome prices (WebSocket with simulation fallback), and deliberate loading / empty / error
 states — without trading, wallet, or real authentication.
@@ -212,7 +212,7 @@ dev server is running. Uses OpenAPI 3.0 + `swagger-ui-dist` (compatible with Nex
 - `React.memo` on cards, outcome rows, and category nav; `EventCard` memoizes mapped props.
 - `useAtomValue` only in price leaf components — card shells do not re-render on tick.
 - React Query: `refetchOnWindowFocus: false` to avoid grid flicker; category filter is client-side.
-- Virtualization skipped at assignment scale (see [docs/PERFORMANCE.md](docs/PERFORMANCE.md)).
+- Virtualization skipped at current payload scale (see [docs/PERFORMANCE.md](docs/PERFORMANCE.md)).
 
 Profiler expectation: with 20+ cards visible, a single tick re-renders only the matching price
 leaves, not the full grid.

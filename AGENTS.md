@@ -8,7 +8,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # bolymarket agent notes
 
-PLAEE Polymarket-style assignment — **Phases 0–6 complete** (including chrome fidelity: footer,
+Polymarket-style UI clone — **Phases 0–6 complete** (including chrome fidelity: footer,
 mobile bottom nav, market search toolbar). Stack: Next.js 16, TypeScript, Tailwind v4, Jotai (UI +
 live prices), React Query (Gamma API cache), `@polymarket/real-time-data-client`, Recharts, Vitest
 (178 tests).
