@@ -28,7 +28,7 @@
     "recharts": "^3.8.1",
     "redis": "^6.0.0",
     "server-only": "^0.0.1",
-    "swagger-ui-react": "^5.32.6",
+    "swagger-ui-dist": "^5.32.6",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"
   },
@@ -39,7 +39,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/swagger-ui-react": "^5.18.0",
+    "@types/swagger-ui-dist": "^3.30.6",
     "@vitejs/plugin-react": "^6.0.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",

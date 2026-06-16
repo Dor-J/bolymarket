@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { SwaggerUIClient } from '@/components/api-docs/SwaggerUIClient';
+import { buildOpenApiSpec } from '@/lib/openapi/spec';
 import './swagger-overrides.css';
 
 export const metadata: Metadata = {
@@ -12,7 +14,12 @@ export const metadata: Metadata = {
 /**
  * Swagger UI page — interactive API explorer at /api-docs.
  */
-export default function ApiDocsPage() {
+export default async function ApiDocsPage() {
+  const headersList = await headers();
+  const host = headersList.get('host') ?? 'localhost:3000';
+  const protocol = headersList.get('x-forwarded-proto') ?? 'http';
+  const spec = buildOpenApiSpec({ serverUrl: `${protocol}://${host}` });
+
   return (
     <div className="min-h-screen bg-surface">
       <header className="border-b border-border bg-surface">
@@ -40,7 +47,7 @@ export default function ApiDocsPage() {
       </header>
 
       <main className="mx-auto max-w-[1350px] px-6 py-6">
-        <SwaggerUIClient specUrl="/api/openapi" />
+        <SwaggerUIClient spec={spec} />
       </main>
     </div>
   );

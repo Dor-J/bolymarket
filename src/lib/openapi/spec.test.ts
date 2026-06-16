@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { buildOpenApiSpec } from './spec';
 
 describe('buildOpenApiSpec', () => {
-  it('returns OpenAPI 3.1 document with all API paths', () => {
+  it('returns OpenAPI 3.0 document with all API paths', () => {
     const spec = buildOpenApiSpec({ serverUrl: 'http://localhost:3000' });
 
-    expect(spec.openapi).toBe('3.1.0');
+    expect(spec.openapi).toBe('3.0.3');
     expect(spec.info.title).toBe('bolymarket API');
     expect(spec.servers?.[0]?.url).toBe('http://localhost:3000');
     expect(spec.paths?.['/api/events']?.get).toBeDefined();

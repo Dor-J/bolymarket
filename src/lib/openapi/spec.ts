@@ -1,7 +1,7 @@
-import type { OpenAPIV3_1 } from 'openapi-types';
+import type { OpenAPIV3 } from 'openapi-types';
 
 /** Reusable OpenAPI schema components for bolymarket API responses. */
-export const openApiSchemas: OpenAPIV3_1.ComponentsObject['schemas'] = {
+export const openApiSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
   Outcome: {
     type: 'object',
     required: ['id', 'name', 'price'],
@@ -88,7 +88,7 @@ export const openApiSchemas: OpenAPIV3_1.ComponentsObject['schemas'] = {
       label: { type: 'string', example: 'Jan 1' },
     },
     additionalProperties: {
-      oneOf: [{ type: 'number' }, { type: 'string' }],
+      type: 'number',
       description: 'Series values keyed by CLOB token id.',
     },
   },
@@ -118,13 +118,13 @@ export interface BuildOpenApiSpecOptions {
 }
 
 /**
- * Builds the OpenAPI 3.1 specification for bolymarket REST routes.
+ * Builds the OpenAPI 3.0 specification for bolymarket REST routes.
  */
 export function buildOpenApiSpec({
   serverUrl,
-}: BuildOpenApiSpecOptions): OpenAPIV3_1.Document {
+}: BuildOpenApiSpecOptions): OpenAPIV3.Document {
   return {
-    openapi: '3.1.0',
+    openapi: '3.0.3',
     info: {
       title: 'bolymarket API',
       version: '1.0.0',

@@ -167,11 +167,11 @@ synced to live Jotai price atoms.
 ## API documentation
 
 Interactive **Swagger UI** is available at [`/api-docs`](http://localhost:3000/api-docs) when the
-dev server is running.
+dev server is running. Uses OpenAPI 3.0 + `swagger-ui-dist` (compatible with Next.js Turbopack).
 
 | Endpoint | Description |
 | -------- | ----------- |
-| `GET /api/openapi` | OpenAPI 3.1 JSON specification |
+| `GET /api/openapi` | OpenAPI 3.0 JSON specification |
 | `GET /api/events` | List open events (`?tag=crypto\|sports\|politics` optional) |
 | `GET /api/events/{slug}` | Single event by slug |
 | `GET /api/prices/{tokenId}` | CLOB price history (`?timeframe=1d` optional) |
