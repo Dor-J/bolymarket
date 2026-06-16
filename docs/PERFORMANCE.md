@@ -7,9 +7,9 @@ This document records performance decisions for bolymarket (PLAEE assignment). I
 
 | Layer             | Holds                                                 | Does not hold |
 | ----------------- | ----------------------------------------------------- | ------------- |
-| React Query       | Events list, single event by slug                     | Live prices   |
-| Jotai             | Category filter, `outcomePriceAtomFamily` per outcome | API cache     |
-| Local React state | Chart timeframe                                       | —             |
+| React Query       | Events list, per-tag events, single event by slug      | Live prices   |
+| Jotai             | Category filter, search query, bookmarks, theme, `outcomePriceAtomFamily` per outcome | API cache |
+| Local React state | Chart timeframe, modal open state, order ticket UI    | —             |
 
 Price ticks never call `invalidateQueries` or `setQueryData` on event queries.
 
@@ -22,7 +22,7 @@ Price ticks never call `invalidateQueries` or `setQueryData` on event queries.
 - `components/market/YesNoChip.tsx` (derives No from Yes atom)
 
 Card shells (`BinaryCard`, `MultiOutcomeCard`, `EventCard`) and list rows (`OutcomeRow`) do not
-subscribe to price atoms. A single simulation tick re-renders only the affected leaf components.
+subscribe to price atoms. A single price tick re-renders only the affected leaf components.
 
 ## Memoization
 
@@ -30,7 +30,7 @@ subscribe to price atoms. A single simulation tick re-renders only the affected 
 | ------------------------------------------------------------- | ------------------------------------------------------------- |
 | `BinaryCard`, `MultiOutcomeCard`, `OutcomeRow`, `CategoryNav` | `React.memo`                                                  |
 | `EventCard`                                                   | `React.memo` + `useMemo` for `mapEventToCardProps`            |
-| `EventsGrid`                                                  | `useMemo` for visible outcome seeds passed to `useLivePrices` |
+| `EventsGrid`, `EventsGridView`, `CategoryPageView`            | `useMemo` for visible outcome seeds passed to `useLivePrices` |
 
 ## React Query policy
 
@@ -42,13 +42,23 @@ Configured in `app/providers.tsx`:
 | `gcTime`               | 5m      | Keep warm cache for back navigation           |
 | `refetchOnWindowFocus` | `false` | Prevent grid flicker on tab focus             |
 
-Category changes filter cached events client-side — no network request.
+Category changes on home filter cached events client-side — no network request. Dedicated category
+routes (`/crypto`, etc.) use separate per-tag query keys and fetch once per tag while cache is warm.
+
+## Live price engine
+
+`useLivePrices` does not start a new interval or WebSocket per component instance. Instead:
+
+1. `acquireLivePriceEngine` in `livePriceEngineManager` reference-counts subscribers.
+2. One shared engine (`websocketEngine` and/or `simulationEngine` via `priceSourceFactory`) serves
+   all visible outcome keys.
+3. Tick commits go through `commitOutcomePriceTick` with RAF coalescing (`coalesceTicks`) so
+   multiple callbacks in one frame produce one Jotai write batch.
 
 ## Simulation batching
 
-`useLivePrices` seeds atoms once per visible outcome set, then runs a random-walk simulation. Tick
-commits are coalesced with `requestAnimationFrame` so multiple interval callbacks in one frame produce
-one Jotai write batch.
+When simulation is active, random-walk ticks are coalesced with `requestAnimationFrame` so multiple
+interval callbacks in one frame produce one Jotai write batch.
 
 ## Virtualization
 
@@ -65,9 +75,10 @@ dataset.
 
 1. **Profiler:** Home grid with 20+ cards → one price tick → only matching `PriceDisplay` / bar /
    chip leaves re-render (card shells stay idle).
-2. **Network:** Switch category tabs → no new Gamma requests while cache is fresh.
-3. **Soak:** Leave tab open 5+ minutes → simulation interval cleans up on unmount; no runaway memory
-   growth in DevTools heap snapshot (smoke test).
+2. **Network:** Switch category tabs on home → no new Gamma requests while aggregated cache is fresh.
+3. **Network:** Navigate to `/crypto` → one tag fetch; return to home → no refetch if staleTime not exceeded.
+4. **Soak:** Leave tab open 5+ minutes → engine cleans up on unmount; no runaway memory growth in
+   DevTools heap snapshot (smoke test).
 
 ## Images
 

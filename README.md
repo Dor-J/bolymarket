@@ -1,9 +1,10 @@
 # bolymarket
 
 bolymarket is a Next.js App Router clone of the [Polymarket](https://polymarket.com) homepage and
-event detail experience, built for the PLAEE frontend assignment. It focuses on UI fidelity,
-responsive layouts, client-side category filtering, simulated live prices, and deliberate loading /
-empty / error states — without trading, wallet, or auth.
+event detail experience, built for the PLAEE frontend assignment. It focuses on UI fidelity
+(responsive chrome, category navigation, footer, mobile bottom nav), client-side category filtering,
+live outcome prices (WebSocket with simulation fallback), and deliberate loading / empty / error
+states — without trading, wallet, or real authentication.
 
 ## Setup
 
@@ -24,7 +25,7 @@ bun install
 bun run dev        # http://localhost:3000
 bun run build      # production build
 bun run start      # serve production build
-bun run test       # Vitest unit + component tests
+bun run test       # Vitest unit + component tests (178 tests)
 bun run lint
 bun run format:check
 ```
@@ -46,7 +47,7 @@ BoliMarket/           # workspace root
 - Next.js 16 (App Router)
 - TypeScript (strict)
 - Tailwind CSS v4 + semantic design tokens
-- Jotai — UI filter state and live outcome prices
+- Jotai — UI filter state, search query, bookmarks, theme, and live outcome prices
 - TanStack React Query + `@tanstack/react-query-persist-client` — events cached in memory and IndexedDB
 - `@polymarket/real-time-data-client` — live trade WebSocket for outcome prices
 - Zod — API response validation
@@ -60,20 +61,21 @@ Structural event data and live prices are intentionally split:
 
 - **React Query** fetches aggregated events (trending + crypto + sports + politics) via
   `/api/events`, persisted to **IndexedDB** on the client and cached in **Redis** (or in-memory
-  fallback) on the server. Bump `QUERY_PERSIST_BUSTER` in `src/lib/cache/constants.ts` when the
-  `Event` shape changes. Prices are read once at seed time — never written back into the query cache
-  on tick.
-- **Jotai** holds `selectedCategoryAtom` and `outcomePriceAtomFamily` keyed by
-  `${marketId}:${outcomeId}` so each outcome updates independently.
-- **Live prices** (`useLivePrices`) seed atoms from API snapshots, then subscribe to Polymarket
-  `activity` trades via `@polymarket/real-time-data-client`, with simulation fallback in `auto`
-  mode when the socket is unavailable.
+  fallback) on the server. Dedicated category routes use `/api/events?tag=…`. Bump
+  `QUERY_PERSIST_BUSTER` in `src/lib/cache/constants.ts` when the `Event` shape changes. Prices are
+  read once at seed time — never written back into the query cache on tick.
+- **Jotai** holds `selectedCategoryAtom`, `searchQueryAtom`, `bookmarksAtom`, `themeAtom`, and
+  `outcomePriceAtomFamily` keyed by `${marketId}:${outcomeId}` so each outcome updates
+  independently.
+- **Live prices** (`useLivePrices`) seed atoms from API snapshots, then run a shared engine via
+  `livePriceEngineManager` — Polymarket `activity` WebSocket trades when available, with simulation
+  fallback in `auto` mode when the socket is unavailable.
 
 ```text
                     ┌─────────────────────┐
                     │   Gamma REST API    │
                     └──────────┬──────────┘
-                               │ aggregated fetch (4 parallel)
+                               │ aggregated fetch (4 parallel) or ?tag=
                                ▼
                     ┌─────────────────────┐
                     │ /api/events         │
@@ -88,12 +90,12 @@ Structural event data and live prices are intentionally split:
                                │ normalized Event[]
            ┌───────────────────┼───────────────────┐
            ▼                   ▼                   ▼
-    useFilteredEvents     useEvent(slug)     (no price writes)
-           │                   │
-           ▼                   ▼
-      EventsGrid         EventDetailPage
-           │                   │
-           └─────────┬─────────┘
+    useFilteredEvents     useCategoryEvents    useEvent(slug)
+           │                   │                   │
+           ▼                   ▼                   ▼
+      EventsGrid         CategoryPageView     EventDetailPage
+           │                   │                   │
+           └─────────┬─────────┴───────────────────┘
                      │ useLivePrices(seeds)
                      ▼ WebSocket trades + optional simulation
            ┌─────────────────────┐
@@ -122,16 +124,19 @@ URLs fetch by slug.
 | `/event/[slug]` | Event detail — header, CLOB chart, outcome rows, order ticket UI      |
 | `/api-docs`     | Interactive Swagger UI — OpenAPI explorer for REST routes           |
 
-Category nav uses Next.js links with URL-based active state. Home (`/`) still shows aggregated
-trending + category data; dedicated routes fetch per-tag lists from Gamma.
+Category nav uses Next.js links with URL-based active state (`CategoryPathSync` keeps
+`selectedCategoryAtom` in sync). Home (`/`) shows aggregated trending + category data with
+client-side filter; dedicated routes fetch per-tag lists from Gamma.
 
 ## Realtime approach
 
 - **Primary source:** `@polymarket/real-time-data-client` WebSocket — subscribes to `activity`
   `trades` / `orders_matched` filtered by visible `event_slug`, maps `asset` (CLOB token id) to
-  Jotai outcome atoms.
+  Jotai outcome atoms via `websocketEngine`.
 - **Fallback:** Client-side random-walk simulation when `NEXT_PUBLIC_LIVE_PRICE_MODE=auto` and the
   socket is not connected within 2s (or always when mode is `simulation`).
+- **Engine:** `acquireLivePriceEngine` in `livePriceEngineManager` shares one engine across all
+  `useLivePrices` subscribers; reference-counted start/stop.
 - **State:** Jotai `outcomePriceAtomFamily`; React Query holds structural event data only.
 - **Updates:** Batched via `requestAnimationFrame` coalescing; only leaf components subscribe.
 - **UX:** Green/red flash ~700ms on direction change; probability bars animate over 300ms;
@@ -146,14 +151,36 @@ synced to live Jotai price atoms.
 
 ## Chrome & UX
 
-- **Search:** Debounced client filter (300ms) with `/` keyboard shortcut to focus the input.
-- **Auth:** Visual-only Log In / Sign Up modals (no real authentication).
-- **Mobile nav:** Slide-in drawer with category links and auth actions.
-- **Bookmarks:** Persisted to `localStorage` via `bookmarksAtom`.
-- **Share / Embed:** Web Share API with clipboard fallback; embed code popover on event detail.
-- **Dark mode:** Toggle in top bar; persisted theme with pre-hydration script to avoid flash.
-- **Motion:** Card hover lift, route progress bar, page fade, modal/drawer transitions; respects
-  `prefers-reduced-motion`.
+Application chrome is mounted in `AppShell` (skipped on `/api-docs`).
+
+| Layer | Component | Notes |
+| ----- | --------- | ----- |
+| Header | `TopBar` | Logo, search (`xl+`), How it works, Log In, Sign Up, `UserMenu` hamburger (`xl+`) |
+| Nav | `CategoryNav` | Sticky category rail; functional links for Trending, Politics, Sports, Crypto |
+| Toolbar | `MarketSearchToolbar` | Search + filter/bookmark icons below nav when header search hidden (`xl:hidden`) |
+| Main | `PageContainer` | max-w 1350px, route fade transition |
+| Footer | `Footer` | Polymarket-style topic grid, support links, social icons, legal row, disclaimer |
+| Mobile | `MobileBottomNav` | Fixed bottom nav — Home, Search, Breaking, More (`md:hidden`) |
+| Mobile | `BackToTopButton` | Scroll-to-top pill above bottom nav (`md:hidden`) |
+
+**Responsive breakpoints (header):** at `xl` (1280px) and above, search lives in the header; below
+`xl`, search moves to `MarketSearchToolbar`. Mobile header shows logo + Sign Up only.
+
+**Search:** Shared `searchQueryAtom`; debounced client filter (300ms); `/` keyboard shortcut focuses
+the visible search input (`useSearchShortcut` with `enabled` tied to breakpoint).
+
+**Auth:** Visual-only Log In / Sign Up modals (`AuthModal`).
+
+**Bookmarks:** Persisted to `localStorage` via `bookmarksAtom`; toggle on cards via `BookmarkButton`.
+The toolbar bookmark icon is visual-only (not yet wired).
+
+**Theme:** Dark mode toggle in desktop `UserMenu`; `ThemeSync` applies `data-theme` on `<html>`;
+pre-hydration script in `layout.tsx` avoids flash.
+
+**Share / Embed:** Web Share API with clipboard fallback; embed code popover on event detail.
+
+**Motion:** Card hover lift, route progress bar, page fade, modal/drawer transitions; respects
+`prefers-reduced-motion`.
 
 ## Limitations
 
@@ -163,6 +190,9 @@ synced to live Jotai price atoms.
 - **Trading:** Order ticket is visual-only — "Sign up to trade" CTA is disabled.
 - **Scope:** No wallet, real authentication, portfolio, or order execution.
 - **Search:** Client-side filter on cached events only (no Gamma `/public-search`).
+- **Chrome placeholders:** Many nav/footer/hamburger links are visual-only (`href="#"`). Filter
+  toolbar button is decorative. Mobile Breaking/More bottom-nav items are no-ops.
+- **Home toolbar:** Polymarket filter pills and "24hr Volume" sort row are not yet implemented.
 
 ## API documentation
 
@@ -193,14 +223,17 @@ leaves, not the full grid.
 bun run test
 ```
 
-Coverage includes:
+**55 test files · 178 tests** (Vitest). Coverage includes:
 
-- Gamma fetch/normalize, CLOB chart normalizer, per-tag server cache, card mapping, category filters
-- Hooks: `useEvents`, `useFilteredEvents`, `useCategoryEvents`, `useEvent`, `useLivePrices`,
-  `usePriceFlash`, `useReducedMotion`, `useChartTimeframe`
-- Component tests: `EventsGrid`, `CategoryNav`, `CategoryPageView`, `FeaturedCarousel`, `OrderTicket`,
-  `EventListEmpty`
-- Atoms: bookmarks, category route validation
+- **API / cache:** Gamma fetch/normalize, CLOB chart normalizer, per-tag server cache, OpenAPI spec
+- **Cards / filters:** Card mapping, category filters, search filter, volume/price formatters
+- **Hooks:** `useEvents`, `useFilteredEvents`, `useCategoryEvents`, `useEvent`, `useLivePrices`,
+  `useDebouncedValue`, `usePriceFlash`, `useReducedMotion`, `useChartTimeframe`
+- **Realtime:** `livePriceEngineManager`, simulation engine, trade payload, subscription index
+- **Layout chrome:** `Footer`, `MobileBottomNav`, `BackToTopButton`, `MarketSearchToolbar`,
+  `CategoryNav`, `CategoryNavMore`
+- **Pages:** `EventsGrid`, `FeaturedCarousel`, `CategoryPageView`, `OrderTicket`, `EventListEmpty`
+- **Atoms:** bookmarks, category route validation, price seeds
 
 Shared test helpers: `src/test/test-utils.tsx` (`renderHookWithProviders`, `renderWithProviders`).
 
@@ -208,23 +241,24 @@ Shared test helpers: `src/test/test-utils.tsx` (`renderHookWithProviders`, `rend
 
 ```text
 src/
-├── app/              Routes, layout, providers
+├── app/              Routes, layout, providers, API routes
 ├── components/       UI by feature (see src/components/README.md)
 ├── hooks/            Data + realtime hooks (see src/hooks/README.md)
-├── lib/              API, atoms, prices, chart, formatters
+├── lib/              API, atoms, prices, chart, realtime, cache, formatters
 └── types/            Polymarket domain types
 ```
 
 ## Implementation progress
 
-| Phase               | Status   | Deliverable                                   |
-| ------------------- | -------- | --------------------------------------------- |
-| 0 — Foundation      | Complete | Tokens, providers, Gamma API, types           |
-| 1 — App shell       | Complete | TopBar, CategoryNav, category filter          |
-| 2 — Events grid     | Complete | BinaryCard, MultiOutcomeCard, responsive grid |
-| 3 — Event detail    | Complete | `/event/[slug]`, chart, outcome rows          |
-| 4 — Realtime        | Complete | Live simulation, flash, leaf-only updates     |
-| 5 — Polish & README | Complete | UX audit, performance docs, submission README |
+| Phase               | Status   | Deliverable                                              |
+| ------------------- | -------- | -------------------------------------------------------- |
+| 0 — Foundation      | Complete | Tokens, providers, Gamma API, types                      |
+| 1 — App shell       | Complete | TopBar, CategoryNav, category filter, path sync         |
+| 2 — Events grid     | Complete | BinaryCard, MultiOutcomeCard, featured carousel, grid    |
+| 3 — Event detail    | Complete | `/event/[slug]`, chart, outcome rows, order ticket       |
+| 4 — Realtime        | Complete | WebSocket + simulation, flash, leaf-only updates         |
+| 5 — Polish & README | Complete | UX audit, performance docs, submission README            |
+| 6 — Chrome fidelity | Complete | Footer, mobile bottom nav, market search toolbar, nav QA |
 
 ## Planning
 
@@ -237,8 +271,12 @@ Detailed implementation plans live in `../plans/`:
 - [PLAN-Phase-4-Realtime-Prices.md](../plans/PLAN-Phase-4-Realtime-Prices.md)
 - [PLAN-Phase-5-Polish-Performance-README.md](../plans/PLAN-Phase-5-Polish-Performance-README.md)
 
+Side-by-side chrome comparison notes: `../design-system/header-and-nav-side-to-side-comparison.md`,
+`../design-system/footer-side-by-side-comparison.md`.
+
 ## Further reading
 
 - [src/components/README.md](src/components/README.md) — component map and conventions
 - [src/hooks/README.md](src/hooks/README.md) — hook reference and data flow
 - [docs/PERFORMANCE.md](docs/PERFORMANCE.md) — profiling notes and virtualization decision
+- [../polymarket-github-repos/README.md](../polymarket-github-repos/README.md) — Polymarket OSS repo catalog

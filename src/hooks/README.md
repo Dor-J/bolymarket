@@ -4,54 +4,88 @@ Custom React hooks for bolymarket. All paths are relative to `src/hooks/`.
 
 ## Hook reference
 
-| Hook                | Phase | Purpose                                                               |
-| ------------------- | ----- | --------------------------------------------------------------------- |
-| `useEvents`         | 1     | React Query wrapper — fetches open events via `eventsQueryOptions`    |
-| `useFilteredEvents` | 1     | Reads `selectedCategoryAtom`; filters + sorts cached events by volume |
-| `useEvent`          | 3     | React Query wrapper — single event by slug, cache-first               |
-| `useChartTimeframe` | 3     | Local state for chart timeframe toggle (`1h` … `all`)                 |
-| `useLivePrices`     | 4     | Seeds outcome atoms and runs price simulation for visible keys        |
-| `usePriceFlash`     | 4     | Flash direction + CSS class from price delta                          |
-| `useReducedMotion`  | 4     | Reads `prefers-reduced-motion` for accessible price updates           |
+| Hook                | Purpose                                                                 |
+| ------------------- | ----------------------------------------------------------------------- |
+| `useEvents`         | React Query wrapper — fetches aggregated open events                    |
+| `useFilteredEvents` | Category + debounced search filter on home aggregated cache             |
+| `useCategoryEvents` | React Query per-tag fetch for `/crypto`, `/sports`, `/politics` + search |
+| `useEvent`          | React Query — single event by slug, cache-first                         |
+| `useChartTimeframe` | Local state for chart timeframe toggle (`1h` … `all`)                   |
+| `useLivePrices`     | Seeds outcome atoms; shared WebSocket/simulation engine for visible keys |
+| `usePriceFlash`     | Flash direction + CSS class from price delta                            |
+| `useReducedMotion`  | Reads `prefers-reduced-motion` for accessible price updates             |
+| `useDebouncedValue` | Generic debounce helper (search uses 300ms)                             |
+| `useSearchShortcut` | Focuses search input on `/` key (`enabled` param for breakpoint gating)   |
 
 ## Data flow
 
-### Home page (Phase 1–2)
+### Home page (`/`)
 
 ```text
-useEvents()                    → React Query: ['events', { closed: false }]
+useEvents()                    → React Query: aggregated ['events', { closed: false }]
         ↓
-useFilteredEvents()            → useAtomValue(selectedCategoryAtom)
-        ↓                        filterAndSortEvents() in useMemo
-EventsGrid / EventsGrid        → renders EventCard list
+useFilteredEvents()            → selectedCategoryAtom + debounced searchQueryAtom
+        ↓                        filterAndSortEvents() + filterEventsBySearch()
+EventsGrid                     → FeaturedCarousel + EventsGridView
+        ↓
+useLivePrices(seeds)           → shared livePriceEngineManager
 ```
 
-Category changes are **instant** — no refetch; filter runs on cached data only.
+Category changes on home are **instant** when filtering cached aggregated data. Navigating to
+`/politics` etc. uses a dedicated tag fetch instead.
 
-### Event detail (Phase 3)
+### Category pages (`/crypto`, `/sports`, `/politics`)
+
+```text
+useCategoryEvents(tag)         → React Query: ['events', { tag }]
+        ↓                        filterEventsBySearch(debounced searchQueryAtom)
+CategoryPageView               → header + EventsGridView (with featured strip)
+        ↓
+useLivePrices(seeds)
+```
+
+`CategoryPathSync` sets `selectedCategoryAtom` from the pathname so nav active state stays correct.
+
+### Event detail (`/event/[slug]`)
 
 ```text
 useEvent(slug)                 → React Query: ['event', slug]
         ↓                        cache-first from events list, else fetchEventBySlug
-EventDetailPage                → header, chart, outcome rows
+EventDetailPage                → header, chart, outcome rows, order ticket
+        ↓
+useLivePrices(seeds)
 ```
 
-Direct URL visits (`/event/my-slug`) hit the API when the events cache is cold.
+Direct URL visits hit the API when the events cache is cold.
 
-### Realtime (Phase 4)
+### Realtime
 
 ```text
-useLivePrices(priceSeeds)        → seed + simulationEngine for visible outcome keys
+useLivePrices(priceSeeds)
         ↓
-outcomePriceAtomFamily         → leaf subscribers only (PriceDisplay, bars, chips)
+seedOutcomePrices()            → Jotai outcomePriceAtomFamily
+        ↓
+acquireLivePriceEngine()       → websocketEngine and/or simulationEngine
+        ↓
+commitOutcomePriceTick()       → RAF-coalesced atom writes
+        ↓
+PriceDisplay · ProbabilityBar · YesNoChip   → leaf useAtomValue only
 ```
+
+Mode is controlled by `NEXT_PUBLIC_LIVE_PRICE_MODE` (`auto` | `websocket` | `simulation`) via
+`priceSourceFactory`.
+
+### Search shortcut
+
+`TopBar` enables `useSearchShortcut(searchRef, isXlUp)` for header search at `xl+`.
+`MarketSearchToolbar` enables it when `!isXlUp`. Only one input is focused per breakpoint.
 
 ## Conventions
 
 - Data fetching hooks use TanStack React Query — never Jotai for API cache.
-- UI filter and live price state use Jotai atoms from `@/lib/atoms/`.
+- UI filter, search, bookmarks, theme, and live price state use Jotai atoms from `@/lib/atoms/`.
 - Hooks that call `useQuery` must be used inside `QueryClientProvider` (wired in `app/providers.tsx`).
-- Export JSDoc on every public hook describing params, return shape, and phase status.
+- Export JSDoc on every public hook describing params, return shape, and behavior.
 
 ## Tests
 
@@ -61,46 +95,35 @@ Hook tests colocate with source files and use the shared wrapper in
 | Test file                             | Hook / scope                                                    |
 | ------------------------------------- | --------------------------------------------------------------- |
 | `useEvents.test.ts`                   | Loading, success, error, query key                              |
-| `useFilteredEvents.test.ts`           | Category filter, volume sort, error forwarding, category change |
+| `useFilteredEvents.test.ts`           | Category filter, volume sort, search, error forwarding          |
 | `useEvent.test.ts`                    | Cache-first slug lookup; cold-cache API fallback                |
-| `useLivePrices.test.ts`               | Seeds atoms, simulation ticks, cleanup                          |
+| `useLivePrices.test.ts`               | Seeds atoms, engine lease, cleanup                              |
+| `useDebouncedValue.test.ts`           | Debounce timing                                                 |
 | `usePriceFlash.test.ts`               | Up/down/none flash classes                                      |
 | `usePriceFlash.reducedMotion.test.ts` | Reduced-motion neutral path via usePriceFlash                   |
 | `useChartTimeframe.test.ts`           | Initial timeframe + selectTimeframe updates                     |
 | `useReducedMotion.test.ts`            | matchMedia preference + change listener                         |
 
-Component smoke tests:
+Related lib tests (realtime, not hooks but coupled):
+
+| Test file                                   | Scope                               |
+| ------------------------------------------- | ----------------------------------- |
+| `lib/realtime/livePriceEngineManager.test.ts` | Shared engine reference counting  |
+| `lib/realtime/simulationEngine.test.ts`     | Simulation start/stop               |
+| `lib/realtime/tradePayload.test.ts`         | WebSocket trade → price mapping     |
+| `lib/realtime/subscriptionIndex.test.ts`    | Event slug subscription index       |
+
+Component tests that exercise hooks indirectly:
 
 | Test file                                     | Scope                                   |
 | --------------------------------------------- | --------------------------------------- |
 | `src/components/home/EventsGrid.test.tsx`     | Loading skeleton, error, empty, success |
-| `src/components/home/EventListEmpty.test.tsx` | Empty copy                              |
-
-Related pure-function tests:
-
-| Test file                                   | Scope                                                    |
-| ------------------------------------------- | -------------------------------------------------------- |
-| `src/lib/filters/category.test.ts`          | Category filter + sort                                   |
-| `src/lib/format/price.test.ts`              | Percent and cents formatting                             |
-| `src/lib/format/volume.test.ts`             | Volume abbreviations                                     |
-| `src/lib/format/detailVolume.test.ts`       | Full-precision detail volume                             |
-| `src/lib/format/date.test.ts`               | ISO date formatting                                      |
-| `src/lib/cards/resolveCardVariant.test.ts`  | Binary vs multi-outcome routing                          |
-| `src/lib/cards/mapEventToCardProps.test.ts` | Event → card prop mapping + yes/no helpers               |
-| `src/lib/chart/generateChartData.test.ts`   | Simulated chart series                                   |
-| `src/lib/chart/colors.test.ts`              | Outcome color palette indexing                           |
-| `src/lib/event/formatBreadcrumb.test.ts`    | Detail breadcrumb labels                                 |
-| `src/lib/event/flattenOutcomes.test.ts`     | Detail outcome row flattening                            |
-| `src/lib/api/normalize.test.ts`             | Gamma event/market normalization                         |
-| `src/lib/api/gamma.test.ts`                 | `fetchOpenEvents` + `fetchEventBySlug`                   |
-| `src/lib/prices/*.test.ts`                  | Outcome keys, coalescing, simulation step, visible seeds |
-| `src/lib/atoms/seedPrices.test.ts`          | Seed + commit atom helpers                               |
-| `src/lib/realtime/simulationEngine.test.ts` | Simulation start/stop                                    |
+| `src/components/category/CategoryPageView.test.tsx` | Tag page data flow                  |
 
 Mock event fixtures: [`src/test/fixtures/events.ts`](../test/fixtures/events.ts)
 
 ```bash
-bun run test          # run once
+bun run test          # 178 tests across 55 files
 bun run test:watch    # watch mode
 ```
 

@@ -6,110 +6,143 @@ UI components for bolymarket. All paths are relative to `src/components/`.
 
 ```text
 components/
-├── cards/       Market cards for the home grid (Phase 2)
-├── chart/       Price chart + timeframe controls (Phase 3)
-├── event/       Event detail page sections (Phase 3)
-├── home/        Home page content (grid, skeletons, empty states)
-├── layout/      App shell — TopBar, CategoryNav, PageContainer
+├── api-docs/    Swagger UI client wrapper
+├── cards/       Market cards for the home grid
+├── category/    Dedicated category route pages (Crypto, Sports, Politics)
+├── chart/       Price chart + timeframe controls
+├── event/       Event detail page sections
+├── home/        Home page content (grid, carousel, skeletons, empty states)
+├── icons/       Inline SVG icons (nav, footer, user menu)
+├── layout/      App shell — header, nav, footer, mobile chrome
 ├── market/      Shared market UI — prices, chips, probability bars
 ├── navigation/  Route progress indicator
 ├── theme/       Theme sync (data-theme on <html>)
-└── ui/          Generic primitives — Button, IconButton, Chip
+└── ui/          Generic primitives — Button, Modal, BookmarkButton
 ```
 
-## Phase status by folder
+## Layout chrome (`layout/`)
 
-### `layout/` — Phase 1 (complete)
+Mounted by `AppShell` on all routes except `/api-docs`.
 
-| Component       | Type         | Notes                                    |
-| --------------- | ------------ | ---------------------------------------- |
-| `AppShell`      | Server       | TopBar + CategoryNav wrapper             |
-| `TopBar`        | Client       | Sticky 64px — logo, search, auth buttons |
-| `CategoryNav`   | Client, memo | Sticky 48px — Jotai category filter      |
-| `PageContainer` | Server       | max-w 1350px, px-6 gutters               |
-| `Logo`          | Server       | bolymarket wordmark                      |
+| Component            | Type         | Notes                                                                 |
+| -------------------- | ------------ | --------------------------------------------------------------------- |
+| `AppShell`           | Client       | Chrome wrapper — TopBar, nav, toolbar, main, footer, mobile chrome    |
+| `TopBar`             | Client       | Sticky header — logo, search (`xl+`), auth, `UserMenu` (`xl+`)        |
+| `CategoryNav`        | Client, memo | Sticky 48px category rail with scroll + `CategoryNavMore`           |
+| `CategoryNavLink`    | Client       | Single nav item; active = darker text only (no underline)           |
+| `CategoryNavMore`    | Client       | "More" dropdown; panel portaled to avoid overflow clip                |
+| `CategoryPathSync`   | Client       | Syncs `selectedCategoryAtom` from pathname                            |
+| `MarketSearchToolbar`| Client       | Below-nav search + filter/bookmark icons (`xl:hidden`)              |
+| `UserMenu`           | Client       | Desktop hamburger — theme, language, APIs link (`xl+`)                |
+| `Footer`             | Server       | Polymarket-style responsive footer grid + legal region                |
+| `MobileBottomNav`    | Client       | Fixed bottom nav — Home, Search, Breaking, More (`md:hidden`)         |
+| `BackToTopButton`    | Client       | Mobile scroll-to-top pill above bottom nav (`md:hidden`)              |
+| `PageContainer`      | Client       | max-w 1350px, px-6 gutters, route fade transition                     |
+| `Logo`               | Server       | bolymarket wordmark                                                   |
+| `ThemeToggle`        | Client       | Standalone theme toggle (used inside `UserMenu`)                      |
 
-### `home/` — Phase 2 (complete)
+## Home (`home/`)
 
-| Component            | Notes                                  |
-| -------------------- | -------------------------------------- |
-| `EventsGrid`         | Responsive card grid container         |
-| `EventsGridSkeleton` | Skeleton grid matching card silhouette |
-| `EventsGridError`    | Retry UI when events query fails       |
-| `EventListEmpty`     | Empty category filter state            |
+| Component            | Notes                                                       |
+| -------------------- | ----------------------------------------------------------- |
+| `EventsGrid`         | Home orchestrator — featured carousel + grid                |
+| `EventsGridView`     | Presentational grid with loading/error/empty + live prices  |
+| `FeaturedCarousel`   | Horizontal featured markets strip                           |
+| `EventsGridSkeleton` | Skeleton grid matching card silhouette                      |
+| `EventsGridError`    | Retry UI when events query fails                            |
+| `EventListEmpty`     | Empty filter/search state                                   |
 
-### `cards/` — Phase 2 (complete)
+## Category pages (`category/`)
+
+| Component          | Notes                                                        |
+| ------------------ | ------------------------------------------------------------ |
+| `CategoryPageView` | `/crypto`, `/sports`, `/politics` — tag fetch + grid + header |
+
+## Cards (`cards/`)
 
 | Component          | Notes                                                 |
 | ------------------ | ----------------------------------------------------- |
 | `BinaryCard`       | `React.memo` — single market, Yes/No, probability bar |
-| `MultiOutcomeCard` | `React.memo` — top 2 outcomes + chips                 |
+| `MultiOutcomeCard` | `React.memo` — top 2 outcomes + Yes/No chips        |
 | `EventCard`        | Variant router: binary vs multi-outcome               |
 | `CardSkeleton`     | Shimmer placeholder matching card anatomy             |
 
-### `market/` — Phase 2 (complete, reused in Phase 3)
+## Market primitives (`market/`)
 
 | Component         | Notes                                        |
 | ----------------- | -------------------------------------------- |
 | `PriceDisplay`    | Leaf — outcome-scoped atom + flash animation |
 | `YesNoChip`       | Green/red chip; derives No from Yes atom     |
-| `ProbabilityBar`  | §12.3 — live width from Yes outcome atom     |
-| `MarketThumbnail` | 24px circular image + initial fallback       |
+| `ProbabilityBar`  | Live width from Yes outcome atom             |
+| `MarketThumbnail` | Circular image + initial fallback            |
 
-### `chart/` — Phase 3 (complete)
+## Chart (`chart/`)
 
-| Component         | Notes                                           |
-| ----------------- | ----------------------------------------------- |
-| `PriceChart`      | Client — Recharts line chart, simulated history |
-| `TimeframeToggle` | Client — 1H 6H 1D 1W 1M ALL                     |
+| Component         | Notes                                              |
+| ----------------- | -------------------------------------------------- |
+| `PriceChart`      | Recharts line chart; CLOB history + sim fallback   |
+| `TimeframeToggle` | 1H 6H 1D 1W 1M ALL                                 |
 
-### `event/` — Phase 3 (complete)
+## Event detail (`event/`)
 
-| Component                    | Notes                                 |
-| ---------------------------- | ------------------------------------- |
-| `EventDetailPage`            | Client orchestrator                   |
-| `EventHeader`                | Icon, breadcrumb, H1, action icons    |
-| `OutcomeLegend`              | Colored dots + live %                 |
-| `OutcomeList` / `OutcomeRow` | `React.memo` rows — bar + Buy buttons |
-| `ChartMetaRow`               | Volume + end date                     |
-| `OrderSidebarPlaceholder`    | Static disabled trading panel         |
-| `EventDetailSkeleton`        | Detail page loading state             |
-| `EventDetailError`           | Retry + back link on fetch failure    |
+| Component              | Notes                                      |
+| ---------------------- | ------------------------------------------ |
+| `EventDetailPage`      | Client orchestrator                        |
+| `EventHeader`          | Breadcrumb, title, share/embed/bookmark    |
+| `OutcomeLegend`        | Colored dots + live %                      |
+| `OutcomeList`          | Full outcome list                          |
+| `OutcomeRow`           | `React.memo` — bar + visual Buy buttons    |
+| `ChartMetaRow`         | Volume + end date                          |
+| `OrderTicket`          | Visual-only buy/sell panel (sticky sidebar)|
+| `OrderSidebarPlaceholder` | Legacy static panel (unused in page flow) |
+| `EventDetailSkeleton`  | Detail page loading state                  |
+| `EventDetailError`     | Retry + back link on fetch failure         |
 
-### `ui/` — Phase 1–2
+## UI primitives (`ui/`)
 
-| Component        | Notes                         |
-| ---------------- | ----------------------------- |
-| `Button`         | ghost-brand, brand variants   |
-| `IconButton`     | Accessible icon-only control  |
-| `Chip`           | Shared Yes/No chip styling    |
-| `BookmarkButton` | Non-functional heart on cards |
+| Component        | Notes                                              |
+| ---------------- | -------------------------------------------------- |
+| `Button`         | ghost-brand, brand variants                        |
+| `IconButton`     | Accessible icon-only control                       |
+| `Chip`           | Shared Yes/No chip styling                         |
+| `BookmarkButton` | Toggle bookmark via `bookmarksAtom` (localStorage) |
+| `Modal`          | Auth + How it works modals                         |
 
-## Phase 5 — polish & performance
+## Icons (`icons/`)
 
-### Client vs server map
+| File                    | Purpose                              |
+| ----------------------- | ------------------------------------ |
+| `CategoryNavIcons`      | Trending flame, World Cup ball       |
+| `CategoryMoreMenuIcons` | More dropdown row icons              |
+| `UserMenuIcons`         | Hamburger menu row icons             |
+| `FooterIcons`           | Social, mobile nav, back-to-top SVGs |
+| `NavChevronDown`        | Shared chevron                       |
 
-| Area                                        | `'use client'` | Notes                       |
-| ------------------------------------------- | -------------- | --------------------------- |
-| `layout/AppShell`, `PageContainer`, `Logo`  | No             | Server shell                |
-| `layout/TopBar`, `CategoryNav`              | Yes            | Sticky nav + Jotai category |
-| `home/EventsGrid`, `EventsGridError`        | Yes            | Query + live prices         |
-| `home/EventsGridSkeleton`, `EventListEmpty` | No             | Static presentational       |
-| `cards/*`                                   | Yes            | Links + chip handlers       |
-| `market/*`                                  | Yes            | Jotai leaf subscriptions    |
-| `event/EventDetailPage`                     | Yes            | Detail orchestrator         |
-| `chart/*`                                   | Yes            | Recharts + timeframe state  |
+## Client vs server map
 
-### Memoized list items
+| Area | `'use client'` | Notes |
+| ---- | -------------- | ----- |
+| `layout/AppShell`, `TopBar`, `CategoryNav*`, `MarketSearchToolbar`, `UserMenu`, `MobileBottomNav`, `BackToTopButton`, `PageContainer` | Yes | Chrome + pathname / Jotai / motion |
+| `layout/Footer`, `layout/Logo` | No | Static server markup |
+| `home/EventsGrid`, `EventsGridView`, `EventsGridError`, `FeaturedCarousel` | Yes | Query + live prices |
+| `home/EventsGridSkeleton`, `EventListEmpty` | No | Static presentational |
+| `category/CategoryPageView` | Yes | Tag query + search filter |
+| `cards/*`, `market/*` | Yes | Links + Jotai leaf subscriptions |
+| `event/EventDetailPage` | Yes | Detail orchestrator |
+| `chart/*` | Yes | Recharts + timeframe state |
+
+## Memoized list items
 
 `BinaryCard`, `MultiOutcomeCard`, `EventCard` (with memoized mapping), `OutcomeRow`, `CategoryNav`.
 
 Price subscriptions stay in **leaf** market components — never on card or row shells.
 
-### Shared layout constants
+## Shared layout constants
 
 `EVENTS_GRID_CLASSES` in `lib/constants/eventsGrid.ts` keeps skeleton and live grid column classes
 identical (no layout shift on hydrate).
+
+Footer and mobile nav height: `MOBILE_BOTTOM_NAV_HEIGHT_PX` in `lib/constants/footer.ts`.
 
 ## Conventions
 
@@ -122,6 +155,25 @@ identical (no layout shift on hydrate).
 
 ## Tests
 
-Component tests live next to source files (`*.test.tsx`) or under `__tests__/`. Phase 5 smoke
-tests cover `EventsGrid` states and `EventListEmpty`. See `../plans/PLAN-Phase-2-Events-Grid.md`
-and `../plans/PLAN-Phase-3-Event-Detail.md` for broader coverage scope.
+Component tests colocate with source (`*.test.tsx`). Key suites:
+
+| Test file | Scope |
+| --------- | ----- |
+| `layout/Footer.test.tsx` | Footer content, topic grid, legal row |
+| `layout/MobileBottomNav.test.tsx` | Mobile nav items, search focus |
+| `layout/BackToTopButton.test.tsx` | Scroll-to-top behavior |
+| `layout/MarketSearchToolbar.test.tsx` | Toolbar search, shortcut scope |
+| `layout/CategoryNav.test.tsx` | Nav items, active state |
+| `layout/CategoryNavMore.test.tsx` | More dropdown |
+| `home/EventsGrid.test.tsx` | Loading, error, empty, success |
+| `home/FeaturedCarousel.test.tsx` | Carousel render |
+| `home/EventListEmpty.test.tsx` | Empty copy |
+| `category/CategoryPageView.test.tsx` | Category page grid |
+| `event/OrderTicket.test.tsx` | Visual order ticket |
+
+```bash
+bun run test
+```
+
+Use `renderWithProviders()` from `src/test/test-utils.tsx` for components that need React Query
+and/or Jotai.
