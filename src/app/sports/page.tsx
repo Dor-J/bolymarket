@@ -1,10 +1,10 @@
 import { PageContainer } from '@/components/layout/PageContainer';
-import { CategoryPageView } from '@/components/category/CategoryPageView';
+import { SportsLivePageView } from '@/components/sports/SportsLivePageView';
 
 export default function SportsPage() {
   return (
     <PageContainer>
-      <CategoryPageView tag="sports" />
+      <SportsLivePageView />
     </PageContainer>
   );
 }

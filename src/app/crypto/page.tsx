@@ -1,10 +1,10 @@
 import { PageContainer } from '@/components/layout/PageContainer';
-import { CategoryPageView } from '@/components/category/CategoryPageView';
+import { CryptoPageView } from '@/components/crypto/CryptoPageView';
 
 export default function CryptoPage() {
   return (
     <PageContainer>
-      <CategoryPageView tag="crypto" />
+      <CryptoPageView />
     </PageContainer>
   );
 }

@@ -1,10 +1,10 @@
 import { PageContainer } from '@/components/layout/PageContainer';
-import { CategoryPageView } from '@/components/category/CategoryPageView';
+import { PoliticsPageView } from '@/components/politics/PoliticsPageView';
 
 export default function PoliticsPage() {
   return (
     <PageContainer>
-      <CategoryPageView tag="politics" />
+      <PoliticsPageView />
     </PageContainer>
   );
 }
