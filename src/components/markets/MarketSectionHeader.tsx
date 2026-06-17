@@ -7,8 +7,9 @@ import {
   MarketSlidersIcon,
   MarketWatchlistIcon,
 } from '@/components/icons/MarketControlIcons';
-import { bookmarksOnlyAtom } from '@/lib/atoms/marketPage';
+import { bookmarksOnlyAtom, marketFiltersVisibleAtom } from '@/lib/atoms/marketPage';
 import { searchQueryAtom } from '@/lib/atoms/search';
+import { toggleAriaPressed } from '@/lib/a11y/toggleAriaPressed';
 import { cn } from '@/lib/cn';
 
 export interface MarketSectionHeaderProps {
@@ -29,7 +30,7 @@ export function MarketSectionHeader({ heading, className }: MarketSectionHeaderP
   const [bookmarksOnly, setBookmarksOnly] = useAtom(bookmarksOnlyAtom);
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const [searchExpanded, setSearchExpanded] = useState(false);
-  const [filtersActive, setFiltersActive] = useState(false);
+  const [filtersVisible, setFiltersVisible] = useAtom(marketFiltersVisibleAtom);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -89,19 +90,24 @@ export function MarketSectionHeader({ heading, className }: MarketSectionHeaderP
         <button
           type="button"
           aria-label="Toggle filters"
-          aria-pressed={filtersActive}
+          aria-pressed={toggleAriaPressed(filtersVisible)}
           className={cn(
             'flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md',
             'transition-colors hover:bg-surface-2',
-            filtersActive
+            filtersVisible
               ? 'border border-text bg-surface'
               : 'border border-transparent bg-transparent',
           )}
           onClick={() => {
-            setFiltersActive((current) => !current);
-            document.getElementById('market-filters')?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'nearest',
+            setFiltersVisible((current) => {
+              const next = !current;
+              if (next) {
+                document.getElementById('market-filters')?.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'nearest',
+                });
+              }
+              return next;
             });
           }}
         >
@@ -113,7 +119,7 @@ export function MarketSectionHeader({ heading, className }: MarketSectionHeaderP
         <button
           type="button"
           aria-label="Toggle watchlist"
-          aria-pressed={bookmarksOnly}
+          aria-pressed={toggleAriaPressed(bookmarksOnly)}
           className={cn(
             'flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md',
             'transition-colors hover:bg-surface-2',

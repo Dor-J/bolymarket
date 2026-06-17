@@ -12,6 +12,7 @@ import { EventsGridError } from '@/components/home/EventsGridError';
 import { EventsGridSkeleton } from '@/components/home/EventsGridSkeleton';
 import { ShowMoreMarketsButton } from './ShowMoreMarketsButton';
 import { MarketSectionHeader } from './MarketSectionHeader';
+import { cn } from '@/lib/cn';
 
 export interface MarketsPageBodyProps {
   events: Event[];
@@ -24,6 +25,9 @@ export interface MarketsPageBodyProps {
   controls?: React.ReactNode;
   emptyMessage?: string;
   showSectionToolbar?: boolean;
+  hideHeading?: boolean;
+  gridClassName?: string;
+  gridWrapperClassName?: string;
 }
 
 /**
@@ -40,6 +44,9 @@ export function MarketsPageBody({
   controls,
   emptyMessage,
   showSectionToolbar = false,
+  hideHeading = false,
+  gridClassName = EVENTS_GRID_CLASSES,
+  gridWrapperClassName,
 }: MarketsPageBodyProps) {
   const { visibleCount, showMore, hasMore } = useShowMoreMarkets(events.length);
   const visibleEvents = useMemo(
@@ -55,7 +62,14 @@ export function MarketsPageBody({
   useLivePrices(priceSeeds);
 
   if (isLoading) {
-    return <EventsGridSkeleton heading={heading} />;
+    return (
+      <EventsGridSkeleton
+        heading={heading}
+        hideHeading={hideHeading}
+        gridClassName={gridClassName}
+        gridWrapperClassName={gridWrapperClassName}
+      />
+    );
   }
 
   if (isError) {
@@ -70,11 +84,13 @@ export function MarketsPageBody({
   if (events.length === 0) {
     return (
       <div>
-        {showSectionToolbar ? (
-          <MarketSectionHeader heading={heading} />
-        ) : (
-          <h2 className="mb-3 text-xl leading-6 font-semibold text-text">{heading}</h2>
-        )}
+        {!hideHeading ? (
+          showSectionToolbar ? (
+            <MarketSectionHeader heading={heading} />
+          ) : (
+            <h2 className="mb-3 text-xl leading-6 font-semibold text-text">{heading}</h2>
+          )
+        ) : null}
         {controls}
         <EventListEmpty message={emptyMessage} />
       </div>
@@ -89,18 +105,27 @@ export function MarketsPageBody({
         </p>
       ) : null}
 
-      {showSectionToolbar ? (
-        <MarketSectionHeader heading={heading} />
-      ) : (
-        <h2 className="mb-3 text-xl leading-6 font-semibold text-text">{heading}</h2>
-      )}
+      {!hideHeading ? (
+        showSectionToolbar ? (
+          <MarketSectionHeader heading={heading} />
+        ) : (
+          <h2 className="mb-3 text-xl leading-6 font-semibold text-text">{heading}</h2>
+        )
+      ) : null}
 
       {controls}
 
-      <div className={EVENTS_GRID_CLASSES}>
-        {visibleEvents.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
+      <div
+        className={cn(
+          'relative flex h-auto w-full shrink-0 flex-col gap-3 pt-px pb-10',
+          gridWrapperClassName,
+        )}
+      >
+        <div className={gridClassName}>
+          {visibleEvents.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </div>
       </div>
 
       {hasMore ? <ShowMoreMarketsButton onClick={showMore} /> : null}
