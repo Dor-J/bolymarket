@@ -37,6 +37,21 @@ export const POLITICS_TOPIC_CHIPS: TopicChip[] = [
   { id: 'gov-shutdown', label: 'Gov Shutdown', match: createKeywordMatcher(['shutdown']) },
   { id: 'la-mayor', label: 'LA Mayor', match: createKeywordMatcher(['la mayor', 'los angeles mayor']) },
   { id: 'uk-elections', label: 'UK Elections', match: createKeywordMatcher(['uk election', 'britain']) },
+  {
+    id: 'colombia-election',
+    label: 'Colombia Election',
+    match: createKeywordMatcher(['colombia election', 'colombia presidential']),
+  },
+  {
+    id: 'german-elections',
+    label: 'German Elections',
+    match: createKeywordMatcher(['german election', 'germany election']),
+  },
+  {
+    id: 'french-elections',
+    label: 'French Elections',
+    match: createKeywordMatcher(['french election', 'france election']),
+  },
   { id: 'us-election', label: 'US Election', match: createKeywordMatcher(['us election', 'presidential']) },
   { id: 'mayoral', label: 'Mayoral Elections', match: createKeywordMatcher(['mayor', 'mayoral']) },
   { id: 'south-korea', label: 'South Korea', match: createKeywordMatcher(['south korea', 'korea']) },

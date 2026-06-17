@@ -6,6 +6,10 @@ export interface TradePayload {
   slug?: string;
   outcomeIndex?: number;
   side?: string;
+  size?: number;
+  outcome?: string;
+  userName?: string;
+  timestamp?: number;
 }
 
 /**
@@ -19,6 +23,9 @@ export function parseTradePayload(payload: object): TradePayload | null {
     return null;
   }
 
+  const size = Number(record.size);
+  const timestamp = Number(record.timestamp);
+
   return {
     asset: typeof record.asset === "string" ? record.asset : undefined,
     price,
@@ -30,6 +37,15 @@ export function parseTradePayload(payload: object): TradePayload | null {
         ? record.outcomeIndex
         : undefined,
     side: typeof record.side === "string" ? record.side : undefined,
+    size: Number.isFinite(size) && size > 0 ? size : undefined,
+    outcome: typeof record.outcome === "string" ? record.outcome : undefined,
+    userName:
+      typeof record.pseudonym === "string"
+        ? record.pseudonym
+        : typeof record.name === "string"
+          ? record.name
+          : undefined,
+    timestamp: Number.isFinite(timestamp) ? timestamp : undefined,
   };
 }
 

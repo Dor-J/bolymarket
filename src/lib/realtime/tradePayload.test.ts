@@ -10,12 +10,37 @@ describe("parseTradePayload", () => {
         eventSlug: "my-event",
       }),
     ).toEqual({
-      asset: "token-1",
+      asset: 'token-1',
       price: 0.62,
-      eventSlug: "my-event",
+      eventSlug: 'my-event',
       slug: undefined,
       outcomeIndex: undefined,
       side: undefined,
+      size: undefined,
+      outcome: undefined,
+      userName: undefined,
+      timestamp: undefined,
+    });
+  });
+
+  it('parses activity trade metadata', () => {
+    expect(
+      parseTradePayload({
+        asset: 'token-1',
+        price: 0.18,
+        pseudonym: 'polyfan',
+        outcome: 'France',
+        size: 260,
+        side: 'BUY',
+        timestamp: 1_781_700_000,
+      }),
+    ).toMatchObject({
+      price: 0.18,
+      userName: 'polyfan',
+      outcome: 'France',
+      size: 260,
+      side: 'BUY',
+      timestamp: 1_781_700_000,
     });
   });
 
