@@ -9,8 +9,8 @@ export interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ChipVariant, string> = {
-  yes: "bg-yes/15 text-yes hover:bg-yes/20",
-  no: "bg-no/10 text-no hover:bg-no/15",
+  yes: "bg-yes/15 text-yes hover:bg-yes hover:text-white",
+  no: "bg-no/10 text-no hover:bg-no hover:text-white",
 };
 
 /**
@@ -27,10 +27,10 @@ export function Chip({
     <button
       type={type}
       className={cn(
-        "inline-flex h-[27px] shrink-0 items-center justify-center rounded-[5.2px] px-3.5",
+        "group relative inline-flex h-[27px] shrink-0 items-center justify-center overflow-hidden rounded-[5.2px] px-3.5",
         "text-[13px] leading-4 font-w490 transition-colors",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-        fullWidth && "flex-1",
+        fullWidth ? "flex-1" : "w-10",
         variantClasses[variant],
         className,
       )}

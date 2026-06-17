@@ -9,6 +9,8 @@ export interface YesNoChipProps {
   marketId: string;
   outcomeId: string;
   fullWidth?: boolean;
+  label?: string;
+  className?: string;
   onClick?: () => void;
 }
 
@@ -21,27 +23,33 @@ export function YesNoChip({
   marketId,
   outcomeId,
   fullWidth = false,
+  label: customLabel,
+  className,
   onClick,
 }: YesNoChipProps) {
-  const label = side === "yes" ? "Yes" : "No";
+  const label = customLabel ?? (side === "yes" ? "Yes" : "No");
+  const initialPrice = side === "no" ? Math.max(0, 1 - price) : price;
 
   return (
     <Chip
       variant={side}
       fullWidth={fullWidth}
+      className={className}
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
         onClick?.();
       }}
     >
-      {label}{" "}
+      <span className="absolute top-1/2 left-1/2 max-w-[36px] -translate-x-1/2 -translate-y-1/2 truncate transition-opacity group-hover:opacity-0">
+        {label}
+      </span>
       <PriceDisplay
         marketId={marketId}
         outcomeId={outcomeId}
-        initialPrice={price}
+        initialPrice={initialPrice}
         side={side}
-        className="ml-0.5"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100"
       />
     </Chip>
   );
