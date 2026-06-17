@@ -1,4 +1,11 @@
-import type { Event, Market, Outcome } from "@/types/polymarket";
+import type {
+  Event,
+  Market,
+  Outcome,
+  SportsEvent,
+  SportsMarket,
+  SportsMarketType,
+} from "@/types/polymarket";
 import type { GammaEvent, GammaMarket } from "./schemas";
 
 const MIN_PRICE = 0;
@@ -59,6 +66,128 @@ function parseOutcomes(market: GammaMarket): Outcome[] {
   }
 
   return outcomes;
+}
+
+/**
+ * Parses Gamma sportsMarketType into the app enum.
+ */
+export function parseSportsMarketType(
+  raw: string | undefined,
+  question?: string,
+): SportsMarketType {
+  const normalized = raw?.toLowerCase().trim() ?? '';
+  if (
+    normalized.includes('moneyline') ||
+    normalized === 'moneyline' ||
+    normalized === 'child_moneyline'
+  ) {
+    return 'moneyline';
+  }
+  if (normalized.includes('spread') || normalized.includes('handicap')) {
+    return 'spread';
+  }
+  if (normalized.includes('total')) {
+    return 'total';
+  }
+  if (normalized.includes('prop')) {
+    return 'prop';
+  }
+
+  const haystack = question?.toLowerCase() ?? '';
+  if (/\bspread\b/.test(haystack)) {
+    return 'spread';
+  }
+  if (/\b(o\/u|over\/under|total points|total runs)\b/.test(haystack)) {
+    return 'total';
+  }
+  if (/\b(winner|moneyline|to win|will win)\b/.test(haystack)) {
+    return 'moneyline';
+  }
+
+  return 'unknown';
+}
+
+function parseLine(value: string | number | undefined): number | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  const parsed = typeof value === 'number' ? value : Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function parseShortOutcomes(market: GammaMarket): string[] | undefined {
+  const raw = market.shortOutcomes;
+  if (!raw || raw.length === 0) {
+    return undefined;
+  }
+
+  return raw;
+}
+
+/**
+ * Normalizes a raw Gamma market with sports metadata.
+ */
+export function normalizeSportsMarket(market: GammaMarket): SportsMarket | null {
+  const base = normalizeMarket(market);
+  if (!base) {
+    return null;
+  }
+
+  const sportsMarketType = parseSportsMarketType(
+    typeof market.sportsMarketType === 'string'
+      ? market.sportsMarketType
+      : undefined,
+    base.question,
+  );
+
+  return {
+    ...base,
+    sportsMarketType,
+    line: parseLine(market.line),
+    gameId: market.gameId !== undefined ? String(market.gameId) : undefined,
+    gameStartTime: market.gameStartTime,
+    teamAId:
+      market.teamAID !== undefined ? String(market.teamAID) : undefined,
+    teamBId:
+      market.teamBID !== undefined ? String(market.teamBID) : undefined,
+    shortOutcomes: parseShortOutcomes(market),
+    gameStatus:
+      typeof market.gameStatus === 'string' ? market.gameStatus : undefined,
+  };
+}
+
+/**
+ * Normalizes a raw Gamma event with sports market metadata preserved.
+ */
+export function normalizeSportsEvent(event: GammaEvent): SportsEvent | null {
+  const base = normalizeEvent(event);
+  if (!base) {
+    return null;
+  }
+
+  const sportsMarkets = (event.markets ?? [])
+    .map(normalizeSportsMarket)
+    .filter((market): market is SportsMarket => market !== null);
+
+  return {
+    ...base,
+    markets: sportsMarkets.length > 0 ? sportsMarkets : base.markets,
+    sportsMarkets,
+    gameStatus:
+      typeof event.gameStatus === 'string' ? event.gameStatus : undefined,
+    spreadsMainLine: parseLine(event.spreadsMainLine),
+    totalsMainLine: parseLine(event.totalsMainLine),
+  };
+}
+
+/**
+ * Normalizes sports events from Gamma, dropping invalid entries.
+ */
+export function normalizeSportsEvents(events: GammaEvent[]): SportsEvent[] {
+  return events
+    .map(normalizeSportsEvent)
+    .filter((event): event is SportsEvent => event !== null);
 }
 
 /**

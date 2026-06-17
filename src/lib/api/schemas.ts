@@ -47,8 +47,44 @@ export const gammaMarketSchema = z
     endDateIso: z.string().optional(),
     active: z.boolean().optional(),
     closed: z.boolean().optional(),
+    sportsMarketType: z.string().optional(),
+    line: z.union([z.string(), z.number()]).optional(),
+    gameId: z.union([z.string(), z.number()]).optional(),
+    gameStartTime: z.string().optional(),
+    teamAID: z.union([z.string(), z.number()]).optional(),
+    teamBID: z.union([z.string(), z.number()]).optional(),
+    shortOutcomes: jsonStringArraySchema.optional(),
+    score: z.union([z.string(), z.number()]).optional(),
+    gameStatus: z.string().optional(),
   })
   .passthrough();
+
+const gammaTeamSchema = z
+  .object({
+    id: z.union([z.string(), z.number()]),
+    name: z.string().optional(),
+    league: z.string().optional(),
+    record: z.string().optional(),
+    logo: z.string().optional(),
+    abbreviation: z.string().optional(),
+    color: z.string().optional(),
+  })
+  .passthrough();
+
+export const gammaTeamsResponseSchema = z.array(gammaTeamSchema);
+
+export const gammaSportsMetadataSchema = z.array(
+  z
+    .object({
+      sport: z.string(),
+      image: z.string().optional(),
+      resolution: z.string().optional(),
+      ordering: z.string().optional(),
+      tags: z.string().optional(),
+      series: z.string().optional(),
+    })
+    .passthrough(),
+);
 
 /** Permissive raw event shape from the Gamma API. */
 export const gammaEventSchema = z
@@ -68,6 +104,9 @@ export const gammaEventSchema = z
     markets: z.array(gammaMarketSchema).optional(),
     active: z.boolean().optional(),
     closed: z.boolean().optional(),
+    gameStatus: z.string().optional(),
+    spreadsMainLine: z.union([z.string(), z.number()]).optional(),
+    totalsMainLine: z.union([z.string(), z.number()]).optional(),
   })
   .passthrough();
 
@@ -76,3 +115,4 @@ export const gammaEventsResponseSchema = z.array(gammaEventSchema);
 
 export type GammaEvent = z.infer<typeof gammaEventSchema>;
 export type GammaMarket = z.infer<typeof gammaMarketSchema>;
+export type GammaTeam = z.infer<typeof gammaTeamSchema>;
