@@ -2,9 +2,13 @@
 
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
+import { CategoryPageHeader } from '@/components/category/CategoryPageHeader';
+import { CategoryPageLayout } from '@/components/category/CategoryPageLayout';
+import { CategorySidebar } from '@/components/category/CategorySidebar';
 import { bookmarksAtom } from '@/lib/atoms/bookmarks';
-import { bookmarksOnlyAtom } from '@/lib/atoms/marketPage';
+import { bookmarksOnlyAtom, marketFiltersVisibleAtom } from '@/lib/atoms/marketPage';
 import { searchQueryAtom } from '@/lib/atoms/search';
+import { CATEGORY_EVENTS_GRID_CLASSES } from '@/lib/constants/eventsGrid';
 import { POLITICS_TOPIC_CHIPS } from '@/lib/markets/constants';
 import {
   countTopicMatches,
@@ -20,7 +24,7 @@ import { MarketTopicRail } from '@/components/markets/MarketTopicRail';
 import { MarketsPageBody } from '@/components/markets/MarketsPageBody';
 
 /**
- * Politics category page with subcategory chips and market controls.
+ * Politics category page with sidebar navigation and Polymarket-style layout.
  */
 export function PoliticsPageView() {
   const { events: rawEvents, isLoading, isError, error, refetch, isFetching } =
@@ -28,6 +32,7 @@ export function PoliticsPageView() {
   const searchQuery = useAtomValue(searchQueryAtom);
   const bookmarks = useAtomValue(bookmarksAtom);
   const bookmarksOnly = useAtomValue(bookmarksOnlyAtom);
+  const filtersVisible = useAtomValue(marketFiltersVisibleAtom);
   const [topicId, setTopicId] = useState('all');
   const [sort, setSort] = useState<MarketSort>('volume');
   const [status, setStatus] = useState<MarketStatus>('all');
@@ -35,6 +40,16 @@ export function PoliticsPageView() {
   const topicCounts = useMemo(
     () => countTopicMatches(rawEvents, POLITICS_TOPIC_CHIPS),
     [rawEvents],
+  );
+
+  const sidebarItems = useMemo(
+    () =>
+      POLITICS_TOPIC_CHIPS.map((chip) => ({
+        id: chip.id,
+        label: chip.label,
+        count: topicCounts[chip.id],
+      })),
+    [topicCounts],
   );
 
   const events = useMemo(() => {
@@ -48,50 +63,69 @@ export function PoliticsPageView() {
     return sortEvents(result, sort);
   }, [rawEvents, topicId, status, bookmarksOnly, bookmarks, sort]);
 
-  const controls = (
-    <div id="market-filters" className="space-y-3">
-      <MarketTopicRail
-        items={POLITICS_TOPIC_CHIPS.map((chip) => ({
-          id: chip.id,
-          label: chip.label,
-          count: topicCounts[chip.id],
-        }))}
-        selectedId={topicId}
-        onSelect={setTopicId}
-      />
-
-      <MarketControlsBar
-        sort={sort}
-        onSortChange={setSort}
-        status={status}
-        onStatusChange={setStatus}
-      />
-    </div>
+  const filterControls = (
+    <MarketControlsBar
+      sort={sort}
+      onSortChange={setSort}
+      status={status}
+      onStatusChange={setStatus}
+      className="pb-0"
+    />
   );
 
   return (
-    <div>
-      <header className="mb-4">
-        <h1 className="text-2xl leading-8 font-semibold text-text">Politics</h1>
-      </header>
+    <CategoryPageLayout
+      sidebar={
+        <CategorySidebar
+          items={sidebarItems}
+          selectedId={topicId}
+          onSelect={setTopicId}
+        />
+      }
+    >
+      <div className="flex w-full flex-col items-center gap-5 pt-3 lg:mx-auto lg:mb-4 lg:max-w-[1350px] lg:pt-5.5">
+        <h1 className="w-full px-4 text-2xl font-semibold leading-8 text-text lg:hidden">
+          Politics
+        </h1>
 
-      <MarketsPageBody
-        events={events}
-        isLoading={isLoading}
-        isError={isError}
-        isFetching={isFetching}
-        error={error}
-        onRetry={() => {
-          void refetch();
-        }}
-        heading="Politics markets"
-        controls={controls}
-        emptyMessage={
-          searchQuery.trim()
-            ? `No politics markets found for "${searchQuery.trim()}"`
-            : undefined
-        }
-      />
-    </div>
+        <CategoryPageHeader title="Politics" filters={filterControls} />
+
+        <div className="w-full px-4 lg:hidden">
+          <MarketTopicRail
+            items={sidebarItems}
+            selectedId={topicId}
+            onSelect={setTopicId}
+            showCounts
+          />
+        </div>
+
+        {filtersVisible ? (
+          <div id="market-filters" className="w-full px-4 lg:hidden">
+            {filterControls}
+          </div>
+        ) : null}
+
+        <div className="w-full">
+          <MarketsPageBody
+            events={events}
+            isLoading={isLoading}
+            isError={isError}
+            isFetching={isFetching}
+            error={error}
+            onRetry={() => {
+              void refetch();
+            }}
+            hideHeading
+            gridClassName={CATEGORY_EVENTS_GRID_CLASSES}
+            gridWrapperClassName="px-4 lg:px-0"
+            emptyMessage={
+              searchQuery.trim()
+                ? `No politics markets found for "${searchQuery.trim()}"`
+                : undefined
+            }
+          />
+        </div>
+      </div>
+    </CategoryPageLayout>
   );
 }
