@@ -1,11 +1,15 @@
 import { CardSkeleton } from "@/components/cards/CardSkeleton";
 import { EVENTS_GRID_CLASSES } from "@/lib/constants/eventsGrid";
+import { cn } from "@/lib/cn";
 
 const SKELETON_COUNT = 10;
 
 export interface EventsGridSkeletonProps {
   heading?: string;
   showFeatured?: boolean;
+  hideHeading?: boolean;
+  gridClassName?: string;
+  gridWrapperClassName?: string;
 }
 
 /**
@@ -14,6 +18,9 @@ export interface EventsGridSkeletonProps {
 export function EventsGridSkeleton({
   heading = 'All markets',
   showFeatured = false,
+  hideHeading = false,
+  gridClassName = EVENTS_GRID_CLASSES,
+  gridWrapperClassName,
 }: EventsGridSkeletonProps) {
   return (
     <div aria-busy="true" aria-label="Loading markets">
@@ -32,14 +39,21 @@ export function EventsGridSkeleton({
         </div>
       ) : null}
 
-      <h2 className="mb-4 text-xl leading-6 font-semibold text-text">
-        {heading}
-      </h2>
+      {!hideHeading ? (
+        <h2 className="mb-4 text-xl leading-6 font-semibold text-text">{heading}</h2>
+      ) : null}
 
-      <div className={EVENTS_GRID_CLASSES}>
-        {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-          <CardSkeleton key={`skeleton-${index}`} />
-        ))}
+      <div
+        className={cn(
+          'relative flex h-auto w-full shrink-0 flex-col gap-3 pt-px pb-10',
+          gridWrapperClassName,
+        )}
+      >
+        <div className={gridClassName}>
+          {Array.from({ length: SKELETON_COUNT }, (_, index) => (
+            <CardSkeleton key={`skeleton-${index}`} />
+          ))}
+        </div>
       </div>
     </div>
   );

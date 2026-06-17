@@ -1,17 +1,26 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import Link from 'next/link';
 import { tradeActivityByEventAtom } from '@/lib/atoms/tradeActivity';
 import { relatedNewsQueryOptions } from '@/lib/api/queries';
-import { formatCents } from '@/lib/format/price';
+import { formatTradeActivityLine } from '@/lib/featured/formatTradeActivity';
 import type { Event } from '@/types/polymarket';
 import { cn } from '@/lib/cn';
 
 export interface FeaturedActivityRailProps {
   event: Event;
   className?: string;
+}
+
+interface ActivityItem {
+  id: string;
+  kind: 'news' | 'trade';
+  title: string;
+  body: string;
+  href?: string;
 }
 
 /**
@@ -34,21 +43,34 @@ export function FeaturedActivityRail({
     }),
   );
 
-  const activityItems = [
-    ...trades.map((trade) => ({
-      id: trade.id,
-      kind: 'trade' as const,
-      title: trade.side ? `${trade.side.toUpperCase()} trade` : 'Live trade',
-      body: formatCents(trade.price),
-    })),
-    ...news.map((article) => ({
+  const activityItems = useMemo<ActivityItem[]>(() => {
+    const newsItems: ActivityItem[] = news.map((article) => ({
       id: article.link,
-      kind: 'news' as const,
+      kind: 'news',
       title: article.source ?? 'News',
       body: article.title,
       href: article.link,
-    })),
-  ].slice(0, 8);
+    }));
+
+    if (newsItems.length > 0) {
+      return newsItems.slice(0, 8);
+    }
+
+    if (isLoading) {
+      return [];
+    }
+
+    return trades.map((trade) => {
+      const formatted = formatTradeActivityLine(trade);
+
+      return {
+        id: trade.id,
+        kind: 'trade',
+        title: formatted.title,
+        body: formatted.body,
+      };
+    }).slice(0, 8);
+  }, [isLoading, news, trades]);
 
   return (
     <div
@@ -78,7 +100,7 @@ export function FeaturedActivityRail({
           ) : null}
 
           {activityItems.map((item) => (
-            <div key={item.id} className="block shrink-0 py-2">
+            <div key={`${item.kind}-${item.id}`} className="block shrink-0 py-2">
               {item.kind === 'news' && item.href ? (
                 <Link
                   href={item.href}

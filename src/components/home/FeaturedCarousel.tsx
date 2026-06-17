@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Event } from '@/types/polymarket';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { cn } from '@/lib/cn';
@@ -11,12 +11,18 @@ import { FeaturedEventPreview } from './FeaturedEventPreview';
 export interface FeaturedCarouselProps {
   events: Event[];
   className?: string;
+  /** `sidebar` — desktop column inside the home featured row; `standalone` — full-width mobile/default. */
+  layout?: 'standalone' | 'sidebar';
 }
 
 /**
  * Featured markets hero carousel with Polymarket-style event previews.
  */
-export function FeaturedCarousel({ events, className }: FeaturedCarouselProps) {
+export function FeaturedCarousel({
+  events,
+  className,
+  layout = 'standalone',
+}: FeaturedCarouselProps) {
   const reducedMotion = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
   const slideCount = events.length;
@@ -33,20 +39,43 @@ export function FeaturedCarousel({ events, className }: FeaturedCarouselProps) {
     [slideCount],
   );
 
-  if (events.length === 0) {
-    return null;
-  }
-
   const resolvedIndex =
     slideCount === 0 ? 0 : Math.min(activeIndex, slideCount - 1);
   const activeEvent = events[resolvedIndex];
+  const activeEventId = activeEvent?.id ?? '';
+  const hasMountedSlide = useRef(false);
+  const previousEventId = useRef(activeEventId);
+  const shouldAnimateSlide =
+    hasMountedSlide.current &&
+    previousEventId.current !== activeEventId &&
+    !reducedMotion;
+
+  useEffect(() => {
+    if (!activeEventId) {
+      return;
+    }
+
+    hasMountedSlide.current = true;
+    previousEventId.current = activeEventId;
+  }, [activeEventId]);
+
+  if (events.length === 0 || !activeEvent) {
+    return null;
+  }
+
+  const isSidebar = layout === 'sidebar';
 
   return (
     <section
       aria-label="Featured markets"
-      className={cn('mb-6', className)}
+      className={cn(
+        isSidebar
+          ? 'group/carousel flex w-full flex-col gap-4'
+          : 'mb-6',
+        className,
+      )}
     >
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className={cn('flex items-center justify-between gap-3', !isSidebar && 'mb-3')}>
         <h2 className="text-xl leading-6 font-semibold text-text">
           Featured markets
         </h2>
@@ -90,7 +119,7 @@ export function FeaturedCarousel({ events, className }: FeaturedCarouselProps) {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={activeEvent.id}
-              initial={reducedMotion ? false : { opacity: 0, x: 12 }}
+              initial={shouldAnimateSlide ? { opacity: 0, x: 12 } : false}
               animate={{ opacity: 1, x: 0 }}
               exit={reducedMotion ? undefined : { opacity: 0, x: -12 }}
               transition={{

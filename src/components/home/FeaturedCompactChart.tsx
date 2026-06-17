@@ -1,12 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import {
   CartesianGrid,
   Line,
   LineChart,
-  ResponsiveContainer,
   XAxis,
   YAxis,
 } from 'recharts';
@@ -33,8 +32,38 @@ export function FeaturedCompactChart({
   eventId,
   className,
 }: FeaturedCompactChartProps) {
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const [chartSize, setChartSize] = useState({ width: 0, height: 0 });
   const liveOutcomes = useLiveChartOutcomes(outcomes);
   const timeframe = '1d' as const;
+
+  useEffect(() => {
+    const element = chartContainerRef.current;
+    if (!element) {
+      return;
+    }
+
+    const updateSize = () => {
+      const { width, height } = element.getBoundingClientRect();
+      const nextWidth = Math.floor(width);
+      const nextHeight = Math.floor(height);
+
+      setChartSize((current) =>
+        current.width === nextWidth && current.height === nextHeight
+          ? current
+          : { width: nextWidth, height: nextHeight },
+      );
+    };
+
+    updateSize();
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const historyQueries = useQueries({
     queries: liveOutcomes.map((outcome) =>
@@ -125,9 +154,14 @@ export function FeaturedCompactChart({
         ))}
       </div>
 
-      <div className="h-[200px] w-full lg:h-[240px]">
-        <ResponsiveContainer width="100%" height="100%">
+      <div
+        ref={chartContainerRef}
+        className="h-[200px] min-h-[200px] w-full min-w-0 lg:h-[240px] lg:min-h-[240px]"
+      >
+        {chartSize.width > 0 && chartSize.height > 0 ? (
           <LineChart
+            width={chartSize.width}
+            height={chartSize.height}
             data={chartData}
             margin={{ top: 4, right: 4, left: 0, bottom: 0 }}
           >
@@ -156,11 +190,12 @@ export function FeaturedCompactChart({
                 stroke={outcome.color ?? getOutcomeColor(index)}
                 strokeWidth={2}
                 dot={false}
+                connectNulls
                 isAnimationActive={false}
               />
             ))}
           </LineChart>
-        </ResponsiveContainer>
+        ) : null}
       </div>
     </div>
   );
