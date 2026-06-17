@@ -38,7 +38,7 @@ export const OutcomeRow = memo(function OutcomeRow({
             <h3 className="truncate text-base leading-4 font-medium text-text">
               {name}
             </h3>
-            <p className="text-[13px] leading-4 font-medium text-[#aeb4bc]">
+            <p className="text-[13px] leading-4 font-w490 text-neutral-300">
               {formatDetailVolume(volume)}
             </p>
           </div>
@@ -48,7 +48,7 @@ export const OutcomeRow = memo(function OutcomeRow({
           marketId={marketId}
           outcomeId={outcomeId}
           initialPrice={yesPrice}
-          className="text-[28px] leading-7 font-semibold text-[#0e0f11]"
+          className="text-[28px] leading-7 font-semibold text-neutral-950"
         />
       </div>
 

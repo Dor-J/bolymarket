@@ -11,7 +11,7 @@ export interface ChartMetaRowProps {
  */
 export function ChartMetaRow({ volume, endDate }: ChartMetaRowProps) {
   return (
-    <div className="flex items-center justify-between gap-4 text-[13px] leading-4 font-medium text-[#aeb4bc]">
+    <div className="flex items-center justify-between gap-4 text-[13px] leading-4 font-w490 text-neutral-300">
       <p>{formatDetailVolume(volume)}</p>
       <p>{formatDate(endDate)}</p>
     </div>

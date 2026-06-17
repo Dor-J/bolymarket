@@ -6,6 +6,7 @@ import { TimeframeToggle } from "@/components/chart/TimeframeToggle";
 import { getOutcomeColor } from "@/lib/chart/colors";
 import type { ChartOutcome } from "@/lib/chart/types";
 import { getChartOutcomes } from "@/lib/event/flattenOutcomes";
+import { resolveEventDetailVariant } from "@/lib/event/resolveEventDetailVariant";
 import { getOutcomeSeedsFromEvent } from "@/lib/prices/visibleOutcomeKeys";
 import { useChartTimeframe } from "@/hooks/useChartTimeframe";
 import { useEvent } from "@/hooks/useEvent";
@@ -14,7 +15,12 @@ import { getYesNoFromMarket } from "@/lib/cards/mapEventToCardProps";
 import { ChartMetaRow } from "./ChartMetaRow";
 import { EventDetailError } from "./EventDetailError";
 import { EventDetailSkeleton } from "./EventDetailSkeleton";
+import { EventDiscussionTabs } from "./EventDiscussionTabs";
 import { EventHeader } from "./EventHeader";
+import { EventMarketContext } from "./EventMarketContext";
+import { EventRulesSection } from "./EventRulesSection";
+import { EventSportsDetail } from "./EventSportsDetail";
+import { EventTimeWindowNav } from "./EventTimeWindowNav";
 import { OrderTicket } from "./OrderTicket";
 import { OutcomeLegend } from "./OutcomeLegend";
 import { OutcomeList } from "./OutcomeList";
@@ -24,11 +30,16 @@ export interface EventDetailPageProps {
 }
 
 /**
- * Client orchestrator for the event detail layout.
+ * Client orchestrator for the event detail layout with variant routing.
  */
 export function EventDetailPage({ slug }: EventDetailPageProps) {
   const { data: event, isLoading, isError, error, refetch } = useEvent(slug);
   const { timeframe, selectTimeframe } = useChartTimeframe();
+
+  const variant = useMemo(
+    () => (event ? resolveEventDetailVariant(event) : "standard"),
+    [event],
+  );
 
   const chartOutcomes = useMemo<ChartOutcome[]>(() => {
     if (!event) {
@@ -76,11 +87,17 @@ export function EventDetailPage({ slug }: EventDetailPageProps) {
     );
   }
 
+  const showTimeWindow = variant === "crypto-recurring";
+  const showSportsLayout = variant === "sports-match";
+
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
       <div className="min-w-0 flex-1 space-y-6 lg:max-w-[938px]">
         <EventHeader event={event} />
         <OutcomeLegend outcomes={chartOutcomes} />
+
+        {showTimeWindow ? <EventTimeWindowNav /> : null}
+
         <div className="space-y-3">
           <PriceChart
             outcomes={chartOutcomes}
@@ -89,8 +106,18 @@ export function EventDetailPage({ slug }: EventDetailPageProps) {
           />
           <TimeframeToggle value={timeframe} onChange={selectTimeframe} />
         </div>
+
         <ChartMetaRow volume={event.volume} endDate={event.endDate} />
-        <OutcomeList event={event} />
+
+        {showSportsLayout ? (
+          <EventSportsDetail event={event} />
+        ) : (
+          <OutcomeList event={event} />
+        )}
+
+        <EventRulesSection description={event.description} />
+        <EventMarketContext event={event} />
+        <EventDiscussionTabs />
       </div>
 
       {primaryMarket ? (
