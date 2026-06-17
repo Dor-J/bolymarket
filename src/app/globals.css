@@ -40,6 +40,7 @@
   --red-700: #951616;
 
   /* semantic — light */
+  --background: #ffffff;
   --bg-surface: #ffffff;
   --card: #ffffff;
   --surface-1: var(--neutral-0);
@@ -48,6 +49,8 @@
   --border: #e5e7eb;
   --input: #e5e7eb;
   --text: #18181b;
+  --text-secondary: var(--neutral-500);
+  --text-tertiary: var(--neutral-300);
   --card-foreground: #030712;
   --muted-foreground: #6b7280;
   --text-disabled: #9f9fa9;
@@ -83,6 +86,7 @@
 }
 
 [data-theme="dark"] {
+  --background: #1a1f23;
   --bg-surface: #1a1f23;
   --bg-surface-hover: #242b32;
   --card: #030712;
@@ -92,6 +96,8 @@
   --muted: #1f2937;
   --muted-foreground: #9ca3af;
   --text: #e5e5e5;
+  --text-secondary: var(--neutral-400);
+  --text-tertiary: var(--neutral-600);
   --text-disabled: #9f9fa9;
   --primary: #f9fafb;
   --primary-foreground: #111827;
@@ -105,11 +111,14 @@
 }
 
 @theme inline {
+  --color-background: var(--background);
   --color-surface: var(--bg-surface);
   --color-card: var(--card);
   --color-surface-2: var(--surface-2);
   --color-border: var(--border);
   --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
   --color-muted: var(--muted-foreground);
   --color-brand: var(--brand);
   --color-brand-subtle: var(--brand-subtle);
