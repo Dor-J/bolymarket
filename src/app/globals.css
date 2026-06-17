@@ -58,6 +58,7 @@
   --yes: #30a159;
   --no: #e23939;
   --brand: #1452f0;
+  --brand-subtle: color-mix(in srgb, var(--brand-500) 10%, transparent);
 
   /* radius scale */
   --radius: 0.7rem;
@@ -70,6 +71,7 @@
   --navbar-height: 104px;
   --header-height: 56px;
   --category-nav-height: 48px;
+  --mobile-bottom-nav-height: 56px;
   --bprogress-height: 2px;
 }
 
@@ -97,6 +99,7 @@
   --neutral-50: #1e2428;
   --brand-500: #0093fd;
   --brand: #0093fd;
+  --brand-subtle: color-mix(in srgb, var(--brand-500) 12%, transparent);
   --yes: #2bae4c;
   --no: #f43437;
 }
@@ -109,10 +112,16 @@
   --color-text: var(--text);
   --color-muted: var(--muted-foreground);
   --color-brand: var(--brand);
+  --color-brand-subtle: var(--brand-subtle);
   --color-yes: var(--yes);
   --color-no: var(--no);
   --color-primary: var(--primary);
   --color-destructive: var(--destructive);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-950: var(--neutral-950);
 
   --radius-chip: var(--radius-chip);
   --radius-sm: var(--radius-sm);
@@ -152,6 +161,19 @@ body {
 .price-text,
 [data-price] {
   font-variant-numeric: tabular-nums;
+}
+
+/* Polymarket Inter variable weights */
+.font-w440 {
+  font-weight: 440;
+}
+
+.font-w490 {
+  font-weight: 490;
+}
+
+.font-w590 {
+  font-weight: 590;
 }
 
 .scrollbar-hide {

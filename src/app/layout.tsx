@@ -7,6 +7,8 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -34,7 +36,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-full flex-col bg-surface font-sans text-text">
+      <body
+        className="flex min-h-full flex-col bg-surface font-sans text-text"
+        suppressHydrationWarning
+      >
         <Providers>
           <AppShell>{children}</AppShell>
         </Providers>
