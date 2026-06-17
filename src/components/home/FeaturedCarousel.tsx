@@ -1,14 +1,12 @@
 'use client';
 
-import Link from 'next/link';
-import { motion } from 'motion/react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useCallback, useState } from 'react';
 import type { Event } from '@/types/polymarket';
-import { MarketThumbnail } from '@/components/market/MarketThumbnail';
-import { PriceDisplay } from '@/components/market/PriceDisplay';
-import { formatVolume } from '@/lib/format/volume';
-import { mapEventToCardProps } from '@/lib/cards/mapEventToCardProps';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { cn } from '@/lib/cn';
+import { FeaturedEventPreview } from './FeaturedEventPreview';
 
 export interface FeaturedCarouselProps {
   events: Event[];
@@ -16,110 +14,120 @@ export interface FeaturedCarouselProps {
 }
 
 /**
- * Horizontal featured markets strip matching Polymarket's hero carousel.
+ * Featured markets hero carousel with Polymarket-style event previews.
  */
 export function FeaturedCarousel({ events, className }: FeaturedCarouselProps) {
   const reducedMotion = useReducedMotion();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const slideCount = events.length;
+
+  const goTo = useCallback(
+    (index: number) => {
+      if (slideCount === 0) {
+        return;
+      }
+
+      const normalized = ((index % slideCount) + slideCount) % slideCount;
+      setActiveIndex(normalized);
+    },
+    [slideCount],
+  );
 
   if (events.length === 0) {
     return null;
   }
+
+  const resolvedIndex =
+    slideCount === 0 ? 0 : Math.min(activeIndex, slideCount - 1);
+  const activeEvent = events[resolvedIndex];
 
   return (
     <section
       aria-label="Featured markets"
       className={cn('mb-6', className)}
     >
-      <h2 className="mb-3 text-xl leading-6 font-semibold text-text">
-        Featured markets
-      </h2>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-xl leading-6 font-semibold text-text">
+          Featured markets
+        </h2>
 
-      <div className="scrollbar-hide -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-1">
-        {events.map((event, index) => {
-          const mapped = mapEventToCardProps(event);
-
-          if (mapped.variant !== 'binary') {
-            return (
-              <motion.div
-                key={event.id}
-                initial={reducedMotion ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: reducedMotion ? 0 : 0.25,
-                  delay: reducedMotion ? 0 : index * 0.04,
-                }}
-                className="w-[min(320px,85vw)] shrink-0 snap-start"
-              >
-                <Link
-                  href={`/event/${event.slug}`}
-                  className={cn(
-                    'group relative flex h-full flex-col rounded-card border border-border bg-card p-3',
-                    'transition-colors duration-200 hover:border-neutral-200 hover:bg-surface-2',
-                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-                  )}
-                >
-                  <div className="flex items-start gap-2">
-                    <MarketThumbnail title={event.title} image={event.image} />
-                    <h3 className="line-clamp-2 min-w-0 flex-1 text-sm leading-5 font-w590 text-text">
-                      {event.title}
-                    </h3>
-                  </div>
-                  <p className="mt-3 text-[13px] font-w490 text-neutral-300">
-                    {formatVolume(event.volume)}
-                  </p>
-                </Link>
-              </motion.div>
-            );
-          }
-
-          const props = mapped.props;
-
-          return (
-            <motion.div
-              key={event.id}
-              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: reducedMotion ? 0 : 0.25,
-                delay: reducedMotion ? 0 : index * 0.04,
+        {slideCount > 1 ? (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Previous featured market"
+              onClick={() => {
+                goTo(activeIndex - 1);
               }}
-              className="w-[min(320px,85vw)] shrink-0 snap-start"
+              className={cn(
+                'inline-flex h-9 w-9 items-center justify-center rounded-full',
+                'bg-surface-2 text-text-secondary hover:bg-neutral-100',
+                'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+              )}
             >
-              <Link
-                href={`/event/${event.slug}`}
-                className={cn(
-                  'group relative flex h-full flex-col rounded-card border border-border bg-card p-3',
-                  'transition-colors duration-200 hover:border-neutral-200 hover:bg-surface-2',
-                  'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-                )}
-              >
-                <div className="flex items-start gap-2">
-                  <MarketThumbnail title={event.title} image={event.image} />
-                  <h3 className="line-clamp-2 min-w-0 flex-1 text-sm leading-5 font-w590 text-text">
-                    {event.title}
-                  </h3>
-                </div>
+              <ChevronLeft className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              type="button"
+              aria-label="Next featured market"
+              onClick={() => {
+                goTo(activeIndex + 1);
+              }}
+              className={cn(
+                'inline-flex h-9 w-9 items-center justify-center rounded-full',
+                'bg-surface-2 text-text-secondary hover:bg-neutral-100',
+                'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+              )}
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
+        ) : null}
+      </div>
 
-                <div className="mt-3 flex items-end justify-between gap-2">
-                  <div>
-                    <PriceDisplay
-                      marketId={props.marketId}
-                      outcomeId={props.yesOutcomeId}
-                      initialPrice={props.yesPrice}
-                      className="text-[26px] leading-[26px] font-semibold text-text"
-                    />
-                    <p className="text-xs font-semibold text-muted-foreground">
-                      chance
-                    </p>
-                  </div>
-                  <p className="text-[13px] font-w490 text-neutral-300">
-                    {formatVolume(event.volume)}
-                  </p>
-                </div>
-              </Link>
+      <div className="group/carousel relative">
+        <div className="min-h-[min(480px,60vh)] lg:max-h-[500px]">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={activeEvent.id}
+              initial={reducedMotion ? false : { opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={reducedMotion ? undefined : { opacity: 0, x: -12 }}
+              transition={{
+                duration: reducedMotion ? 0 : 0.2,
+              }}
+              className="h-full"
+            >
+              <FeaturedEventPreview
+                event={activeEvent}
+                isActive
+                className="h-full min-h-[min(480px,60vh)]"
+              />
             </motion.div>
-          );
-        })}
+          </AnimatePresence>
+        </div>
+
+        {slideCount > 1 ? (
+          <div className="mt-3 flex items-center justify-center gap-2">
+            {events.map((event, index) => (
+              <button
+                key={event.id}
+                type="button"
+                aria-label={`Show featured market ${index + 1}`}
+                aria-current={index === resolvedIndex ? 'true' : undefined}
+                onClick={() => {
+                  goTo(index);
+                }}
+                className={cn(
+                  'h-2 rounded-full transition-all',
+                  index === activeIndex
+                    ? 'w-6 bg-brand'
+                    : 'w-2 bg-neutral-200 hover:bg-neutral-300',
+                )}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );
