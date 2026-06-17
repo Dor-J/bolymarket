@@ -75,4 +75,25 @@ describe("resolveCardVariant", () => {
 
     expect(resolveCardVariant(event)).toBe("multi-outcome");
   });
+
+  it("returns crypto-up-down for up/down binary markets", () => {
+    const event = createMockEvent({
+      id: "4",
+      slug: "btc-updown",
+      title: "BTC Up or Down 5m",
+      markets: [
+        {
+          id: "m1",
+          question: "BTC Up or Down",
+          volume: 100,
+          outcomes: [
+            { id: "yes", name: "Yes", price: 0.51 },
+            { id: "no", name: "No", price: 0.49 },
+          ],
+        },
+      ],
+    });
+
+    expect(resolveCardVariant(event)).toBe("crypto-up-down");
+  });
 });
