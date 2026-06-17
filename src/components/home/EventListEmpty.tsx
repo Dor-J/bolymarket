@@ -3,12 +3,13 @@ import { cn } from "@/lib/cn";
 
 export interface EventListEmptyProps {
   className?: string;
+  message?: string;
 }
 
 /**
  * Empty state when a category filter yields no markets.
  */
-export function EventListEmpty({ className }: EventListEmptyProps) {
+export function EventListEmpty({ className, message }: EventListEmptyProps) {
   return (
     <div
       className={cn(
@@ -18,7 +19,7 @@ export function EventListEmpty({ className }: EventListEmptyProps) {
     >
       <SearchX className="h-8 w-8 text-muted" aria-hidden />
       <p className="text-sm leading-5 font-medium text-muted">
-        No markets found
+        {message ?? 'No markets found'}
       </p>
     </div>
   );

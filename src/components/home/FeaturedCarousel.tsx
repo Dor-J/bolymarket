@@ -53,19 +53,18 @@ export function FeaturedCarousel({ events, className }: FeaturedCarouselProps) {
                 <Link
                   href={`/event/${event.slug}`}
                   className={cn(
-                    'group flex h-full flex-col rounded-card border border-border bg-card p-3',
-                    'transition-all duration-200 hover:-translate-y-0.5 hover:border-[#caced3]',
-                    'hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)]',
+                    'group relative flex h-full flex-col rounded-card border border-border bg-card p-3',
+                    'transition-colors duration-200 hover:border-neutral-200 hover:bg-surface-2',
                     'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
                   )}
                 >
                   <div className="flex items-start gap-2">
                     <MarketThumbnail title={event.title} image={event.image} />
-                    <h3 className="line-clamp-2 min-w-0 flex-1 text-sm leading-5 font-semibold text-text">
+                    <h3 className="line-clamp-2 min-w-0 flex-1 text-sm leading-5 font-w590 text-text">
                       {event.title}
                     </h3>
                   </div>
-                  <p className="mt-3 text-[13px] font-medium text-[#aeb4bc]">
+                  <p className="mt-3 text-[13px] font-w490 text-neutral-300">
                     {formatVolume(event.volume)}
                   </p>
                 </Link>
@@ -89,15 +88,14 @@ export function FeaturedCarousel({ events, className }: FeaturedCarouselProps) {
               <Link
                 href={`/event/${event.slug}`}
                 className={cn(
-                  'group flex h-full flex-col rounded-card border border-border bg-card p-3',
-                  'transition-all duration-200 hover:-translate-y-0.5 hover:border-[#caced3]',
-                  'hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)]',
+                  'group relative flex h-full flex-col rounded-card border border-border bg-card p-3',
+                  'transition-colors duration-200 hover:border-neutral-200 hover:bg-surface-2',
                   'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
                 )}
               >
                 <div className="flex items-start gap-2">
                   <MarketThumbnail title={event.title} image={event.image} />
-                  <h3 className="line-clamp-2 min-w-0 flex-1 text-sm leading-5 font-semibold text-text">
+                  <h3 className="line-clamp-2 min-w-0 flex-1 text-sm leading-5 font-w590 text-text">
                     {event.title}
                   </h3>
                 </div>
@@ -108,13 +106,13 @@ export function FeaturedCarousel({ events, className }: FeaturedCarouselProps) {
                       marketId={props.marketId}
                       outcomeId={props.yesOutcomeId}
                       initialPrice={props.yesPrice}
-                      className="text-2xl leading-7 font-semibold text-text"
+                      className="text-[26px] leading-[26px] font-semibold text-text"
                     />
                     <p className="text-xs font-semibold text-muted-foreground">
                       chance
                     </p>
                   </div>
-                  <p className="text-[13px] font-medium text-[#aeb4bc]">
+                  <p className="text-[13px] font-w490 text-neutral-300">
                     {formatVolume(event.volume)}
                   </p>
                 </div>
