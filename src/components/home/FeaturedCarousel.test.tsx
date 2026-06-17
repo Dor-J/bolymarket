@@ -51,7 +51,7 @@ describe('FeaturedCarousel', () => {
     renderWithProviders(<FeaturedCarousel events={featuredEvents} />);
 
     expect(
-      screen.getByRole('heading', { name: 'Featured markets' }),
+      screen.getByRole('region', { name: 'Featured markets' }),
     ).toBeInTheDocument();
     expect(screen.getByText('World Cup Winner')).toBeInTheDocument();
     expect(screen.getByText('France')).toBeInTheDocument();
@@ -62,12 +62,16 @@ describe('FeaturedCarousel', () => {
   it('navigates between featured slides', async () => {
     renderWithProviders(<FeaturedCarousel events={featuredEvents} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Next featured market' }));
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Next featured market: Election 2028' })[0]!,
+    );
 
     await waitFor(() => {
-      expect(screen.getByText('Election 2028')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 3, name: 'Election 2028' })).toBeInTheDocument();
     });
-    expect(screen.queryByText('World Cup Winner')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { level: 3, name: 'World Cup Winner' }),
+    ).not.toBeInTheDocument();
   });
 
   it('returns null for empty events', () => {

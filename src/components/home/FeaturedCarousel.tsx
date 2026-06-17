@@ -1,11 +1,11 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Event } from '@/types/polymarket';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { cn } from '@/lib/cn';
+import { FeaturedCarouselControls } from './FeaturedCarouselControls';
 import { FeaturedEventPreview } from './FeaturedEventPreview';
 
 export interface FeaturedCarouselProps {
@@ -75,45 +75,6 @@ export function FeaturedCarousel({
         className,
       )}
     >
-      <div className={cn('flex items-center justify-between gap-3', !isSidebar && 'mb-3')}>
-        <h2 className="text-xl leading-6 font-semibold text-text">
-          Featured markets
-        </h2>
-
-        {slideCount > 1 ? (
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Previous featured market"
-              onClick={() => {
-                goTo(activeIndex - 1);
-              }}
-              className={cn(
-                'inline-flex h-9 w-9 items-center justify-center rounded-full',
-                'bg-surface-2 text-text-secondary hover:bg-neutral-100',
-                'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-              )}
-            >
-              <ChevronLeft className="h-4 w-4" aria-hidden />
-            </button>
-            <button
-              type="button"
-              aria-label="Next featured market"
-              onClick={() => {
-                goTo(activeIndex + 1);
-              }}
-              className={cn(
-                'inline-flex h-9 w-9 items-center justify-center rounded-full',
-                'bg-surface-2 text-text-secondary hover:bg-neutral-100',
-                'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-              )}
-            >
-              <ChevronRight className="h-4 w-4" aria-hidden />
-            </button>
-          </div>
-        ) : null}
-      </div>
-
       <div className="group/carousel relative">
         <div className="min-h-[min(480px,60vh)] lg:max-h-[500px]">
           <AnimatePresence mode="wait" initial={false}>
@@ -137,25 +98,17 @@ export function FeaturedCarousel({
         </div>
 
         {slideCount > 1 ? (
-          <div className="mt-3 flex items-center justify-center gap-2">
-            {events.map((event, index) => (
-              <button
-                key={event.id}
-                type="button"
-                aria-label={`Show featured market ${index + 1}`}
-                aria-current={index === resolvedIndex ? 'true' : undefined}
-                onClick={() => {
-                  goTo(index);
-                }}
-                className={cn(
-                  'h-2 rounded-full transition-all',
-                  index === activeIndex
-                    ? 'w-6 bg-brand'
-                    : 'w-2 bg-neutral-200 hover:bg-neutral-300',
-                )}
-              />
-            ))}
-          </div>
+          <FeaturedCarouselControls
+            events={events}
+            activeIndex={resolvedIndex}
+            onSelect={goTo}
+            onPrevious={() => {
+              goTo(activeIndex - 1);
+            }}
+            onNext={() => {
+              goTo(activeIndex + 1);
+            }}
+          />
         ) : null}
       </div>
     </section>
