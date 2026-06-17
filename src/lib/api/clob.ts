@@ -151,7 +151,26 @@ export function mergeChartSeries(
     }
   }
 
-  return Array.from(byTimestamp.values()).sort(
+  const sorted = Array.from(byTimestamp.values()).sort(
     (a, b) => a.timestamp - b.timestamp,
   );
+
+  const lastValues: Record<string, number> = {};
+
+  for (const point of sorted) {
+    for (const outcomeId of outcomeIds) {
+      const value = point[outcomeId];
+
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        lastValues[outcomeId] = value;
+        continue;
+      }
+
+      if (lastValues[outcomeId] !== undefined) {
+        point[outcomeId] = lastValues[outcomeId];
+      }
+    }
+  }
+
+  return sorted;
 }

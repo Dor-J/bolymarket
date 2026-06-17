@@ -50,4 +50,21 @@ describe('mergeChartSeries', () => {
     expect(merged[1]?.['token-a']).toBe(0.5);
     expect(merged[1]?.['token-b']).toBe(0.7);
   });
+
+  it('forward-fills missing series values across timestamps', () => {
+    const seriesA: ChartPoint[] = [
+      { timestamp: 100, label: 'a', 'token-a': 0.4 },
+      { timestamp: 300, label: 'c', 'token-a': 0.5 },
+    ];
+    const seriesB: ChartPoint[] = [
+      { timestamp: 200, label: 'b', 'token-b': 0.6 },
+    ];
+
+    const merged = mergeChartSeries([seriesA, seriesB], ['token-a', 'token-b']);
+
+    expect(merged).toHaveLength(3);
+    expect(merged[1]?.['token-a']).toBe(0.4);
+    expect(merged[1]?.['token-b']).toBe(0.6);
+    expect(merged[2]?.['token-b']).toBe(0.6);
+  });
 });
