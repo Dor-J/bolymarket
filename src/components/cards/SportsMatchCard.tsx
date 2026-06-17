@@ -110,7 +110,7 @@ export const SportsMatchCard = memo(function SportsMatchCard({
                   )}
                 >
                   <span
-                    className="relative z-[1] truncate transition group-hover:text-white"
+                    className="relative z-1 truncate transition group-hover:text-white"
                     style={{
                       color: /^draw$/i.test(outcome.name) ? undefined : color,
                     }}

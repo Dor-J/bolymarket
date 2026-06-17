@@ -11,7 +11,7 @@ export function RouteProgress() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-x-0 top-0 z-[100] h-[var(--bprogress-height)]"
+      className="pointer-events-none fixed inset-x-0 top-0 z-100 h-(--bprogress-height)"
     >
       <div key={pathname} className="route-progress-bar h-full bg-brand" />
     </div>

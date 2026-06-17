@@ -12,7 +12,7 @@ export const CategoryNav = memo(function CategoryNav() {
   return (
     <nav
       aria-label="Categories"
-      className="sticky top-[var(--header-height)] z-40 overflow-visible border-b border-border bg-surface"
+      className="sticky top-(--header-height) z-40 overflow-visible border-b border-border bg-surface"
     >
       <div className="mx-auto max-w-[1350px] px-4 md:px-6">
         <div className="flex h-12 items-center">
