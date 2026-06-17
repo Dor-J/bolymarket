@@ -5,6 +5,7 @@ import { readServerCache, writeServerCache } from '@/lib/cache/serverCache';
 import { SPORTS_LEAGUE_SECTIONS } from '@/lib/markets/constants';
 import {
   buildLeagueSummaries,
+  buildSportsFuturesFromEvents,
   buildSportsGamesFromEvents,
 } from '@/lib/sports/buildSportsGameCard';
 import type { SportsLiveResponse } from '@/types/polymarket';
@@ -36,10 +37,12 @@ export async function getCachedSportsLiveGames(): Promise<SportsLiveResponse> {
   const teams = await fetchTeams(leagues);
   const teamLookup = buildTeamLookup(teams);
   const games = buildSportsGamesFromEvents(events, teamLookup);
+  const futuresGames = buildSportsFuturesFromEvents(events, teamLookup);
   const metadataIcons = buildMetadataIconMap(metadata);
 
   const payload: SportsLiveResponse = {
     games,
+    futuresGames,
     leagues: buildLeagueSummaries(games, metadataIcons),
     fetchedAt: new Date().toISOString(),
   };

@@ -4,6 +4,11 @@ import {
 import type { SportsEvent, SportsMetadata, TeamInfo } from '@/types/polymarket';
 import { normalizeSportsEvents } from './normalize';
 import {
+  buildEnhancedTeamLookup,
+  normalizeTeamsFromGamma,
+  type TeamLookup,
+} from '@/lib/sports/teamLookup';
+import {
   gammaEventsResponseSchema,
   gammaSportsMetadataSchema,
   gammaTeamsResponseSchema,
@@ -19,24 +24,8 @@ export interface FetchSportsLiveEventsOptions {
   signal?: AbortSignal;
 }
 
-function normalizeTeam(team: GammaTeam): TeamInfo | null {
-  const name = team.name?.trim();
-  if (!name) {
-    return null;
-  }
-
-  const id =
-    typeof team.id === 'number' ? team.id : Number.parseInt(String(team.id), 10);
-
-  return {
-    id: Number.isFinite(id) ? id : 0,
-    name,
-    abbreviation: team.abbreviation?.toUpperCase() ?? name.slice(0, 3).toUpperCase(),
-    record: team.record,
-    logo: team.logo,
-    league: team.league,
-    color: typeof team.color === 'string' ? team.color : undefined,
-  };
+function normalizeTeam(team: GammaTeam) {
+  return normalizeTeamsFromGamma([team])[0] ?? null;
 }
 
 /**
@@ -123,17 +112,13 @@ export async function fetchTeams(
 }
 
 /**
- * Builds a team lookup map keyed by stringified team id.
+ * Builds a multi-key team lookup from Gamma team records.
  */
-export function buildTeamLookup(teams: TeamInfo[]): Map<string, TeamInfo> {
-  const lookup = new Map<string, TeamInfo>();
-
-  for (const team of teams) {
-    lookup.set(String(team.id), team);
-  }
-
-  return lookup;
+export function buildTeamLookup(teams: TeamInfo[]): TeamLookup {
+  return buildEnhancedTeamLookup(teams);
 }
+
+export { buildEnhancedTeamLookup };
 
 async function fetchSportsEventsPage(
   offset: number,

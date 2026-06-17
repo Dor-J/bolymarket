@@ -1,5 +1,6 @@
 import type { Store } from 'jotai/vanilla/store';
 import { sportsGameStateAtomFamily } from '@/lib/atoms/sportsGameState';
+import { normalizeMatchupKey } from '@/lib/sports/buildSportsGameCard';
 import type { SportsGameState } from '@/types/polymarket';
 
 const SPORTS_WS_URL = 'wss://sports-api.polymarket.com/ws';
@@ -37,6 +38,18 @@ function parseSportsGameState(payload: SportsWsPayload): SportsGameState | null 
     live: payload.live,
     ended: payload.ended,
   };
+}
+
+function storeGameState(store: Store, state: SportsGameState): void {
+  store.set(sportsGameStateAtomFamily(state.gameId), state);
+
+  if (state.slug) {
+    store.set(sportsGameStateAtomFamily(state.slug), state);
+    store.set(
+      sportsGameStateAtomFamily(normalizeMatchupKey(state.slug)),
+      state,
+    );
+  }
 }
 
 /**
@@ -83,7 +96,7 @@ export function createSportsWebSocketEngine() {
         return;
       }
 
-      activeStore.set(sportsGameStateAtomFamily(state.gameId), state);
+      storeGameState(activeStore, state);
     } catch {
       // Ignore non-JSON frames.
     }

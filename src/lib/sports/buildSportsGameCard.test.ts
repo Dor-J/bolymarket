@@ -4,7 +4,9 @@ import {
   buildSportsGameCard,
   buildSportsGamesFromEvents,
   isLiveOrUpcomingGame,
+  normalizeMatchupKey,
 } from './buildSportsGameCard';
+import { buildEnhancedTeamLookup } from './teamLookup';
 
 function createSportsMarket(
   overrides: Partial<SportsMarket> & Pick<SportsMarket, 'id' | 'question'>,
@@ -60,32 +62,28 @@ function createEvent(overrides: Partial<SportsEvent> = {}): SportsEvent {
   };
 }
 
-const teamLookup = new Map<string, TeamInfo>([
-  [
-    '1',
-    {
-      id: 1,
-      name: 'Atlanta Braves',
-      abbreviation: 'ATL',
-      record: '40-30',
-      logo: 'https://example.com/atl.png',
-      league: 'mlb',
-      color: '#C00040',
-    },
-  ],
-  [
-    '2',
-    {
-      id: 2,
-      name: 'Chicago Cubs',
-      abbreviation: 'CHC',
-      record: '38-36',
-      logo: 'https://example.com/chc.png',
-      league: 'mlb',
-      color: '#004A94',
-    },
-  ],
-]);
+const teams: TeamInfo[] = [
+  {
+    id: 1,
+    name: 'Atlanta Braves',
+    abbreviation: 'ATL',
+    record: '40-30',
+    logo: 'https://example.com/atl.png',
+    league: 'mlb',
+    color: '#C00040',
+  },
+  {
+    id: 2,
+    name: 'Chicago Cubs',
+    abbreviation: 'CHC',
+    record: '38-36',
+    logo: 'https://example.com/chc.png',
+    league: 'mlb',
+    color: '#004A94',
+  },
+];
+
+const teamLookup = buildEnhancedTeamLookup(teams);
 
 describe('buildSportsGameCard', () => {
   it('groups multi-market events into a single game card', () => {
@@ -99,6 +97,7 @@ describe('buildSportsGameCard', () => {
     expect(game?.teams[0]?.abbreviation).toBe('ATL');
     expect(game?.teams[1]?.abbreviation).toBe('CHC');
     expect(game?.teams[0]?.record).toBe('40-30');
+    expect(game?.matchupKey).toBe(normalizeMatchupKey('Braves vs. Cubs'));
   });
 });
 
@@ -125,26 +124,61 @@ describe('isLiveOrUpcomingGame', () => {
 });
 
 describe('buildSportsGamesFromEvents', () => {
-  it('returns sorted live/upcoming games', () => {
-    const lowVolume = createEvent({
-      id: 'e-low',
-      slug: 'low-volume',
-      title: 'Braves vs. Cubs',
-      volume: 100,
+  it('merges More Markets siblings and prefers MLB ordering', () => {
+    const base = createEvent({
+      id: 'e-base',
+      slug: 'portugal-dr-congo',
+      title: 'Portugal vs. DR Congo',
+      volume: 1000,
+      tags: ['world-cup', 'fifa'],
     });
-    const highVolume = createEvent({
-      id: 'e-high',
-      slug: 'high-volume',
-      title: 'Yankees vs. Red Sox',
-      volume: 9000,
+    const moreMarkets = createEvent({
+      id: 'e-more',
+      slug: 'portugal-dr-congo-more',
+      title: 'Portugal vs. DR Congo - More Markets',
+      volume: 5000,
+      tags: ['world-cup', 'fifa'],
+      sportsMarkets: [
+        createSportsMarket({
+          id: 'mm1',
+          question: 'Moneyline',
+          sportsMarketType: 'moneyline',
+        }),
+        createSportsMarket({
+          id: 'mm2',
+          question: 'Spread',
+          sportsMarketType: 'spread',
+          line: 7.5,
+        }),
+        createSportsMarket({
+          id: 'mm3',
+          question: 'Total',
+          sportsMarketType: 'total',
+          line: 2.5,
+          outcomes: [
+            { id: 'o1', name: 'Over', price: 0.5 },
+            { id: 'o2', name: 'Under', price: 0.5 },
+          ],
+        }),
+      ],
+    });
+    const mlb = createEvent({
+      id: 'e-mlb',
+      slug: 'braves-cubs',
+      title: 'Braves vs. Cubs',
+      volume: 500,
+      tags: ['mlb'],
     });
 
     const games = buildSportsGamesFromEvents(
-      [lowVolume, highVolume],
+      [base, moreMarkets, mlb],
       teamLookup,
     );
 
-    expect(games.length).toBe(2);
-    expect(games[0]?.volume).toBe(9000);
+    expect(games).toHaveLength(2);
+    expect(games[0]?.leagueId).toBe('mlb');
+    const merged = games.find((game) => game.title.includes('Portugal'));
+    expect(merged?.spread?.line).toBe(7.5);
+    expect(merged?.total?.line).toBe(2.5);
   });
 });

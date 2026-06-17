@@ -7,8 +7,15 @@ import type {
   TeamInfo,
 } from '@/types/polymarket';
 import { classifySportsMarkets } from './classifySportsMarkets';
+import { sortSportsLiveGames } from './sortSportsLiveGames';
 import { getTeamAbbrev } from './teamAbbrev';
-import { resolveTeamColor } from './teamColors';
+import {
+  mergeSportsGameCards,
+  pickBetterLineMarket,
+} from './teamColors';
+import type { TeamLookup } from './teamLookup';
+import { resolveTeam } from './teamLookup';
+import { getSportIconUrl } from './sportIcons';
 
 const FUTURES_PATTERN = /futures|winner|champion|season|mvp|award/i;
 const PROP_SUFFIX_PATTERN =
@@ -37,6 +44,10 @@ function isMatchupTitle(title: string): boolean {
   }
 
   return /\bvs\.?\b/i.test(title);
+}
+
+function isFuturesTitle(title: string): boolean {
+  return FUTURES_PATTERN.test(title) || NON_MATCHUP_PATTERN.test(title);
 }
 
 function eventHaystack(event: SportsEvent): string {
@@ -82,17 +93,24 @@ function parseTeamsFromTitle(title: string): [string, string] | null {
 function buildTeamFromOutcome(
   outcomeName: string,
   abbrev: string | undefined,
-  teamLookup: Map<string, TeamInfo>,
+  teamLookup: TeamLookup,
   teamId: string | undefined,
   leagueId: string,
   index: number,
   titleFallback?: string,
 ): TeamInfo {
-  const fromApi = teamId ? teamLookup.get(teamId) : undefined;
   const parsedTeams = titleFallback ? parseTeamsFromTitle(titleFallback) : null;
   const parsedName = parsedTeams?.[index];
   const isGenericOutcome = /^(yes|no|draw|over|under)$/i.test(outcomeName);
-  const name = fromApi?.name ?? (isGenericOutcome ? parsedName : undefined) ?? outcomeName;
+  const lookupName = isGenericOutcome ? parsedName : outcomeName;
+
+  const fromApi = resolveTeam(teamLookup, {
+    teamId,
+    name: lookupName,
+    abbreviation: abbrev,
+  });
+
+  const name = fromApi?.name ?? lookupName ?? outcomeName;
   const abbreviation =
     abbrev ?? fromApi?.abbreviation ?? getTeamAbbrev(name);
 
@@ -103,7 +121,8 @@ function buildTeamFromOutcome(
     record: fromApi?.record,
     logo: fromApi?.logo,
     league: fromApi?.league ?? leagueId,
-    color: resolveTeamColor(leagueId, index, fromApi?.color),
+    color: fromApi?.color,
+    alias: fromApi?.alias,
   };
 }
 
@@ -116,12 +135,16 @@ function getGameId(event: SportsEvent, markets: SportsMarket[]): string {
   return fromMarket ?? event.id;
 }
 
+function getDisplayTitle(title: string): string {
+  return title.replace(/\s*-\s*more markets$/i, '').trim();
+}
+
 /**
  * Builds a sports game view model from a normalized sports event.
  */
 export function buildSportsGameCard(
   event: SportsEvent,
-  teamLookup: Map<string, TeamInfo>,
+  teamLookup: TeamLookup,
 ): SportsGame | null {
   const markets =
     event.sportsMarkets.length > 0 ? event.sportsMarkets : event.markets;
@@ -137,6 +160,8 @@ export function buildSportsGameCard(
   const shortOutcomes = primary.shortOutcomes;
   const teamAId = primary.teamAId;
   const teamBId = primary.teamBId;
+  const displayTitle = getDisplayTitle(event.title);
+  const isMoreMarkets = / - more markets$/i.test(event.title);
 
   const teams = [
     buildTeamFromOutcome(
@@ -146,7 +171,7 @@ export function buildSportsGameCard(
       teamAId,
       league.id,
       0,
-      event.title,
+      displayTitle,
     ),
     buildTeamFromOutcome(
       primary.outcomes[1]!.name,
@@ -155,20 +180,25 @@ export function buildSportsGameCard(
       teamBId,
       league.id,
       1,
-      event.title,
+      displayTitle,
     ),
   ] as [TeamInfo, TeamInfo];
 
+  const gameId = getGameId(event, sportsMarkets);
+
   return {
-    gameId: getGameId(event, sportsMarkets),
+    gameId,
     eventId: event.id,
     slug: event.slug,
-    title: event.title,
+    title: displayTitle,
     league: league.label,
     leagueId: league.id,
     volume: event.volume,
     image: event.image,
     gameStartTime: getGameStartTime(sportsMarkets),
+    matchupKey: normalizeMatchupKey(displayTitle),
+    wsGameId: gameId,
+    isMoreMarkets,
     teams,
     moneyline: classified.moneyline,
     spread: classified.spread,
@@ -208,34 +238,30 @@ export function isLiveOrUpcomingGame(game: SportsGame): boolean {
   return start >= now - windowMs && start <= now + windowMs;
 }
 
-function scoreGameCard(game: SportsGame): number {
-  let score = game.volume;
+function mergeGamePair(existing: SportsGame, incoming: SportsGame): SportsGame {
+  const merged = mergeSportsGameCards(existing, incoming);
 
-  if (game.spread) {
-    score += 1_000_000;
+  if (!incoming.isMoreMarkets) {
+    merged.spread = pickBetterLineMarket(merged.spread, incoming.spread);
+    merged.total = pickBetterLineMarket(merged.total, incoming.total);
   }
 
-  if (game.total) {
-    score += 1_000_000;
-  }
-
-  if (/ - more markets$/i.test(game.title)) {
-    score += 500_000;
-  }
-
-  return score;
+  return merged;
 }
 
 function dedupeGamesByMatchup(games: SportsGame[]): SportsGame[] {
   const byKey = new Map<string, SportsGame>();
 
   for (const game of games) {
-    const key = normalizeMatchupKey(game.title);
+    const key = game.matchupKey;
     const existing = byKey.get(key);
 
-    if (!existing || scoreGameCard(game) > scoreGameCard(existing)) {
+    if (!existing) {
       byKey.set(key, game);
+      continue;
     }
+
+    byKey.set(key, mergeGamePair(existing, game));
   }
 
   return Array.from(byKey.values());
@@ -246,7 +272,7 @@ function dedupeGamesByMatchup(games: SportsGame[]): SportsGame[] {
  */
 export function buildSportsGamesFromEvents(
   events: SportsEvent[],
-  teamLookup: Map<string, TeamInfo>,
+  teamLookup: TeamLookup,
 ): SportsGame[] {
   const games: SportsGame[] = [];
 
@@ -257,9 +283,30 @@ export function buildSportsGamesFromEvents(
     }
   }
 
-  return dedupeGamesByMatchup(games).sort(
-    (left, right) => right.volume - left.volume,
-  );
+  return sortSportsLiveGames(dedupeGamesByMatchup(games));
+}
+
+/**
+ * Builds futures-style game cards for the Futures tab.
+ */
+export function buildSportsFuturesFromEvents(
+  events: SportsEvent[],
+  teamLookup: TeamLookup,
+): SportsGame[] {
+  const games: SportsGame[] = [];
+
+  for (const event of events) {
+    if (!isFuturesTitle(event.title)) {
+      continue;
+    }
+
+    const game = buildSportsGameCard(event, teamLookup);
+    if (game) {
+      games.push(game);
+    }
+  }
+
+  return games.sort((left, right) => right.volume - left.volume);
 }
 
 /**
@@ -289,7 +336,7 @@ export function buildLeagueSummaries(
         id: section.id,
         label: section.label,
         count: entry.count,
-        icon: metadataIcons.get(section.id),
+        icon: getSportIconUrl(section.id, metadataIcons.get(section.id)),
       });
       counts.delete(section.id);
     }
@@ -300,7 +347,7 @@ export function buildLeagueSummaries(
       id,
       label: entry.label,
       count: entry.count,
-      icon: metadataIcons.get(id),
+      icon: getSportIconUrl(id, metadataIcons.get(id)),
     });
   }
 
@@ -317,7 +364,9 @@ export function groupGamesByLeague(
   const used = new Set<string>();
 
   for (const section of SPORTS_LEAGUE_SECTIONS) {
-    const matched = games.filter((game) => game.leagueId === section.id);
+    const matched = sortSportsLiveGames(
+      games.filter((game) => game.leagueId === section.id),
+    );
     if (matched.length > 0) {
       sections.push({
         id: section.id,
@@ -330,7 +379,9 @@ export function groupGamesByLeague(
     }
   }
 
-  const remaining = games.filter((game) => !used.has(game.gameId));
+  const remaining = sortSportsLiveGames(
+    games.filter((game) => !used.has(game.gameId)),
+  );
   if (remaining.length > 0) {
     sections.push({ id: 'other', label: 'OTHER', games: remaining });
   }
