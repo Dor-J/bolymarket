@@ -3,7 +3,11 @@
 import { useAtom, useAtomValue, useStore } from 'jotai';
 import { useEffect, useMemo, useState } from 'react';
 import { bookmarksAtom } from '@/lib/atoms/bookmarks';
-import { breakingFilterAtom, bookmarksOnlyAtom } from '@/lib/atoms/marketPage';
+import {
+  breakingFilterAtom,
+  bookmarksOnlyAtom,
+  marketFiltersVisibleAtom,
+} from '@/lib/atoms/marketPage';
 import { searchQueryAtom } from '@/lib/atoms/search';
 import { pruneTradeActivity } from '@/lib/atoms/tradeActivity';
 import { HOME_TOPIC_CHIPS } from '@/lib/markets/constants';
@@ -19,7 +23,8 @@ import type { HomeHideToggles, MarketSort, MarketStatus } from '@/lib/markets/ty
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
 import { useLivePrices } from '@/hooks/useLivePrices';
 import { getFeaturedOutcomeSeedsFromEvents } from '@/lib/prices/visibleOutcomeKeys';
-import { FeaturedCarousel } from './FeaturedCarousel';
+import { useIsMounted } from '@/hooks/useIsMounted';
+import { HomeFeaturedSection } from './HomeFeaturedSection';
 import { MarketControlsBar } from '@/components/markets/MarketControlsBar';
 import { MarketTopicRail } from '@/components/markets/MarketTopicRail';
 import { MarketsPageBody } from '@/components/markets/MarketsPageBody';
@@ -35,6 +40,8 @@ export function HomeMarketsView() {
   const bookmarks = useAtomValue(bookmarksAtom);
   const [breakingOnly, setBreakingOnly] = useAtom(breakingFilterAtom);
   const bookmarksOnly = useAtomValue(bookmarksOnlyAtom);
+  const filtersVisible = useAtomValue(marketFiltersVisibleAtom);
+  const isMounted = useIsMounted();
   const [topicId, setTopicId] = useState('all');
   const [sort, setSort] = useState<MarketSort>('volume');
   const [status, setStatus] = useState<MarketStatus>('all');
@@ -97,62 +104,64 @@ export function HomeMarketsView() {
         }}
       />
 
-      <MarketControlsBar
-        sort={sort}
-        onSortChange={setSort}
-        status={status}
-        onStatusChange={setStatus}
-      >
-        <label className="inline-flex items-center gap-1.5 text-sm font-w490 text-neutral-500">
-          <input
-            type="checkbox"
-            checked={hideToggles.hideSports}
-            onChange={(event) =>
-              setHideToggles((current) => ({
-                ...current,
-                hideSports: event.target.checked,
-              }))
-            }
-            className="rounded border-border"
-          />
-          Hide sports
-        </label>
-        <label className="inline-flex items-center gap-1.5 text-sm font-w490 text-neutral-500">
-          <input
-            type="checkbox"
-            checked={hideToggles.hideCrypto}
-            onChange={(event) =>
-              setHideToggles((current) => ({
-                ...current,
-                hideCrypto: event.target.checked,
-              }))
-            }
-            className="rounded border-border"
-          />
-          Hide crypto
-        </label>
-        <label className="inline-flex items-center gap-1.5 text-sm font-w490 text-neutral-500">
-          <input
-            type="checkbox"
-            checked={hideToggles.hideEarnings}
-            onChange={(event) =>
-              setHideToggles((current) => ({
-                ...current,
-                hideEarnings: event.target.checked,
-              }))
-            }
-            className="rounded border-border"
-          />
-          Hide earnings
-        </label>
-      </MarketControlsBar>
+      {isMounted && filtersVisible ? (
+        <MarketControlsBar
+          sort={sort}
+          onSortChange={setSort}
+          status={status}
+          onStatusChange={setStatus}
+        >
+          <label className="inline-flex items-center gap-1.5 text-sm font-w490 text-neutral-500">
+            <input
+              type="checkbox"
+              checked={hideToggles.hideSports}
+              onChange={(event) =>
+                setHideToggles((current) => ({
+                  ...current,
+                  hideSports: event.target.checked,
+                }))
+              }
+              className="rounded border-border"
+            />
+            Hide sports
+          </label>
+          <label className="inline-flex items-center gap-1.5 text-sm font-w490 text-neutral-500">
+            <input
+              type="checkbox"
+              checked={hideToggles.hideCrypto}
+              onChange={(event) =>
+                setHideToggles((current) => ({
+                  ...current,
+                  hideCrypto: event.target.checked,
+                }))
+              }
+              className="rounded border-border"
+            />
+            Hide crypto
+          </label>
+          <label className="inline-flex items-center gap-1.5 text-sm font-w490 text-neutral-500">
+            <input
+              type="checkbox"
+              checked={hideToggles.hideEarnings}
+              onChange={(event) =>
+                setHideToggles((current) => ({
+                  ...current,
+                  hideEarnings: event.target.checked,
+                }))
+              }
+              className="rounded border-border"
+            />
+            Hide earnings
+          </label>
+        </MarketControlsBar>
+      ) : null}
     </div>
   );
 
   return (
     <>
       {!isLoading && !isError && featuredEvents.length > 0 ? (
-        <FeaturedCarousel events={featuredEvents} />
+        <HomeFeaturedSection events={featuredEvents} />
       ) : null}
 
       <MarketsPageBody

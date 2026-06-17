@@ -4,9 +4,10 @@ import { Bookmark, Search, SlidersHorizontal } from 'lucide-react';
 import { useAtom, useSetAtom } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 import { IconButton } from '@/components/ui/IconButton';
-import { bookmarksOnlyAtom } from '@/lib/atoms/marketPage';
+import { bookmarksOnlyAtom, marketFiltersVisibleAtom } from '@/lib/atoms/marketPage';
 import { searchQueryAtom } from '@/lib/atoms/search';
 import { useSearchShortcut } from '@/hooks/useSearchShortcut';
+import { toggleAriaPressed } from '@/lib/a11y/toggleAriaPressed';
 import { cn } from '@/lib/cn';
 
 /**
@@ -16,6 +17,7 @@ import { cn } from '@/lib/cn';
 export function MarketSearchToolbar() {
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const setBookmarksOnly = useSetAtom(bookmarksOnlyAtom);
+  const [filtersVisible, setFiltersVisible] = useAtom(marketFiltersVisibleAtom);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isXlUp, setIsXlUp] = useState(false);
 
@@ -62,11 +64,21 @@ export function MarketSearchToolbar() {
         <div className="flex items-center gap-2">
           <IconButton
             label="Toggle filters"
-            className="h-9 w-9 rounded-md"
+            aria-pressed={toggleAriaPressed(filtersVisible)}
+            className={cn(
+              'h-9 w-9 rounded-md',
+              filtersVisible && 'border border-text bg-surface',
+            )}
             onClick={() => {
-              document.getElementById('market-filters')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
+              setFiltersVisible((current) => {
+                const next = !current;
+                if (next) {
+                  document.getElementById('market-filters')?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                }
+                return next;
               });
             }}
           >
