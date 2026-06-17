@@ -6,14 +6,16 @@ import { LiveBadge } from "@/components/markets/LiveBadge";
 import { MarketThumbnail } from "@/components/market/MarketThumbnail";
 import { PriceDisplay } from "@/components/market/PriceDisplay";
 import { YesNoChip } from "@/components/market/YesNoChip";
+import { BookmarkButton } from "@/components/ui/BookmarkButton";
 import type { CryptoUpDownCardProps } from "@/lib/cards/cryptoCardTypes";
 import { formatVolume } from "@/lib/format/volume";
 import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
-  "group/card relative isolate flex min-h-[180px] h-full flex-col justify-between overflow-hidden rounded-xl border border-neutral-100 bg-card pt-3",
+  "group/card relative isolate flex min-h-[180px] h-full flex-col justify-between overflow-hidden rounded-xl border border-neutral-100 bg-background pt-3",
   "shadow-md shadow-black/4 transition hover:-translate-y-px hover:shadow-md hover:shadow-black/8",
   "focus-within:ring-2 focus-within:ring-ring focus-within:outline-none",
+  "[&_a]:relative [&_a]:z-30 [&_button]:relative [&_button]:z-30",
 );
 
 /**
@@ -35,21 +37,25 @@ export const CryptoUpDownCard = memo(function CryptoUpDownCard({
 
   return (
     <article className={cardShellClasses}>
-      <Link href={href} className="absolute inset-0 z-0 rounded-xl" aria-label={title} />
+      <Link
+        href={href}
+        className="absolute inset-0 z-0 rounded-xl"
+        aria-label={title}
+      />
 
       <div className="pointer-events-none relative z-10 flex h-full flex-col justify-between">
-        <div className="flex w-full items-start gap-2 px-3">
+        <div className="static flex h-[42px] w-full items-start gap-2 px-3">
           <MarketThumbnail
             title={title}
             image={image}
             size={38}
-            className="rounded-sm"
+            className="rounded-sm object-cover"
           />
-          <div className="flex min-w-0 flex-1 justify-between gap-3">
-            <h3 className="line-clamp-3 min-w-0 text-sm leading-5 font-w590 text-text decoration-2 group-hover/card:underline">
+          <div className="flex min-w-0 flex-1 cursor-default justify-between gap-4">
+            <h3 className="line-clamp-3 min-w-0 text-body-base font-[590] text-text decoration-2 group-hover/card:underline">
               {title}
             </h3>
-            <div className="relative -mt-1 flex w-[58px] shrink-0 flex-col items-center">
+            <div className="relative flex w-[58px] shrink-0 flex-col items-center">
               <svg
                 aria-hidden
                 viewBox="-29 -29 58 34"
@@ -78,7 +84,9 @@ export const CryptoUpDownCard = memo(function CryptoUpDownCard({
                   initialPrice={yesPrice}
                   className="text-base leading-5 font-medium text-neutral-950"
                 />
-                <span className="text-xs leading-4 font-semibold text-neutral-500">Up</span>
+                <span className="text-body-xs line-clamp-2 text-center font-semibold text-text-secondary">
+                  Up
+                </span>
               </div>
             </div>
           </div>
@@ -106,13 +114,28 @@ export const CryptoUpDownCard = memo(function CryptoUpDownCard({
             />
           </div>
 
-          <div className="flex items-center justify-between text-[13px] leading-4 font-w490 text-neutral-500">
-            <div className="flex items-center gap-1">
+          <div className="pointer-events-auto flex items-center justify-between text-body-sm text-text-secondary">
+            <div className="flex items-center gap-1 overflow-visible whitespace-nowrap">
               {isLive ? <LiveBadge /> : null}
-              {isLive && assetLabel ? <span className="opacity-50">·</span> : null}
-              {assetLabel ? <span>{assetLabel}</span> : null}
-              {!isLive && !assetLabel ? <span>{formatVolume(volume)}</span> : null}
+              {isLive && assetLabel ? (
+                <span className="mx-px opacity-50">·</span>
+              ) : null}
+              {assetLabel ? (
+                <Link
+                  href={`/crypto/${assetLabel.toLowerCase()}`}
+                  className="hover:text-text-tertiary"
+                >
+                  {assetLabel}
+                </Link>
+              ) : null}
+              {!isLive && !assetLabel ? (
+                <span>{formatVolume(volume)}</span>
+              ) : null}
             </div>
+            <BookmarkButton
+              slug={slug}
+              className="h-7 w-7 rounded-full text-text-secondary"
+            />
           </div>
         </div>
       </div>
