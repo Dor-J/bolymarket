@@ -3,7 +3,7 @@ import {
   mapEventToBinaryProps,
 } from "@/lib/cards/mapEventToCardProps";
 import { resolveCardVariant } from "@/lib/cards/resolveCardVariant";
-import { flattenOutcomes } from "@/lib/event/flattenOutcomes";
+import { flattenOutcomes, getChartOutcomes } from "@/lib/event/flattenOutcomes";
 import type { Event } from "@/types/polymarket";
 import { getOutcomePriceKey } from "./outcomeKey";
 
@@ -41,6 +41,31 @@ export function getVisibleOutcomeSeedsFromEvents(
     }
 
     for (const row of getTopOutcomeRows(event, 2)) {
+      const market = event.markets.find((item) => item.id === row.marketId);
+      const outcomeKey = getOutcomePriceKey(row.marketId, row.outcomeId);
+      seeds.set(outcomeKey, {
+        outcomeKey,
+        price: row.yesPrice,
+        assetId: row.outcomeId,
+        eventSlug: event.slug,
+        marketSlug: market?.slug,
+      });
+    }
+  }
+
+  return Array.from(seeds.values());
+}
+
+/**
+ * Returns price seeds for featured carousel chart outcomes (up to four per event).
+ */
+export function getFeaturedOutcomeSeedsFromEvents(
+  events: Event[],
+): OutcomePriceSeed[] {
+  const seeds = new Map<string, OutcomePriceSeed>();
+
+  for (const event of events) {
+    for (const row of getChartOutcomes(event, 4)) {
       const market = event.markets.find((item) => item.id === row.marketId);
       const outcomeKey = getOutcomePriceKey(row.marketId, row.outcomeId);
       seeds.set(outcomeKey, {

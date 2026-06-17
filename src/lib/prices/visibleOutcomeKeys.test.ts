@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createMockEvent } from "@/test/fixtures/events";
 import {
+  getFeaturedOutcomeSeedsFromEvents,
   getOutcomeKeysFromSeeds,
   getOutcomeSeedsFromEvent,
   getVisibleOutcomeSeedsFromEvents,
@@ -73,6 +74,34 @@ describe("getVisibleOutcomeSeedsFromEvents", () => {
 
     expect(seeds).toHaveLength(2);
     expect(seeds[0]?.outcomeKey).toBe("m1:france");
+  });
+});
+
+describe("getFeaturedOutcomeSeedsFromEvents", () => {
+  it("returns up to four chart outcomes per featured event", () => {
+    const event = createMockEvent({
+      id: "4",
+      slug: "featured",
+      title: "Featured",
+      markets: [
+        {
+          id: "m1",
+          question: "Winner",
+          volume: 100,
+          outcomes: [
+            { id: "a", name: "A", price: 0.4 },
+            { id: "b", name: "B", price: 0.3 },
+            { id: "c", name: "C", price: 0.2 },
+            { id: "d", name: "D", price: 0.1 },
+            { id: "e", name: "E", price: 0.05 },
+          ],
+        },
+      ],
+    });
+
+    const seeds = getFeaturedOutcomeSeedsFromEvents([event]);
+    expect(seeds).toHaveLength(4);
+    expect(seeds[0]?.outcomeKey).toBe("m1:a");
   });
 });
 
