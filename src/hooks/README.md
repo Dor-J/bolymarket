@@ -16,6 +16,7 @@ Custom React hooks for bolymarket. All paths are relative to `src/hooks/`.
 | `useReducedMotion`  | Reads `prefers-reduced-motion` for accessible price updates             |
 | `useDebouncedValue` | Generic debounce helper (search uses 300ms)                             |
 | `useSearchShortcut` | Focuses search input on `/` key (`enabled` param for breakpoint gating)   |
+| `useShowMoreMarkets` | Paginates visible market count with responsive initial size + show more   |
 
 ## Data flow
 
@@ -103,6 +104,9 @@ Hook tests colocate with source files and use the shared wrapper in
 | `usePriceFlash.reducedMotion.test.ts` | Reduced-motion neutral path via usePriceFlash                   |
 | `useChartTimeframe.test.ts`           | Initial timeframe + selectTimeframe updates                     |
 | `useReducedMotion.test.ts`            | matchMedia preference + change listener                         |
+| `useCategoryEvents.test.ts`           | Tag fetch, error forwarding, debounced search filter              |
+| `useSearchShortcut.test.ts`           | `/` focus, disabled state, editable guard, cleanup              |
+| `useShowMoreMarkets.test.ts`          | Initial count, show more, hasMore, totalCount reset             |
 
 Related lib tests (realtime, not hooks but coupled):
 
@@ -123,7 +127,7 @@ Component tests that exercise hooks indirectly:
 Mock event fixtures: [`src/test/fixtures/events.ts`](../test/fixtures/events.ts)
 
 ```bash
-bun run test          # 178 tests across 55 files
+bun run test          # full suite
 bun run test:watch    # watch mode
 ```
 
