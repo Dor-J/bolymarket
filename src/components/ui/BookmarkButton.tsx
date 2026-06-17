@@ -31,7 +31,7 @@ export function BookmarkButton({ slug, className }: BookmarkButtonProps) {
         'inline-flex h-8 w-8 items-center justify-center rounded-sm transition-colors',
         'hover:bg-black/5 hover:text-text dark:hover:bg-white/10',
         'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-        active ? 'text-brand' : 'text-[#aeb4bc]',
+        active ? 'text-brand' : 'text-neutral-300',
         className,
       )}
       onClick={(event) => {
