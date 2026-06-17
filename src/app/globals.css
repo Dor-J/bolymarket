@@ -63,6 +63,13 @@
   --brand: #1452f0;
   --brand-subtle: color-mix(in srgb, var(--brand-500) 10%, transparent);
 
+  --purple-100: #f3e8ff;
+  --purple-600: #9333ea;
+  --purple-700: #7e22ce;
+  --purple-800: #6b21a8;
+  --gray-600: var(--neutral-600);
+  --element-border: var(--border);
+
   /* radius scale */
   --radius: 0.7rem;
   --radius-chip: calc(var(--radius) - 6px);
@@ -132,6 +139,12 @@
   --color-neutral-300: var(--neutral-300);
   --color-neutral-500: var(--neutral-500);
   --color-neutral-950: var(--neutral-950);
+  --color-purple-100: var(--purple-100);
+  --color-purple-600: var(--purple-600);
+  --color-purple-700: var(--purple-700);
+  --color-purple-800: var(--purple-800);
+  --color-gray-600: var(--gray-600);
+  --color-element-border: var(--element-border);
 
   --radius-chip: var(--radius-chip);
   --radius-sm: var(--radius-sm);
