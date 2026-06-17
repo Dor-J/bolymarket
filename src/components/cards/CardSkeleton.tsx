@@ -11,7 +11,7 @@ export function CardSkeleton({ className }: CardSkeletonProps) {
   return (
     <div
       className={cn(
-        "flex min-h-[180px] flex-col rounded-card border border-[#e6e8ea] bg-card p-3",
+        "flex min-h-[180px] flex-col rounded-card border border-neutral-100 bg-card p-3",
         className,
       )}
       aria-hidden

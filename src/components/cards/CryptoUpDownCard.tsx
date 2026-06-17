@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { memo } from "react";
+import { LiveBadge } from "@/components/markets/LiveBadge";
 import { MarketThumbnail } from "@/components/market/MarketThumbnail";
 import { PriceDisplay } from "@/components/market/PriceDisplay";
-import { ProbabilityBar } from "@/components/market/ProbabilityBar";
 import { YesNoChip } from "@/components/market/YesNoChip";
-import type { BinaryCardProps } from "@/lib/cards/types";
+import type { CryptoUpDownCardProps } from "@/lib/cards/cryptoCardTypes";
 import { formatVolume } from "@/lib/format/volume";
 import { cn } from "@/lib/cn";
 
@@ -17,9 +17,9 @@ const cardShellClasses = cn(
 );
 
 /**
- * Binary Yes/No market card with centered chance display.
+ * Crypto up/down market card with Live badge and asset label.
  */
-export const BinaryCard = memo(function BinaryCard({
+export const CryptoUpDownCard = memo(function CryptoUpDownCard({
   slug,
   title,
   image,
@@ -28,7 +28,9 @@ export const BinaryCard = memo(function BinaryCard({
   yesOutcomeId,
   yesPrice,
   noPrice,
-}: BinaryCardProps) {
+  assetLabel,
+  isLive,
+}: CryptoUpDownCardProps) {
   const href = `/event/${slug}`;
 
   return (
@@ -38,29 +40,37 @@ export const BinaryCard = memo(function BinaryCard({
       <div className="relative z-10 pointer-events-none flex flex-col h-full">
         <div className="flex items-start gap-2">
           <MarketThumbnail title={title} image={image} />
-          <h3 className="line-clamp-2 min-w-0 flex-1 text-sm leading-5 font-w590 text-text">
-            {title}
-          </h3>
+          <div className="min-w-0 flex-1">
+            <h3 className="line-clamp-2 text-sm leading-5 font-w590 text-text">
+              {title}
+            </h3>
+            <div className="mt-1 flex items-center gap-1 text-xs text-neutral-500">
+              {isLive ? <LiveBadge /> : null}
+              {assetLabel ? <span>· {assetLabel}</span> : null}
+            </div>
+          </div>
         </div>
 
-        <div className="mt-2 flex flex-col items-center gap-0.5">
-          <PriceDisplay
-            marketId={marketId}
-            outcomeId={yesOutcomeId}
-            initialPrice={yesPrice}
-            className="text-base leading-5 font-medium text-black"
-          />
-          <span className="text-xs leading-4 font-semibold text-neutral-500">
-            chance
-          </span>
+        <div className="mt-2 flex items-center justify-center gap-4">
+          <div className="text-center">
+            <PriceDisplay
+              marketId={marketId}
+              outcomeId={yesOutcomeId}
+              initialPrice={yesPrice}
+              className="text-base leading-5 font-semibold text-yes"
+            />
+            <span className="text-xs font-semibold text-neutral-500">Up</span>
+          </div>
+          <div className="text-center">
+            <PriceDisplay
+              marketId={marketId}
+              outcomeId={yesOutcomeId}
+              initialPrice={noPrice}
+              className="text-base leading-5 font-semibold text-no"
+            />
+            <span className="text-xs font-semibold text-neutral-500">Down</span>
+          </div>
         </div>
-
-        <ProbabilityBar
-          marketId={marketId}
-          yesOutcomeId={yesOutcomeId}
-          yesPrice={yesPrice}
-          className="mt-2"
-        />
 
         <div className="mt-3 flex gap-2 pointer-events-auto">
           <YesNoChip
