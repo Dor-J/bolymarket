@@ -60,7 +60,7 @@ export function FeaturedActivityRail({
       return [];
     }
 
-    return trades.map((trade) => {
+    return trades.map((trade): ActivityItem => {
       const formatted = formatTradeActivityLine(trade);
 
       return {

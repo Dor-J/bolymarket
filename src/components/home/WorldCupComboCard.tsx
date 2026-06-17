@@ -15,7 +15,7 @@ export function WorldCupComboCard({ className }: WorldCupComboCardProps) {
       data-polykit="true"
       className={cn(
         'relative mb-4 shrink-0 overflow-hidden rounded-[18px] border',
-        'border-[var(--color-element-border)] bg-background p-4',
+        'border-(--color-element-border) bg-background p-4',
         'shadow-[0_1px_30px_rgba(9,9,11,0.03)] dark:shadow-[0_18px_60px_rgba(0,0,0,0.28)]',
         className,
       )}
@@ -29,7 +29,7 @@ export function WorldCupComboCard({ className }: WorldCupComboCardProps) {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[90px] bg-gradient-to-b from-transparent to-background"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[90px] bg-linear-to-b from-transparent to-background"
       />
 
       <span
@@ -65,7 +65,7 @@ export function WorldCupComboCard({ className }: WorldCupComboCardProps) {
           <h2 className="text-[22px] leading-7 font-[580] text-primary">
             Build a World Cup combo
           </h2>
-          <p className="max-w-[260px] text-base font-medium text-[var(--color-gray-600)]">
+          <p className="max-w-[260px] text-base font-medium text-(--color-gray-600)">
             Combine multiple predictions in one trade for a bigger payout
           </p>
         </div>
@@ -74,9 +74,9 @@ export function WorldCupComboCard({ className }: WorldCupComboCardProps) {
           href="/sports/world-cup/games"
           className={cn(
             'mt-1.5 flex h-10 w-full items-center justify-center rounded-full',
-            'bg-[var(--color-purple-600)] text-base font-semibold text-white',
-            'transition-[background-color,scale] duration-[120ms] ease-out',
-            'hover:bg-[var(--color-purple-700)] active:scale-[0.98]',
+            'bg-(--color-purple-600) text-base font-semibold text-white',
+            'transition-[background-color,scale] duration-120 ease-out',
+            'hover:bg-(--color-purple-700) active:scale-[0.98]',
           )}
         >
           Get started

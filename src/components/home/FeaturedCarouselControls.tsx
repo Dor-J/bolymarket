@@ -151,7 +151,7 @@ export function FeaturedCarouselControls({
               'border border-border bg-neutral-50',
               'transition-transform group-active:scale-[0.98]',
               'group-hover:bg-neutral-100/70 dark:group-hover:bg-neutral-100',
-              'group-focus-visible:outline group-focus-visible:outline-2',
+              'group-focus-visible:outline',
               'group-focus-visible:outline-offset-2 group-focus-visible:outline-text',
             )}
           >
@@ -176,7 +176,7 @@ export function FeaturedCarouselControls({
               'border border-border bg-neutral-50',
               'transition-transform group-active:scale-[0.98]',
               'group-hover:bg-neutral-100/70 dark:group-hover:bg-neutral-100',
-              'group-focus-visible:outline group-focus-visible:outline-2',
+              'group-focus-visible:outline',
               'group-focus-visible:outline-offset-2 group-focus-visible:outline-text',
             )}
           >
