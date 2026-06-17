@@ -4,6 +4,7 @@ import {
   type Message,
 } from '@polymarket/real-time-data-client';
 import type { Store } from 'jotai/vanilla/store';
+import { appendTradeActivity } from '@/lib/atoms/tradeActivity';
 import { enqueuePriceTick } from '@/lib/prices/coalesceTicks';
 import type { OutcomePriceSeed } from '@/lib/prices/visibleOutcomeKeys';
 import {
@@ -34,6 +35,7 @@ export function createWebSocketEngine(
   let client: RealTimeDataClient | null = null;
   let activeStore: Store | null = null;
   let assetToOutcomeKey = new Map<string, string>();
+  let assetToEventSlug = new Map<string, string>();
   let subscribedEventSlugs: string[] = [];
   let subscriptionSignature = "";
   let connected = false;
@@ -100,7 +102,20 @@ export function createWebSocketEngine(
       return;
     }
 
-    enqueuePriceTick(outcomeKey, clampTradePrice(trade.price));
+    const clampedPrice = clampTradePrice(trade.price);
+    enqueuePriceTick(outcomeKey, clampedPrice);
+
+    const eventSlug =
+      trade.eventSlug ?? assetToEventSlug.get(trade.asset ?? '');
+
+    if (eventSlug && activeStore) {
+      appendTradeActivity(activeStore, eventSlug, {
+        price: clampedPrice,
+        side: trade.side,
+        timestamp: Date.now(),
+        assetId: trade.asset,
+      });
+    }
   }
 
   function connectClient(): void {
@@ -142,6 +157,7 @@ export function createWebSocketEngine(
   function updateSubscriptions(seeds: OutcomePriceSeed[]): void {
     const index = buildRealtimeSubscriptionIndex(seeds);
     assetToOutcomeKey = index.assetToOutcomeKey;
+    assetToEventSlug = index.assetToEventSlug;
     subscribedEventSlugs = index.eventSlugs;
 
     const nextSignature = getRealtimeSubscriptionSignature(seeds);
@@ -172,6 +188,7 @@ export function createWebSocketEngine(
       disconnectClient();
       activeStore = null;
       assetToOutcomeKey = new Map();
+      assetToEventSlug = new Map();
       subscribedEventSlugs = [];
       subscriptionSignature = "";
     },
