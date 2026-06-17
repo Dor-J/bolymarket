@@ -12,8 +12,8 @@ import { formatVolume } from "@/lib/format/volume";
 import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
-  "group relative flex min-h-[180px] flex-col rounded-card border border-neutral-100 bg-card px-3 pb-3 pt-3",
-  "transition-colors duration-200 hover:border-neutral-200 hover:bg-surface-2",
+  "group/card relative isolate flex min-h-[180px] h-full flex-col justify-between overflow-hidden rounded-xl border border-neutral-100 bg-card pt-3",
+  "shadow-md shadow-black/4 transition hover:-translate-y-px hover:shadow-md hover:shadow-black/8",
   "focus-within:ring-2 focus-within:ring-ring focus-within:outline-none",
 );
 
@@ -33,38 +33,42 @@ export const CryptoPriceTargetCard = memo(function CryptoPriceTargetCard({
 
   return (
     <article className={cardShellClasses}>
-      <Link href={href} className="absolute inset-0 z-0 rounded-card" aria-label={title} />
+      <Link href={href} className="absolute inset-0 z-0 rounded-xl" aria-label={title} />
 
-      <div className="relative z-10 pointer-events-none flex flex-col h-full">
-        <div className="flex items-start gap-2">
-          <MarketThumbnail title={title} image={image} />
+      <div className="pointer-events-none relative z-10 flex h-full flex-col justify-between">
+        <div className="flex h-[42px] w-full items-start gap-2 px-3">
+          <MarketThumbnail
+            title={title}
+            image={image}
+            size={38}
+            className="rounded-sm"
+          />
           <div className="min-w-0 flex-1">
-            <h3 className="line-clamp-2 text-sm leading-5 font-w590 text-text">
+            <h3 className="line-clamp-3 text-sm leading-5 font-w590 text-text decoration-2 group-hover/card:underline">
               {title}
             </h3>
-            <div className="mt-1 flex items-center gap-1 text-xs text-neutral-500">
-              {isLive ? <LiveBadge /> : null}
-              {assetLabel ? <span>· {assetLabel}</span> : null}
-            </div>
           </div>
         </div>
 
-        <div className="mt-2 flex flex-col gap-2">
-          {outcomes.map((outcome) => (
+        <div className="flex flex-col justify-end gap-1.5 px-3 pb-2">
+          <div className="relative mt-0.5 h-20 w-full">
+          {outcomes.slice(0, 2).map((outcome) => (
             <div
               key={`${outcome.marketId}-${outcome.outcomeId}`}
-              className="grid grid-cols-[1fr_auto_auto] items-center gap-x-2"
+              className="flex min-h-10 w-full shrink-0 items-center justify-between gap-4"
             >
-              <span className="truncate text-sm leading-5 font-w440 text-neutral-950">
-                {outcome.name}
-              </span>
-              <PriceDisplay
-                marketId={outcome.marketId}
-                outcomeId={outcome.outcomeId}
-                initialPrice={outcome.yesPrice}
-                className="text-[15px] leading-[22.5px] font-semibold text-neutral-950"
-              />
-              <div className="flex items-center gap-1 pointer-events-auto">
+              <div className="flex min-w-0 flex-1 items-center gap-2">
+                <span className="truncate text-sm leading-5 font-w440 text-neutral-950">
+                  {outcome.name}
+                </span>
+              </div>
+              <div className="pointer-events-auto flex shrink-0 items-center justify-end gap-1">
+                <PriceDisplay
+                  marketId={outcome.marketId}
+                  outcomeId={outcome.outcomeId}
+                  initialPrice={outcome.yesPrice}
+                  className="mr-1 text-[15px] leading-[22.5px] font-semibold text-neutral-950"
+                />
                 <YesNoChip
                   side="yes"
                   price={outcome.yesPrice}
@@ -80,13 +84,18 @@ export const CryptoPriceTargetCard = memo(function CryptoPriceTargetCard({
               </div>
             </div>
           ))}
-        </div>
+          </div>
 
-        <div className="mt-auto flex items-center justify-between pt-3 pointer-events-auto">
-          <p className="text-[13px] leading-4 font-w490 text-neutral-300">
+        <div className="pointer-events-auto flex items-center justify-between text-[13px] leading-4 font-w490 text-neutral-500">
+          <div className="flex items-center gap-1">
+            <p>
             {formatVolume(volume)}
-          </p>
+            </p>
+            {isLive ? <LiveBadge /> : null}
+            {assetLabel ? <span>· {assetLabel}</span> : null}
+          </div>
           <BookmarkButton slug={slug} />
+        </div>
         </div>
       </div>
     </article>

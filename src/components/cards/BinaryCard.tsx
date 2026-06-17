@@ -11,8 +11,8 @@ import { formatVolume } from "@/lib/format/volume";
 import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
-  "group relative flex min-h-[180px] flex-col rounded-card border border-neutral-100 bg-card px-3 pb-3 pt-3",
-  "transition-colors duration-200 hover:border-neutral-200 hover:bg-surface-2",
+  "group/card relative isolate flex min-h-[180px] h-full flex-col justify-between overflow-hidden rounded-xl border border-neutral-100 bg-card pt-3",
+  "shadow-md shadow-black/4 transition hover:-translate-y-px hover:shadow-md hover:shadow-black/8",
   "focus-within:ring-2 focus-within:ring-ring focus-within:outline-none",
 );
 
@@ -33,55 +33,61 @@ export const BinaryCard = memo(function BinaryCard({
 
   return (
     <article className={cardShellClasses}>
-      <Link href={href} className="absolute inset-0 z-0 rounded-card" aria-label={title} />
+      <Link href={href} className="absolute inset-0 z-0 rounded-xl" aria-label={title} />
 
-      <div className="relative z-10 pointer-events-none flex flex-col h-full">
-        <div className="flex items-start gap-2">
-          <MarketThumbnail title={title} image={image} />
-          <h3 className="line-clamp-2 min-w-0 flex-1 text-sm leading-5 font-w590 text-text">
+      <div className="pointer-events-none relative z-10 flex h-full flex-col justify-between">
+        <div className="flex h-[42px] w-full items-start gap-2 px-3">
+          <MarketThumbnail
+            title={title}
+            image={image}
+            size={38}
+            className="rounded-sm"
+          />
+          <h3 className="line-clamp-3 min-w-0 flex-1 text-sm leading-5 font-w590 text-text decoration-2 group-hover/card:underline">
             {title}
           </h3>
         </div>
 
-        <div className="mt-2 flex flex-col items-center gap-0.5">
+        <div className="flex flex-1 flex-col items-center justify-center gap-0.5 px-3">
           <PriceDisplay
             marketId={marketId}
             outcomeId={yesOutcomeId}
             initialPrice={yesPrice}
-            className="text-base leading-5 font-medium text-black"
+            className="text-base leading-5 font-medium text-neutral-950"
           />
           <span className="text-xs leading-4 font-semibold text-neutral-500">
             chance
           </span>
         </div>
 
-        <ProbabilityBar
-          marketId={marketId}
-          yesOutcomeId={yesOutcomeId}
-          yesPrice={yesPrice}
-          className="mt-2"
-        />
+        <div className="flex flex-col justify-end gap-1.5 px-3 pb-2">
+          <ProbabilityBar
+            marketId={marketId}
+            yesOutcomeId={yesOutcomeId}
+            yesPrice={yesPrice}
+          />
 
-        <div className="mt-3 flex gap-2 pointer-events-auto">
-          <YesNoChip
-            side="yes"
-            price={yesPrice}
-            marketId={marketId}
-            outcomeId={yesOutcomeId}
-            fullWidth
-          />
-          <YesNoChip
-            side="no"
-            price={noPrice}
-            marketId={marketId}
-            outcomeId={yesOutcomeId}
-            fullWidth
-          />
+          <div className="pointer-events-auto flex gap-2">
+            <YesNoChip
+              side="yes"
+              price={yesPrice}
+              marketId={marketId}
+              outcomeId={yesOutcomeId}
+              fullWidth
+            />
+            <YesNoChip
+              side="no"
+              price={noPrice}
+              marketId={marketId}
+              outcomeId={yesOutcomeId}
+              fullWidth
+            />
+          </div>
+
+          <p className="text-[13px] leading-4 font-w490 text-neutral-500">
+            {formatVolume(volume)}
+          </p>
         </div>
-
-        <p className="mt-auto pt-3 text-[13px] leading-4 font-w490 text-neutral-300">
-          {formatVolume(volume)}
-        </p>
       </div>
     </article>
   );

@@ -8,6 +8,7 @@ import { BinaryCard } from "./BinaryCard";
 import { CryptoPriceTargetCard } from "./CryptoPriceTargetCard";
 import { CryptoUpDownCard } from "./CryptoUpDownCard";
 import { MultiOutcomeCard } from "./MultiOutcomeCard";
+import { SportsMatchCard } from "./SportsMatchCard";
 
 export interface EventCardProps {
   event: Event;
@@ -29,6 +30,10 @@ export const EventCard = memo(function EventCard({ event }: EventCardProps) {
         isLive={isLive}
       />
     );
+  }
+
+  if (mapped.variant === "sports-match") {
+    return <SportsMatchCard event={event} isLive={isLive} />;
   }
 
   if (mapped.variant === "crypto-price-target") {
