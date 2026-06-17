@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Menu, Moon, Sun, ChevronRight } from 'lucide-react';
+import { Moon, Sun, ChevronRight } from 'lucide-react';
 import { useAtom } from 'jotai';
 import {
   USER_MENU_ITEMS,
@@ -17,8 +17,8 @@ import {
   LeaderboardMenuIcon,
   RewardsMenuIcon,
 } from '@/components/icons/UserMenuIcons';
+import { UserMenuTriggerIcon } from '@/components/icons/UserMenuTriggerIcon';
 import { themeAtom, toggleThemeAtom } from '@/lib/atoms/theme';
-import { IconButton } from '@/components/ui/IconButton';
 import { cn } from '@/lib/cn';
 
 function renderMenuIcon(icon: UserMenuIconKey | undefined) {
@@ -115,7 +115,7 @@ export function UserMenu() {
               className={cn(
                 'relative inline-flex h-6 w-11 shrink-0 rounded-full',
                 'transition-colors',
-                theme === 'dark' ? 'bg-brand' : 'bg-[#e6e8ea]',
+                theme === 'dark' ? 'bg-brand' : 'bg-neutral-100',
               )}
             >
               <span
@@ -128,7 +128,7 @@ export function UserMenu() {
                 {theme === 'dark' ? (
                   <Moon className="h-3 w-3 text-brand" aria-hidden />
                 ) : (
-                  <Sun className="h-3 w-3 text-[#77808d]" aria-hidden />
+                  <Sun className="h-3 w-3 text-neutral-500" aria-hidden />
                 )}
               </span>
             </button>
@@ -229,17 +229,23 @@ export function UserMenu() {
 
   return (
     <div ref={containerRef} className="relative hidden xl:block">
-      <IconButton
-        label="Open user menu"
+      <button
+        type="button"
+        aria-label="Open user menu"
+        aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => {
           setOpen((value) => !value);
           setLanguageOpen(false);
         }}
-        className="h-[34px] w-10 rounded-md"
+        className={cn(
+          'group hidden cursor-pointer items-center rounded-[6px] p-2 xl:flex',
+          'transition-none hover:bg-surface-2',
+          'focus:outline-none focus-visible:outline-none',
+        )}
       >
-        <Menu className="h-5 w-5" aria-hidden />
-      </IconButton>
+        <UserMenuTriggerIcon />
+      </button>
 
       {open ? (
         <div
