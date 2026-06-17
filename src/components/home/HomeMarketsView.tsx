@@ -1,10 +1,11 @@
 'use client';
 
-import { useAtom, useAtomValue } from 'jotai';
-import { useMemo, useState } from 'react';
+import { useAtom, useAtomValue, useStore } from 'jotai';
+import { useEffect, useMemo, useState } from 'react';
 import { bookmarksAtom } from '@/lib/atoms/bookmarks';
 import { breakingFilterAtom, bookmarksOnlyAtom } from '@/lib/atoms/marketPage';
 import { searchQueryAtom } from '@/lib/atoms/search';
+import { pruneTradeActivity } from '@/lib/atoms/tradeActivity';
 import { HOME_TOPIC_CHIPS } from '@/lib/markets/constants';
 import {
   applyHomeHideToggles,
@@ -16,6 +17,8 @@ import {
 } from '@/lib/markets/filterEvents';
 import type { HomeHideToggles, MarketSort, MarketStatus } from '@/lib/markets/types';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
+import { useLivePrices } from '@/hooks/useLivePrices';
+import { getFeaturedOutcomeSeedsFromEvents } from '@/lib/prices/visibleOutcomeKeys';
 import { FeaturedCarousel } from './FeaturedCarousel';
 import { MarketControlsBar } from '@/components/markets/MarketControlsBar';
 import { MarketTopicRail } from '@/components/markets/MarketTopicRail';
@@ -25,6 +28,7 @@ import { MarketsPageBody } from '@/components/markets/MarketsPageBody';
  * Home trending page with topic rails, controls, and show-more grid.
  */
 export function HomeMarketsView() {
+  const store = useStore();
   const { events: rawEvents, isLoading, isError, error, refetch, isFetching } =
     useFilteredEvents();
   const searchQuery = useAtomValue(searchQueryAtom);
@@ -65,6 +69,17 @@ export function HomeMarketsView() {
   }, [rawEvents, topicId, breakingOnly, hideToggles, status, bookmarksOnly, bookmarks, sort]);
 
   const featuredEvents = useMemo(() => events.slice(0, 6), [events]);
+
+  const featuredSeeds = useMemo(
+    () => getFeaturedOutcomeSeedsFromEvents(featuredEvents),
+    [featuredEvents],
+  );
+
+  useLivePrices(featuredSeeds);
+
+  useEffect(() => {
+    pruneTradeActivity(store, new Set(featuredEvents.map((event) => event.slug)));
+  }, [featuredEvents, store]);
 
   const controls = (
     <div id="market-filters" className="space-y-3">
