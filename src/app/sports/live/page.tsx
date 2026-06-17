@@ -1,5 +1,5 @@
 import { SportsLivePageView } from '@/components/sports/SportsLivePageView';
 
-export default function SportsPage() {
+export default function SportsLivePage() {
   return <SportsLivePageView />;
 }
