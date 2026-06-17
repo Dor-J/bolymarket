@@ -3,6 +3,13 @@ import type { Store } from 'jotai/vanilla/store';
 
 const MAX_TRADES_PER_EVENT = 20;
 
+let tradeActivityIdSeq = 0;
+
+/** Resets the trade id sequence — for unit tests only. */
+export function resetTradeActivityIdSeqForTests(): void {
+  tradeActivityIdSeq = 0;
+}
+
 /** Single live trade row for featured activity display. */
 export interface TradeActivityItem {
   id: string;
@@ -11,6 +18,10 @@ export interface TradeActivityItem {
   side?: string;
   timestamp: number;
   assetId?: string;
+  /** Trade notional in USDC when provided by the activity feed. */
+  size?: number;
+  outcome?: string;
+  userName?: string;
 }
 
 /** Recent trades keyed by event slug. */
@@ -30,7 +41,7 @@ export function appendTradeActivity(
   const existing = current[eventSlug] ?? [];
   const nextItem: TradeActivityItem = {
     ...item,
-    id: `${item.timestamp}-${item.assetId ?? 'trade'}-${existing.length}`,
+    id: `${item.timestamp}-${item.assetId ?? 'trade'}-${++tradeActivityIdSeq}`,
     eventSlug,
   };
 
