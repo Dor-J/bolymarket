@@ -1,12 +1,12 @@
 'use client';
 
-import { useAtomValue } from 'jotai';
+import Image from 'next/image';
 import { useMemo, useState } from 'react';
-import { MarketThumbnail } from '@/components/market/MarketThumbnail';
+import { PriceDisplay } from '@/components/market/PriceDisplay';
 import { TradingButton } from '@/components/trading/TradingButton';
-import { outcomePriceAtomFamily } from '@/lib/atoms/prices';
-import { formatCents } from '@/lib/format/price';
-import { getOutcomePriceKey } from '@/lib/prices/outcomeKey';
+import { getSportIconUrl } from '@/lib/sports/sportIcons';
+import { getMoneylineFeedColors } from '@/lib/sports/teamColors';
+import { getWorldCupTeamFlagUrl } from '@/lib/sports/worldCupFlags';
 import type {
   SportsGame,
   SportsMarket,
@@ -14,6 +14,7 @@ import type {
   SportsSelection,
 } from '@/types/polymarket';
 import { cn } from '@/lib/cn';
+import { ChevronDownSmall } from './SportsSidebarIcons';
 
 export interface SportsTradeWidgetProps {
   game: SportsGame | null;
@@ -25,6 +26,13 @@ export interface SportsTradeWidgetProps {
 type OrderSide = 'buy' | 'sell';
 
 const QUICK_AMOUNTS = [1, 5, 10, 100] as const;
+
+const quickAmountButtonClass = cn(
+  'inline-flex h-7.5 cursor-pointer items-center justify-center gap-2 rounded-md',
+  'border border-border px-2.5 text-xs font-semibold whitespace-nowrap',
+  'text-text-secondary transition duration-150 active:scale-[97%]',
+  'hover:bg-neutral-25 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
+);
 
 function getMarketForSelection(
   game: SportsGame,
@@ -77,29 +85,25 @@ export function SportsTradeWidget({
       ? game?.teams[activeSelection.outcomeIndex]
       : undefined;
 
-  const outcomeKey =
-    activeMarket && activeOutcome
-      ? getOutcomePriceKey(activeMarket.id, activeOutcome.id)
-      : '';
-  const livePrice = useAtomValue(outcomePriceAtomFamily(outcomeKey));
-  const displayPrice = livePrice?.value ?? activeOutcome?.price ?? 0;
-
-  const payout = useMemo(() => {
-    const dollars = Number.parseFloat(amount.replace(/[^0-9.]/g, ''));
-    if (!Number.isFinite(dollars) || dollars <= 0 || displayPrice <= 0) {
-      return 0;
-    }
-
-    return dollars / displayPrice;
-  }, [amount, displayPrice]);
+  const leagueIcon = game ? getSportIconUrl(game.leagueId) : undefined;
+  const activeTeamImage =
+    activeTeam && game?.leagueId === 'world-cup'
+      ? getWorldCupTeamFlagUrl(activeTeam.name)
+      : undefined;
+  const headerImage = activeTeam?.logo ?? activeTeamImage ?? leagueIcon;
+  const activeTeamColors = getMoneylineFeedColors(
+    activeSelection?.outcomeIndex ?? 0,
+    activeTeam?.color,
+  );
+  const outcomeAccentColor = activeTeam ? activeTeamColors.background : '#E04000';
 
   return (
     <div className={cn('not-lg:hidden hidden shrink-0 lg:flex lg:w-[372px]', className)}>
       <div
         id="trade-widget"
         className={cn(
-          'sticky max-h-[calc(100vh-var(--navbar-height))] w-full',
-          'box-border overflow-y-auto px-4 pt-8 pb-4 scrollbar-hide',
+          'sticky h-fit max-h-[calc(100vh-var(--navbar-height))] w-full',
+          'box-border overflow-y-auto px-4 pt-8 pb-4 scrollbar-hide max-lg:hidden',
         )}
         style={{ top: 'var(--navbar-height)' }}
       >
@@ -107,164 +111,230 @@ export function SportsTradeWidget({
           {game && activeMarket && activeOutcome ? (
             <div
               className={cn(
-                'relative flex w-[340px] flex-col gap-5 overflow-visible',
+                'relative flex h-full w-[340px] flex-col gap-5 overflow-visible',
                 'rounded-xl border border-border bg-surface-1 px-4 py-4 shadow-md',
               )}
             >
-              <div className="flex w-full items-center gap-3">
-                <MarketThumbnail
-                  title={game.title}
-                  image={activeTeam?.logo ?? game.image}
-                  size={40}
-                  className="rounded-sm object-contain"
-                />
-                <div className="flex min-w-0 flex-col">
-                  <span className="truncate text-sm font-medium text-neutral-500">
-                    {game.title}
-                  </span>
-                  <span
-                    className="truncate text-base font-semibold"
-                    style={{ color: activeTeam?.color ?? '#C00040' }}
+              <div className="flex w-full flex-col gap-5">
+                <div className="flex w-full items-center gap-3">
+                  <div
+                    className="relative flex shrink-0 items-center justify-center overflow-hidden bg-transparent"
+                    style={{
+                      width: 40,
+                      height: 40,
+                      minWidth: 40,
+                      minHeight: 40,
+                      borderRadius: 4,
+                    }}
                   >
-                    {activeOutcome.name}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex gap-4 border-b border-border">
-                {(['buy', 'sell'] as const).map((side) => (
-                  <button
-                    key={side}
-                    type="button"
-                    onClick={() => setOrderSide(side)}
-                    className={cn(
-                      'border-b-2 pb-2 text-sm font-semibold capitalize transition-colors',
-                      orderSide === side
-                        ? 'border-text text-text'
-                        : 'border-transparent text-neutral-500',
+                    {headerImage ? (
+                      <Image
+                        alt=""
+                        src={headerImage}
+                        width={40}
+                        height={40}
+                        className="h-10 w-auto object-contain"
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold text-text-secondary">
+                        {game.title.charAt(0)}
+                      </span>
                     )}
-                  >
-                    {side}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex gap-2">
-                {activeMarket.outcomes.slice(0, 2).map((outcome, index) => {
-                  const team = game.teams[index];
-                  const label =
-                    activeSelection?.marketType === 'total'
-                      ? index === 0
-                        ? 'O'
-                        : 'U'
-                      : team?.abbreviation ?? outcome.name;
-
-                  return (
-                    <TradingButton
-                      key={outcome.id}
-                      label={label}
-                      marketId={activeMarket.id}
-                      outcomeId={outcome.id}
-                      price={outcome.price}
-                      format="cents"
-                      variant="custom"
-                      backgroundColor={team?.color}
-                      onClick={() => {
-                        onSelectOutcome?.({
-                          gameId: game.gameId,
-                          marketType: activeSelection!.marketType,
-                          outcomeIndex: index,
-                        });
-                      }}
-                      className={cn(
-                        activeSelection?.outcomeIndex === index &&
-                          'ring-2 ring-brand ring-offset-1',
-                      )}
-                    />
-                  );
-                })}
-              </div>
-
-              <div>
-                <label className="text-xs font-medium text-neutral-500">
-                  Market
-                  <select
-                    className={cn(
-                      'mt-1 block w-full rounded-md border border-border bg-surface-2',
-                      'px-3 py-2 text-sm text-text',
-                    )}
-                    defaultValue="market"
-                  >
-                    <option value="market">Market</option>
-                  </select>
-                </label>
-              </div>
-
-              <div>
-                <label className="text-xs font-medium text-neutral-500">
-                  Amount
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={amount}
-                    onChange={(event) => setAmount(event.target.value)}
-                    placeholder="$0"
-                    className={cn(
-                      'mt-1 w-full rounded-md border border-border bg-surface-2 px-3 py-3',
-                      'text-sm text-text placeholder:text-neutral-500',
-                      'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-                    )}
-                  />
-                </label>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {QUICK_AMOUNTS.map((value) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => {
-                        const current = Number.parseFloat(
-                          amount.replace(/[^0-9.]/g, ''),
-                        );
-                        const next = Number.isFinite(current) ? current + value : value;
-                        setAmount(`$${next}`);
-                      }}
-                      className={cn(
-                        'rounded-full border border-border px-2.5 py-1',
-                        'text-xs font-semibold text-neutral-600 hover:bg-neutral-50',
-                      )}
+                  </div>
+                  <div className="flex min-w-0 w-full flex-col">
+                    <span className="truncate text-sm font-medium text-text-secondary">
+                      {game.title}
+                    </span>
+                    <span
+                      className="flex min-w-0 items-center text-base font-semibold dark:brightness-150"
+                      style={{ color: outcomeAccentColor }}
                     >
-                      +${value}
-                    </button>
-                  ))}
+                      <span className="min-w-0 truncate">{activeOutcome.name}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="-ml-4 flex w-[calc(100%+32px)] items-end justify-between border-b border-border px-4 pb-2">
+                  <div className="flex gap-3" role="radiogroup" aria-label="Order side">
+                    {(['buy', 'sell'] as const).map((side) => {
+                      const active = orderSide === side;
+                      return (
+                        <button
+                          key={side}
+                          type="button"
+                          role="radio"
+                          aria-checked={active}
+                          onClick={() => setOrderSide(side)}
+                          className={cn(
+                            'relative cursor-pointer bg-transparent font-semibold text-heading-lg',
+                            'focus:outline-none active:outline-none',
+                            active
+                              ? 'text-text-primary'
+                              : 'text-text-secondary hover:text-text-tertiary',
+                          )}
+                        >
+                          {side === 'buy' ? 'Buy' : 'Sell'}
+                          {active ? (
+                            <div className="absolute bottom-[-9px] left-0 h-0.5 w-full bg-text-primary" />
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button
+                    type="button"
+                    className={cn(
+                      'flex w-[90px] cursor-pointer items-center justify-end gap-1',
+                      'font-medium text-body-base text-text-primary capitalize outline-none',
+                    )}
+                  >
+                    Market
+                    <ChevronDownSmall className="ml-1 text-neutral-400" />
+                  </button>
                 </div>
               </div>
 
-              <div className="space-y-1 text-sm">
-                <div className="flex items-center justify-between text-neutral-500">
-                  <span>Price</span>
-                  <span className="font-semibold text-text">
-                    {formatCents(displayPrice)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-neutral-500">
-                  <span>Potential payout</span>
-                  <span className="font-semibold text-text">
-                    {payout > 0 ? `$${payout.toFixed(2)}` : '—'}
-                  </span>
+              <div className="flex w-full flex-col">
+                <div className="flex w-full gap-3" role="radiogroup" aria-label="Outcome">
+                  {activeMarket.outcomes.slice(0, 2).map((outcome, index) => {
+                    const team = game.teams[index];
+                    const label =
+                      activeSelection?.marketType === 'total'
+                        ? index === 0
+                          ? 'O'
+                          : 'U'
+                        : (team?.abbreviation ?? outcome.name);
+                    const selected = activeSelection?.outcomeIndex === index;
+                    const teamColors = getMoneylineFeedColors(index, team?.color);
+
+                    return (
+                      <span
+                        key={outcome.id}
+                        className="flex h-12 w-full max-w-full min-w-0 flex-1"
+                      >
+                        <TradingButton
+                          label={label}
+                          marketId={activeMarket.id}
+                          outcomeId={outcome.id}
+                          price={outcome.price}
+                          format="sportsCents"
+                          variant={selected ? 'custom' : 'gray'}
+                          backgroundColor={selected ? teamColors.background : undefined}
+                          textColor={selected ? '#ffffff' : undefined}
+                          shadowHeight="5px"
+                          onClick={() => {
+                            onSelectOutcome?.({
+                              gameId: game.gameId,
+                              marketType: activeSelection!.marketType,
+                              outcomeIndex: index,
+                            });
+                          }}
+                          className="h-[43px]! rounded-md uppercase"
+                        >
+                          <span className="flex flex-1 items-baseline justify-center px-3">
+                            <span
+                              className={cn(
+                                'text-[15px] leading-tight font-semibold transition-none',
+                                selected ? 'text-inherit opacity-70' : 'opacity-70',
+                              )}
+                            >
+                              {label}
+                            </span>
+                            <PriceDisplay
+                              marketId={activeMarket.id}
+                              outcomeId={outcome.id}
+                              initialPrice={outcome.price}
+                              format="sportsCents"
+                              className="ml-1 text-base font-semibold tabular-nums"
+                            />
+                          </span>
+                        </TradingButton>
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
 
-              <TradingButton variant="blue" className="h-11 text-sm">
-                Trade
-              </TradingButton>
+              <div className="flex w-full flex-col gap-4">
+                <div className="mt-3 flex w-full flex-col gap-2">
+                  <div className="flex w-full items-center justify-between gap-3">
+                    <p className="font-medium text-heading-lg text-text-primary">Amount</p>
+                    <div className="relative flex min-w-px flex-1 items-center justify-end">
+                      <input
+                        id="market-order-amount-input"
+                        type="text"
+                        inputMode="decimal"
+                        autoComplete="off"
+                        value={amount}
+                        onChange={(event) => setAmount(event.target.value)}
+                        placeholder="$0"
+                        className={cn(
+                          'w-full bg-transparent text-right text-[40px] font-semibold',
+                          'tracking-tight text-text-primary outline-none',
+                          '[font-variant-numeric:tabular-nums] placeholder:text-text-tertiary',
+                        )}
+                      />
+                    </div>
+                  </div>
+                  <div className="relative mt-2 flex flex-1 justify-end">
+                    <div className="flex gap-1">
+                      {QUICK_AMOUNTS.map((value) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => {
+                            const current = Number.parseFloat(
+                              amount.replace(/[^0-9.]/g, ''),
+                            );
+                            const next = Number.isFinite(current) ? current + value : value;
+                            setAmount(`$${next}`);
+                          }}
+                          className={quickAmountButtonClass}
+                        >
+                          +${value}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
-              <p className="text-center text-[11px] text-neutral-500">
-                By trading, you agree to the{' '}
-                <a href="/terms" className="underline">
-                  Terms of Use
-                </a>
-                .
-              </p>
+                <div className="flex w-full flex-col gap-2">
+                  <div className="flex h-full flex-1 overflow-hidden">
+                    <span className="flex h-12 w-full max-w-full flex-1">
+                      <TradingButton
+                        variant="blue"
+                        shadowHeight="5px"
+                        className="h-[43px]! w-full rounded-md text-sm font-semibold"
+                      >
+                        <span className="flex items-center gap-3">
+                          <span className="relative flex flex-col items-center gap-0.5">
+                            <span className="flex items-center">
+                              <span className="w-fit whitespace-nowrap text-sm font-semibold text-inherit!">
+                                Trade
+                              </span>
+                            </span>
+                          </span>
+                        </span>
+                      </TradingButton>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex w-full flex-col items-center gap-4">
+                <p className="w-full bg-transparent text-center text-body-sm text-neutral-500 outline-none">
+                  By trading, you agree to the{' '}
+                  <a
+                    href="/tos"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-inherit underline"
+                  >
+                    Terms of Use
+                  </a>
+                  .
+                </p>
+              </div>
             </div>
           ) : (
             <div
@@ -274,7 +344,7 @@ export function SportsTradeWidget({
               )}
             >
               <p className="text-sm font-medium text-text">Select a market</p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-text-secondary">
                 Choose a game from the list to preview the trade ticket.
               </p>
             </div>

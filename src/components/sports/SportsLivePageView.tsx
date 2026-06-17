@@ -58,21 +58,29 @@ function filterGames(
 export function SportsLivePageView() {
   const { data, isLoading, isError, error, refetch } = useSportsLiveGames();
   const searchQuery = useAtomValue(searchQueryAtom);
+  const [viewTab, setViewTab] = useState<'live' | 'futures'>('live');
   const [filterId, setFilterId] = useState('all');
   const [selection, setSelection] = useState<SportsSelection | null>(null);
 
-  const games = data?.games ?? [];
+  const liveGames = data?.games ?? [];
+  const futuresGames = data?.futuresGames ?? [];
   const leagues: SportsLeagueSummary[] = data?.leagues ?? [];
+  const sourceGames = viewTab === 'live' ? liveGames : futuresGames;
 
   const visibleGames = useMemo(
-    () => filterGames(games, filterId, searchQuery),
-    [games, filterId, searchQuery],
+    () => filterGames(sourceGames, filterId, searchQuery),
+    [sourceGames, filterId, searchQuery],
   );
 
-  const sections = useMemo(
-    () => groupGamesByLeague(visibleGames),
-    [visibleGames],
-  );
+  const sections = useMemo(() => {
+    if (viewTab === 'futures') {
+      return visibleGames.length > 0
+        ? [{ id: 'futures', label: 'FUTURES', games: visibleGames }]
+        : [];
+    }
+
+    return groupGamesByLeague(visibleGames);
+  }, [visibleGames, viewTab]);
 
   const priceSeeds = useMemo(
     () => getVisibleOutcomeSeedsFromSportsGames(visibleGames),
@@ -80,7 +88,7 @@ export function SportsLivePageView() {
   );
 
   useLivePrices(priceSeeds);
-  useSportsGameResults(visibleGames.map((game) => game.gameId));
+  useSportsGameResults(visibleGames);
 
   const selectedGame = useMemo(() => {
     if (!selection) {
@@ -141,9 +149,14 @@ export function SportsLivePageView() {
     <SportsPageLayout
       sidebar={
         <SportsSidebar
+          viewTab={viewTab}
+          onViewTabChange={setViewTab}
           leagues={sidebarItems}
           selectedFilterId={filterId === 'all' ? '' : filterId}
-          onFilterSelect={(id) => setFilterId(id)}
+          onFilterSelect={(id) => {
+            setFilterId(id);
+            setViewTab('live');
+          }}
         />
       }
       tradePanel={
@@ -155,29 +168,43 @@ export function SportsLivePageView() {
       }
     >
       <div className="relative h-fit w-full max-w-[756px] pt-8 max-lg:w-[calc(100vw-2rem)] max-lg:px-0 max-lg:pt-0 md:max-w-none lg:min-w-full lg:pl-8 xl:max-w-[756px]">
-        <SportsWorldCupBanner />
+        {viewTab === 'live' ? (
+          <SportsWorldCupBanner onSelect={() => setFilterId('world-cup')} />
+        ) : null}
 
         <SportsLiveHeader />
 
         <div className="mb-3 lg:hidden">
           <MarketTopicRail
             items={[
-              { id: 'all', label: 'All' },
+              { id: 'live', label: 'Live' },
+              { id: 'futures', label: 'Futures' },
               ...sidebarItems.map((item) => ({
                 id: item.id,
                 label: item.label,
                 count: item.count,
               })),
             ]}
-            selectedId={filterId}
-            onSelect={setFilterId}
+            selectedId={filterId === 'all' ? viewTab : filterId}
+            onSelect={(id) => {
+              if (id === 'live' || id === 'futures') {
+                setViewTab(id);
+                setFilterId('all');
+                return;
+              }
+
+              setFilterId(id);
+              setViewTab('live');
+            }}
             showCounts
           />
         </div>
 
         {sections.length === 0 ? (
           <p className="py-8 text-center text-sm text-neutral-500">
-            No sports markets found
+            {viewTab === 'futures'
+              ? 'No futures markets found'
+              : 'No sports markets found'}
           </p>
         ) : (
           sections.map((section) => (

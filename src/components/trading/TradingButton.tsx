@@ -11,7 +11,7 @@ export interface TradingButtonProps {
   marketId?: string;
   outcomeId?: string;
   price?: number;
-  format?: 'percent' | 'cents';
+  format?: 'percent' | 'cents' | 'sportsCents';
   variant?: TradingButtonVariant;
   backgroundColor?: string;
   textColor?: string;
@@ -19,6 +19,7 @@ export interface TradingButtonProps {
   className?: string;
   children?: ReactNode;
   disabled?: boolean;
+  shadowHeight?: string;
 }
 
 const VARIANT_STYLES: Record<
@@ -33,12 +34,12 @@ const VARIANT_STYLES: Record<
   gray: {
     background: '#f5f5f5',
     color: '#171717',
-    shadow: 'inset 0 -4px 0 rgba(0,0,0,0.08)',
+    shadow: 'inset 0 calc(-1 * var(--btn-shadow-height, 4px)) 0 rgba(0,0,0,0.08)',
   },
   blue: {
     background: '#2E5CFF',
     color: '#ffffff',
-    shadow: 'inset 0 -4px 0 rgba(0,0,0,0.2)',
+    shadow: 'inset 0 calc(-1 * var(--btn-shadow-height, 4px)) 0 rgba(0,0,0,0.2)',
   },
 };
 
@@ -58,6 +59,7 @@ export const TradingButton = memo(function TradingButton({
   className,
   children,
   disabled = false,
+  shadowHeight = '4px',
 }: TradingButtonProps) {
   const styles = VARIANT_STYLES[variant];
   const bg = backgroundColor ?? styles.background;
@@ -70,7 +72,7 @@ export const TradingButton = memo(function TradingButton({
       disabled={disabled}
       className={cn(
         'flex h-9 w-full min-w-0 items-center justify-center gap-1 rounded-md px-2',
-        'text-xs font-semibold uppercase transition-transform active:scale-[97%]',
+        'text-xs font-semibold transition-transform active:scale-[97%]',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}
@@ -80,7 +82,7 @@ export const TradingButton = memo(function TradingButton({
         boxShadow: styles.shadow,
         ['--btn-background' as string]: bg,
         ['--btn-color' as string]: color,
-        ['--btn-shadow-height' as string]: '4px',
+        ['--btn-shadow-height' as string]: shadowHeight,
       }}
     >
       {children ?? (

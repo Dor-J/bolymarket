@@ -28,7 +28,13 @@ export function SportsLiveHeader() {
 
   return (
     <div className="mb-3 flex h-9 scroll-mt-4 items-center lg:mb-5 lg:justify-between">
-      <h1 className="text-2xl font-semibold tracking-[0.25px] text-text md:text-3xl">
+      <h1
+        className={cn(
+          'text-text text-heading-2xl font-semibold tracking-[0.25px]',
+          'transition-[text-decoration-color] duration-120 ease-out',
+          '[font-variant-numeric:slashed-zero] md:text-heading-3xl',
+        )}
+      >
         Sports Live
       </h1>
 
