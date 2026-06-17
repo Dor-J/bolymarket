@@ -4,7 +4,7 @@ import {
 } from "@/lib/cards/mapEventToCardProps";
 import { resolveCardVariant } from "@/lib/cards/resolveCardVariant";
 import { flattenOutcomes, getChartOutcomes } from "@/lib/event/flattenOutcomes";
-import type { Event } from "@/types/polymarket";
+import type { Event, SportsGame } from "@/types/polymarket";
 import { getOutcomePriceKey } from "./outcomeKey";
 
 /** Seed payload for a single outcome price atom. */
@@ -95,6 +95,44 @@ export function getOutcomeSeedsFromEvent(event: Event): OutcomePriceSeed[] {
       marketSlug: market?.slug,
     };
   });
+}
+
+function addMarketOutcomeSeeds(
+  seeds: Map<string, OutcomePriceSeed>,
+  game: SportsGame,
+  market: SportsGame['moneyline'],
+): void {
+  if (!market) {
+    return;
+  }
+
+  for (const outcome of market.outcomes) {
+    const outcomeKey = getOutcomePriceKey(market.id, outcome.id);
+    seeds.set(outcomeKey, {
+      outcomeKey,
+      price: outcome.price,
+      assetId: outcome.id,
+      eventSlug: game.slug,
+      marketSlug: market.slug,
+    });
+  }
+}
+
+/**
+ * Returns price seeds for all outcomes visible on the sports live page.
+ */
+export function getVisibleOutcomeSeedsFromSportsGames(
+  games: SportsGame[],
+): OutcomePriceSeed[] {
+  const seeds = new Map<string, OutcomePriceSeed>();
+
+  for (const game of games) {
+    addMarketOutcomeSeeds(seeds, game, game.moneyline);
+    addMarketOutcomeSeeds(seeds, game, game.spread);
+    addMarketOutcomeSeeds(seeds, game, game.total);
+  }
+
+  return Array.from(seeds.values());
 }
 
 /**
