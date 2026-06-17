@@ -63,10 +63,8 @@ describe('useCategoryEvents', () => {
   });
 
   it('filters events by debounced search query', async () => {
-    vi.useFakeTimers();
-
     const queryClient = createTestQueryClient();
-    mockedFetchEventsClient.mockResolvedValue(mockEvents);
+    queryClient.setQueryData(['events', { tag: 'politics' }], mockEvents);
     const jotaiStore = createJotaiStore();
 
     const { result } = renderHookWithProviders(
@@ -74,11 +72,11 @@ describe('useCategoryEvents', () => {
       { queryClient, jotaiStore },
     );
 
-    await act(async () => {
-      await Promise.resolve();
+    await waitFor(() => {
+      expect(result.current.events.length).toBe(4);
     });
 
-    expect(result.current.events.length).toBe(4);
+    vi.useFakeTimers();
 
     act(() => {
       jotaiStore.set(searchQueryAtom, 'crypto');

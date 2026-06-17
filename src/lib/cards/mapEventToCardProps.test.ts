@@ -106,6 +106,38 @@ describe("getTopOutcomeRows", () => {
     expect(rows[0]?.name).toBe("France");
     expect(rows[1]?.name).toBe("Spain");
   });
+
+  it("uses compact Polymarket-style labels for binary submarkets", () => {
+    const event = createMockEvent({
+      id: "2",
+      slug: "world-cup-binaries",
+      title: "World Cup Winner",
+      markets: [
+        {
+          id: "m1",
+          question: "Will France win the 2026 FIFA World Cup?",
+          volume: 100,
+          outcomes: [
+            { id: "france-yes", name: "Yes", price: 0.18 },
+            { id: "france-no", name: "No", price: 0.82 },
+          ],
+        },
+        {
+          id: "m2",
+          question: "Will Spain win the 2026 FIFA World Cup?",
+          volume: 100,
+          outcomes: [
+            { id: "spain-yes", name: "Yes", price: 0.14 },
+            { id: "spain-no", name: "No", price: 0.86 },
+          ],
+        },
+      ],
+    });
+
+    const rows = getTopOutcomeRows(event, 2);
+
+    expect(rows.map((row) => row.name)).toEqual(["France", "Spain"]);
+  });
 });
 
 describe("mapEventToBinaryProps", () => {
