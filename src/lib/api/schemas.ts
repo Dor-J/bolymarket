@@ -67,6 +67,7 @@ const gammaTeamSchema = z
     record: z.string().optional(),
     logo: z.string().optional(),
     abbreviation: z.string().optional(),
+    alias: z.string().optional(),
     color: z.string().optional(),
   })
   .passthrough();

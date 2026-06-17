@@ -70,6 +70,7 @@ export interface TeamInfo {
   logo?: string;
   league?: string;
   color?: string;
+  alias?: string;
 }
 
 /** Classified markets for a single game. */
@@ -90,6 +91,9 @@ export interface SportsGame {
   volume: number;
   image?: string;
   gameStartTime?: string;
+  matchupKey: string;
+  wsGameId?: string;
+  isMoreMarkets?: boolean;
   teams: [TeamInfo, TeamInfo];
   moneyline?: SportsMarket;
   spread?: SportsMarket;
@@ -123,6 +127,7 @@ export interface SportsLeagueSummary {
 /** Response from `/api/sports/live`. */
 export interface SportsLiveResponse {
   games: SportsGame[];
+  futuresGames: SportsGame[];
   leagues: SportsLeagueSummary[];
   fetchedAt: string;
 }

@@ -124,6 +124,7 @@
   --color-surface-2: var(--surface-2);
   --color-border: var(--border);
   --color-text: var(--text);
+  --color-text-primary: var(--text);
   --color-text-secondary: var(--text-secondary);
   --color-text-tertiary: var(--text-tertiary);
   --color-muted: var(--muted-foreground);
@@ -153,6 +154,17 @@
   --radius-xl: var(--radius-xl);
 
   --font-sans: var(--font-inter), Inter, sans-serif;
+
+  --text-heading-2xl: 1.875rem;
+  --text-heading-2xl--line-height: 1.1;
+  --text-heading-3xl: 2.25rem;
+  --text-heading-3xl--line-height: 1.1;
+  --text-heading-lg: 1.25rem;
+  --text-heading-lg--line-height: 1.25;
+  --text-body-base: 1rem;
+  --text-body-base--line-height: 1.5;
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.25rem;
 }
 
 html {
@@ -197,6 +209,13 @@ body {
 
 .font-w590 {
   font-weight: 590;
+}
+
+/* Polymarket display typography (Inter-based; matches font-sauce / heading-2xl tokens) */
+.font-sauce {
+  font-family: var(--font-inter), Inter, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .scrollbar-hide {

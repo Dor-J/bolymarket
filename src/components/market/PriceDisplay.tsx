@@ -3,6 +3,7 @@
 import { useAtomValue } from "jotai";
 import { outcomePriceAtomFamily } from "@/lib/atoms/prices";
 import { formatCents, formatPercent } from "@/lib/format/price";
+import { formatSportsCents } from "@/lib/format/sportsPrice";
 import { getOutcomePriceKey } from "@/lib/prices/outcomeKey";
 import { usePriceFlash } from "@/hooks/usePriceFlash";
 import { cn } from "@/lib/cn";
@@ -11,7 +12,7 @@ export interface PriceDisplayProps {
   marketId: string;
   outcomeId: string;
   initialPrice: number;
-  format?: "percent" | "cents";
+  format?: "percent" | "cents" | "sportsCents";
   side?: "yes" | "no";
   className?: string;
   enableFlash?: boolean;
@@ -37,7 +38,9 @@ export function PriceDisplay({
   const displayPrevious =
     side === "no" ? Math.max(0, 1 - yesPrevious) : yesPrevious;
   const formatted =
-    format === "cents"
+    format === "sportsCents"
+      ? formatSportsCents(displayValue)
+      : format === "cents"
       ? formatCents(displayValue)
       : formatPercent(displayValue);
 
