@@ -112,8 +112,11 @@ export function createWebSocketEngine(
       appendTradeActivity(activeStore, eventSlug, {
         price: clampedPrice,
         side: trade.side,
-        timestamp: Date.now(),
+        timestamp: trade.timestamp ?? Date.now(),
         assetId: trade.asset,
+        size: trade.size,
+        outcome: trade.outcome,
+        userName: trade.userName,
       });
     }
   }
