@@ -5,6 +5,7 @@ import { renderWithProviders } from '@/test/test-utils';
 
 vi.mock('next/navigation', () => ({
   usePathname: vi.fn(() => '/'),
+  useRouter: vi.fn(() => ({ push: vi.fn() })),
 }));
 
 describe('MobileBottomNav', () => {

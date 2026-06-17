@@ -33,7 +33,7 @@ describe('MarketSearchToolbar', () => {
 
     renderWithProviders(<MarketSearchToolbar />);
 
-    expect(screen.getByPlaceholderText('Search')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search polymarkets...')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /toggle filters/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /bookmark markets/i })).toBeInTheDocument();
   });
@@ -43,7 +43,7 @@ describe('MarketSearchToolbar', () => {
 
     renderWithProviders(<MarketSearchToolbar />);
 
-    const input = screen.getAllByPlaceholderText('Search')[0] as HTMLInputElement;
+    const input = screen.getAllByPlaceholderText('Search polymarkets...')[0] as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'politics' } });
 
     expect(input.value).toBe('politics');

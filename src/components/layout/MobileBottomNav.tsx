@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useSetAtom } from 'jotai';
 import { MOBILE_BOTTOM_NAV_HEIGHT_PX } from '@/lib/constants/footer';
+import { breakingFilterAtom } from '@/lib/atoms/marketPage';
 import {
   MobileNavBreakingIcon,
   MobileNavHomeIcon,
@@ -52,6 +54,8 @@ const MOBILE_BOTTOM_NAV_ITEMS: MobileBottomNavItem[] = [
  */
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const setBreakingFilter = useSetAtom(breakingFilterAtom);
 
   return (
     <nav
@@ -66,7 +70,7 @@ export function MobileBottomNav() {
           const className = cn(
             'flex flex-1 flex-col items-center justify-center gap-0.5',
             'text-[10px] leading-3 font-medium',
-            active ? 'text-text' : 'text-[#77808d]',
+            active ? 'text-text' : 'text-neutral-500',
           );
 
           if (item.href.startsWith('/')) {
@@ -87,12 +91,31 @@ export function MobileBottomNav() {
                 if (item.key === 'search') {
                   event.preventDefault();
                   const input = document.querySelector<HTMLInputElement>(
-                    'input[placeholder="Search"], input[placeholder="Search polymarkets..."]',
+                    'input[placeholder="Search polymarkets..."], input[placeholder="Search"]',
                   );
                   input?.focus();
                   input?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                   return;
                 }
+
+                if (item.key === 'breaking') {
+                  event.preventDefault();
+                  setBreakingFilter(true);
+                  if (pathname !== '/') {
+                    router.push('/');
+                  }
+                  return;
+                }
+
+                if (item.key === 'more') {
+                  event.preventDefault();
+                  document.getElementById('market-filters')?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                  return;
+                }
+
                 event.preventDefault();
               }}
             >
