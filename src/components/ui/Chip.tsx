@@ -28,7 +28,7 @@ export function Chip({
       type={type}
       className={cn(
         "inline-flex h-[27px] shrink-0 items-center justify-center rounded-[5.2px] px-3.5",
-        "text-[13px] leading-4 font-semibold transition-colors",
+        "text-[13px] leading-4 font-w490 transition-colors",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         fullWidth && "flex-1",
         variantClasses[variant],
