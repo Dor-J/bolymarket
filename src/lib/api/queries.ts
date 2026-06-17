@@ -3,6 +3,7 @@ import { QUERY_PERSIST_MAX_AGE_MS } from '@/lib/cache/constants';
 import type { Timeframe } from '@/lib/chart/types';
 import { fetchEventBySlugClient, fetchEventsClient } from './eventsClient';
 import { fetchPriceHistoryClient } from './pricesClient';
+import { fetchRelatedNewsClient } from './relatedNewsClient';
 
 /** React Query options for the aggregated open events list. */
 export const eventsQueryOptions = queryOptions({
@@ -41,5 +42,37 @@ export function priceHistoryQueryOptions(tokenId: string, timeframe: Timeframe) 
     staleTime: 30_000,
     gcTime: 5 * 60_000,
     retry: 1,
+  });
+}
+
+/** React Query options for related OkSurf headlines ranked to an event. */
+export function relatedNewsQueryOptions(input: {
+  slug: string;
+  title: string;
+  category?: string;
+  tags?: string[];
+  marketQuestions?: string[];
+  enabled?: boolean;
+}) {
+  return queryOptions({
+    queryKey: [
+      'related-news',
+      input.slug,
+      input.title,
+      input.category ?? '',
+      (input.tags ?? []).join(','),
+    ],
+    queryFn: ({ signal }) =>
+      fetchRelatedNewsClient({
+        slug: input.slug,
+        title: input.title,
+        category: input.category,
+        tags: input.tags,
+        marketQuestions: input.marketQuestions,
+        signal,
+      }),
+    staleTime: 120_000,
+    gcTime: 10 * 60_000,
+    enabled: input.enabled ?? true,
   });
 }
