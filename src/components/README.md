@@ -11,7 +11,9 @@ components/
 ├── category/    Dedicated category route pages (Crypto, Sports, Politics)
 ├── chart/       Price chart + timeframe controls
 ├── event/       Event detail page sections
-├── home/        Home page content (grid, carousel, skeletons, empty states)
+├── home/        Home page — featured carousel, sidebar, markets grid
+├── markets/     Shared market listing controls (sort, filters, topic rail)
+├── sports/      Sports live page (`/sports/live`)
 ├── icons/       Inline SVG icons (nav, footer, user menu)
 ├── layout/      App shell — header, nav, footer, mobile chrome
 ├── market/      Shared market UI — prices, chips, probability bars
@@ -43,14 +45,43 @@ Mounted by `AppShell` on all routes except `/api-docs`.
 
 ## Home (`home/`)
 
-| Component            | Notes                                                       |
-| -------------------- | ----------------------------------------------------------- |
-| `EventsGrid`         | Home orchestrator — featured carousel + grid                |
-| `EventsGridView`     | Presentational grid with loading/error/empty + live prices  |
-| `FeaturedCarousel`   | Horizontal featured markets strip                           |
-| `EventsGridSkeleton` | Skeleton grid matching card silhouette                      |
-| `EventsGridError`    | Retry UI when events query fails                            |
-| `EventListEmpty`     | Empty filter/search state                                   |
+See [`home/README.md`](home/README.md) for the full map.
+
+| Component | Notes |
+| --------- | ----- |
+| `HomeMarketsView` | Home orchestrator — filters, featured section, grid |
+| `HomeFeaturedSection` | Desktop carousel + hot-topics sidebar row |
+| `FeaturedCarousel` | Hero carousel with bottom dot/nav controls |
+| `FeaturedEventPreview` | Polymarket-style featured card (chart, activity, bids) |
+| `HomeFeaturedSidebar` | World Cup combo + hot topics (`lg+`) |
+| `EventsGrid` | Thin entry → `HomeMarketsView` |
+| `EventsGridSkeleton` | Skeleton grid matching card silhouette |
+| `EventsGridError` | Retry UI when events query fails |
+| `EventListEmpty` | Empty filter/search state |
+
+## Markets listing (`markets/`)
+
+Shared controls used on the home page and category views.
+
+| Component | Notes |
+| --------- | ----- |
+| `MarketsPageBody` | Grid body with loading states, controls slot, show-more |
+| `MarketSectionHeader` | “All markets” row + desktop search/filter/watchlist |
+| `MarketTopicRail` | Topic chips (Breaking, Politics, …) |
+| `MarketControlsBar` | Sort, status, hide toggles (when filters expanded) |
+| `MarketSortSelect` / `MarketStatusSelect` | Filter dropdowns |
+| `ShowMoreMarketsButton` | Paginated “Show more” CTA |
+
+## Sports (`sports/`)
+
+See [`sports/README.md`](sports/README.md).
+
+| Component | Notes |
+| --------- | ----- |
+| `SportsLivePageView` | `/sports/live` orchestrator |
+| `SportsLeagueSection` | League-grouped live games |
+| `SportsMarketRow` | Single game row with market buttons |
+| `SportsTradeWidget` | Visual trade panel for selected market |
 
 ## Category pages (`category/`)
 
@@ -85,18 +116,7 @@ Mounted by `AppShell` on all routes except `/api-docs`.
 
 ## Event detail (`event/`)
 
-| Component              | Notes                                      |
-| ---------------------- | ------------------------------------------ |
-| `EventDetailPage`      | Client orchestrator                        |
-| `EventHeader`          | Breadcrumb, title, share/embed/bookmark    |
-| `OutcomeLegend`        | Colored dots + live %                      |
-| `OutcomeList`          | Full outcome list                          |
-| `OutcomeRow`           | `React.memo` — bar + visual Buy buttons    |
-| `ChartMetaRow`         | Volume + end date                          |
-| `OrderTicket`          | Visual-only buy/sell panel (sticky sidebar)|
-| `OrderSidebarPlaceholder` | Legacy static panel (unused in page flow) |
-| `EventDetailSkeleton`  | Detail page loading state                  |
-| `EventDetailError`     | Retry + back link on fetch failure         |
+See [`event/README.md`](event/README.md).
 
 ## UI primitives (`ui/`)
 
@@ -166,8 +186,11 @@ Component tests colocate with source (`*.test.tsx`). Key suites:
 | `layout/CategoryNav.test.tsx` | Nav items, active state |
 | `layout/CategoryNavMore.test.tsx` | More dropdown |
 | `home/EventsGrid.test.tsx` | Loading, error, empty, success |
-| `home/FeaturedCarousel.test.tsx` | Carousel render |
+| `home/FeaturedCarousel.test.tsx` | Carousel render + navigation |
+| `home/FeaturedCarouselControls.test.tsx` | Dot + pill controls |
+| `home/HomeFeaturedSidebar.test.tsx` | Sidebar promo + hot topics |
 | `home/EventListEmpty.test.tsx` | Empty copy |
+| `markets/markets.test.tsx` | Show more button |
 | `category/CategoryPageView.test.tsx` | Category page grid |
 | `event/OrderTicket.test.tsx` | Visual order ticket |
 

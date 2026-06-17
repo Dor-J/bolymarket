@@ -1,0 +1,49 @@
+# Event detail components
+
+Client orchestrator and sections for `/event/[slug]`.
+
+## Orchestration
+
+| Component | Role |
+| --------- | ---- |
+| `EventDetailPage` | Cache-first slug fetch, live prices, layout assembly |
+| `EventDetailSkeleton` | Loading state |
+| `EventDetailError` | Retry + back link |
+
+## Header & context
+
+| Component | Role |
+| --------- | ---- |
+| `EventHeader` | Breadcrumb, title, share/embed/bookmark actions |
+| `EventMarketContext` | Volume, end date, category metadata |
+| `ChartMetaRow` | Chart footer stats |
+
+## Markets & chart
+
+| Component | Role |
+| --------- | ---- |
+| `OutcomeLegend` | Colored dots + live percentages |
+| `OutcomeList` | Full outcome list container |
+| `OutcomeRow` | `React.memo` — probability bar + visual Buy buttons |
+| `OrderTicket` | Visual-only buy/sell sidebar (sticky on `lg+`) |
+| `OrderSidebarPlaceholder` | Legacy static panel (unused in page flow) |
+
+Chart rendering lives in `components/chart/` (`PriceChart`, `TimeframeToggle`).
+
+## Variant routing
+
+`lib/event/resolveEventDetailVariant.ts` picks layout variants (binary vs multi-outcome)
+before rendering outcome sections.
+
+## Data flow
+
+```text
+useEvent(slug) → React Query ['event', slug]
+useLivePrices(seeds) → Jotai outcome atoms
+useChartTimeframe() → local timeframe state
+```
+
+## Tests
+
+Event detail UI is covered indirectly via hook tests (`useEvent`) and page integration.
+Add colocated `*.test.tsx` here when adding new interactive event sections.

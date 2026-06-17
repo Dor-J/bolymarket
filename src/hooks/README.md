@@ -17,6 +17,10 @@ Custom React hooks for bolymarket. All paths are relative to `src/hooks/`.
 | `useDebouncedValue` | Generic debounce helper (search uses 300ms)                             |
 | `useSearchShortcut` | Focuses search input on `/` key (`enabled` param for breakpoint gating)   |
 | `useShowMoreMarkets` | Paginates visible market count with responsive initial size + show more   |
+| `useIsMounted`       | `true` after client mount — defers hydration-sensitive UI                 |
+| `useLiveChartOutcomes` | Merges Jotai live prices into chart outcome metadata (stable snapshots) |
+| `useSportsLiveGames` | React Query — sports live games from `/api/sports/live`                 |
+| `useSportsGameResults` | Subscribes ref-counted sports WebSocket for visible game ids            |
 
 ## Data flow
 
@@ -107,6 +111,10 @@ Hook tests colocate with source files and use the shared wrapper in
 | `useCategoryEvents.test.ts`           | Tag fetch, error forwarding, debounced search filter              |
 | `useSearchShortcut.test.ts`           | `/` focus, disabled state, editable guard, cleanup              |
 | `useShowMoreMarkets.test.ts`          | Initial count, show more, hasMore, totalCount reset             |
+| `useIsMounted.test.ts`                | Mount detection, stable true across rerenders                   |
+| `useLiveChartOutcomes.test.ts`        | Live price merge, snapshot stability, atom updates              |
+| `useSportsLiveGames.test.ts`          | Query options, loading, success, error                          |
+| `useSportsGameResults.test.ts`        | Prune, WebSocket lease acquire/release, id changes            |
 
 Related lib tests (realtime, not hooks but coupled):
 

@@ -25,7 +25,7 @@ bun install
 bun run dev        # http://localhost:3000
 bun run build      # production build
 bun run start      # serve production build
-bun run test       # Vitest unit + component tests (178 tests)
+bun run test       # Vitest unit + component tests
 bun run lint
 bun run format:check
 ```
@@ -117,9 +117,10 @@ URLs fetch by slug.
 
 | Route           | Description                                                           |
 | --------------- | --------------------------------------------------------------------- |
-| `/`             | Home — featured carousel, category nav, responsive events grid        |
+| `/`             | Home — featured carousel + hot-topics sidebar, topic rails, markets grid |
 | `/crypto`       | Crypto markets — tag-specific fetch via `/api/events?tag=crypto`      |
 | `/sports`       | Sports markets — tag-specific fetch via `/api/events?tag=sports`      |
+| `/sports/live`  | Sports live games — league-grouped rows, trade widget, sports WS      |
 | `/politics`     | Politics markets — tag-specific fetch via `/api/events?tag=politics` |
 | `/event/[slug]` | Event detail — header, CLOB chart, outcome rows, order ticket UI      |
 | `/api-docs`     | Interactive Swagger UI — OpenAPI explorer for REST routes           |
@@ -172,7 +173,7 @@ the visible search input (`useSearchShortcut` with `enabled` tied to breakpoint)
 **Auth:** Visual-only Log In / Sign Up modals (`AuthModal`).
 
 **Bookmarks:** Persisted to `localStorage` via `bookmarksAtom`; toggle on cards via `BookmarkButton`.
-The toolbar bookmark icon is visual-only (not yet wired).
+Toolbar and section-header watchlist icons filter to bookmarked markets via `bookmarksOnlyAtom`.
 
 **Theme:** Dark mode toggle in desktop `UserMenu`; `ThemeSync` applies `data-theme` on `<html>`;
 pre-hydration script in `layout.tsx` avoids flash.
@@ -190,9 +191,10 @@ pre-hydration script in `layout.tsx` avoids flash.
 - **Trading:** Order ticket is visual-only — "Sign up to trade" CTA is disabled.
 - **Scope:** No wallet, real authentication, portfolio, or order execution.
 - **Search:** Client-side filter on cached events only (no Gamma `/public-search`).
-- **Chrome placeholders:** Many nav/footer/hamburger links are visual-only (`href="#"`). Filter
-  toolbar button is decorative. Mobile Breaking/More bottom-nav items are no-ops.
-- **Home toolbar:** Polymarket filter pills and "24hr Volume" sort row are not yet implemented.
+- **Chrome placeholders:** Many nav/footer/hamburger links are visual-only (`href="#"`).
+  Hot-topics / combo sidebar links mirror Polymarket paths and may 404 until routes exist.
+- **Home filters:** Topic rail, sort/status row, and hide toggles work on home; some Polymarket
+  category pages use simpler filter rows.
 
 ## API documentation
 
@@ -205,6 +207,8 @@ dev server is running. Uses OpenAPI 3.0 + `swagger-ui-dist` (compatible with Nex
 | `GET /api/events` | List open events (`?tag=crypto\|sports\|politics` optional) |
 | `GET /api/events/{slug}` | Single event by slug |
 | `GET /api/prices/{tokenId}` | CLOB price history (`?timeframe=1d` optional) |
+| `GET /api/sports/live` | Sports live games and league summaries |
+| `GET /api/related-news` | Related news for event context |
 
 ## Performance
 
@@ -223,17 +227,18 @@ leaves, not the full grid.
 bun run test
 ```
 
-**55 test files · 178 tests** (Vitest). Coverage includes:
+**79 test files · 258 tests** (Vitest). Every hook under `src/hooks/` has a colocated test.
+Coverage highlights:
 
-- **API / cache:** Gamma fetch/normalize, CLOB chart normalizer, per-tag server cache, OpenAPI spec
+- **API / cache:** Gamma fetch/normalize, CLOB chart normalizer, sports live cache, OpenAPI spec
 - **Cards / filters:** Card mapping, category filters, search filter, volume/price formatters
-- **Hooks:** `useEvents`, `useFilteredEvents`, `useCategoryEvents`, `useEvent`, `useLivePrices`,
-  `useDebouncedValue`, `usePriceFlash`, `useReducedMotion`, `useChartTimeframe`
-- **Realtime:** `livePriceEngineManager`, simulation engine, trade payload, subscription index
-- **Layout chrome:** `Footer`, `MobileBottomNav`, `BackToTopButton`, `MarketSearchToolbar`,
-  `CategoryNav`, `CategoryNavMore`
-- **Pages:** `EventsGrid`, `FeaturedCarousel`, `CategoryPageView`, `OrderTicket`, `EventListEmpty`
-- **Atoms:** bookmarks, category route validation, price seeds
+- **Hooks:** All 15 hooks in `src/hooks/` including `useLiveChartOutcomes`, `useSportsLiveGames`,
+  `useIsMounted`, `useSportsGameResults`
+- **Realtime:** `livePriceEngineManager`, sports WebSocket, simulation engine, trade payload
+- **Layout chrome:** `Footer`, `MobileBottomNav`, `MarketSearchToolbar`, `CategoryNav`
+- **Home:** `FeaturedCarousel`, carousel controls, hot-topics sidebar, `EventsGrid`
+- **Pages:** `CategoryPageView`, `OrderTicket`, sports game card builder
+- **Atoms:** bookmarks, trade activity, price seeds, sports game state
 
 Shared test helpers: `src/test/test-utils.tsx` (`renderHookWithProviders`, `renderWithProviders`).
 
@@ -241,10 +246,11 @@ Shared test helpers: `src/test/test-utils.tsx` (`renderHookWithProviders`, `rend
 
 ```text
 src/
-├── app/              Routes, layout, providers, API routes
+├── app/              Routes, layout, providers, API routes (see app/api/README.md)
 ├── components/       UI by feature (see src/components/README.md)
-├── hooks/            Data + realtime hooks (see src/hooks/README.md)
-├── lib/              API, atoms, prices, chart, realtime, cache, formatters
+├── hooks/            Data + realtime hooks — all colocated tests (src/hooks/README.md)
+├── lib/              API, atoms, prices, chart, realtime, cache (src/lib/README.md)
+├── test/             Shared Vitest helpers (src/test/README.md)
 └── types/            Polymarket domain types
 ```
 
@@ -259,6 +265,8 @@ src/
 | 4 — Realtime        | Complete | WebSocket + simulation, flash, leaf-only updates         |
 | 5 — Polish & README | Complete | UX audit, performance docs, submission README            |
 | 6 — Chrome fidelity | Complete | Footer, mobile bottom nav, market search toolbar, nav QA |
+| 7 — Home featured   | Complete | Carousel controls, hot-topics sidebar, activity/bid rails |
+| 8 — Sports live     | In progress | `/sports/live` page, sports API, WebSocket game state |
 
 ## Planning
 
@@ -278,5 +286,7 @@ Side-by-side chrome comparison notes: `../design-system/header-and-nav-side-to-s
 
 - [src/components/README.md](src/components/README.md) — component map and conventions
 - [src/hooks/README.md](src/hooks/README.md) — hook reference and data flow
+- [src/lib/README.md](src/lib/README.md) — shared library layout
+- [src/test/README.md](src/test/README.md) — Vitest helpers and fixtures
 - [docs/PERFORMANCE.md](docs/PERFORMANCE.md) — profiling notes and virtualization decision
 - [../polymarket-github-repos/README.md](../polymarket-github-repos/README.md) — Polymarket OSS repo catalog
