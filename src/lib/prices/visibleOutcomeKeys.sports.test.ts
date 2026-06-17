@@ -12,6 +12,7 @@ describe('getVisibleOutcomeSeedsFromSportsGames', () => {
       league: 'MLB',
       leagueId: 'mlb',
       volume: 1000,
+      matchupKey: 'team a vs team b',
       teams: [
         {
           id: 1,
