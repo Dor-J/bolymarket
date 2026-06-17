@@ -14,7 +14,7 @@ function renderIcon(icon: CategoryIcon | undefined, isActive: boolean) {
   if (icon === 'trending') {
     return (
       <TrendingIcon
-        className={isActive ? 'text-text' : 'text-[#77808d]'}
+        className={isActive ? 'text-text' : 'text-neutral-500'}
       />
     );
   }
@@ -43,7 +43,7 @@ export function CategoryNavLink({ item }: CategoryNavLinkProps) {
     'inline-flex h-12 shrink-0 items-center gap-1.5 px-2.5',
     'text-sm leading-5 font-semibold whitespace-nowrap transition-colors',
     'hover:text-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-    isActive ? 'text-text' : 'text-[#77808d]',
+    isActive ? 'text-text' : 'text-neutral-500',
     !isActive && !isWorldCup && item.accentClass,
     isWorldCup ? 'rich-nav-world-cup' : '',
   );

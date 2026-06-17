@@ -108,7 +108,7 @@ export function CategoryNavMore() {
         onClick={openMenu}
         className={cn(
           'group inline-flex h-10 cursor-pointer items-center gap-1.5',
-          'rounded-md px-3 py-1 text-sm font-medium text-[#77808d]',
+          'rounded-md px-3 py-1 text-sm font-w490 text-neutral-500',
           'transition-colors duration-150 outline-none',
           'hover:text-text focus-visible:ring-2 focus-visible:ring-ring',
           open ? 'text-text' : '',

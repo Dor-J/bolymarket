@@ -25,13 +25,13 @@ export const CategoryNav = memo(function CategoryNav() {
                   <>
                     <span
                       aria-hidden
-                      className="mx-1 text-sm text-[#77808d] select-none lg:hidden"
+                      className="mx-1 text-sm text-neutral-500 select-none lg:hidden"
                     >
                       |
                     </span>
                     <span
                       aria-hidden
-                      className="mx-2 hidden h-3.5 w-0.5 shrink-0 rounded-full bg-[#e6e8ea] lg:block"
+                      className="mx-2 hidden h-3.5 w-0.5 shrink-0 rounded-full bg-neutral-100 lg:block"
                     />
                   </>
                 ) : null}
