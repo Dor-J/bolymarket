@@ -1,7 +1,7 @@
 'use client';
 
 import type { MarketStatus } from '@/lib/markets/types';
-import { cn } from '@/lib/cn';
+import { MarketFilterDropdown } from './MarketFilterDropdown';
 
 export interface MarketStatusSelectProps {
   value: MarketStatus;
@@ -9,13 +9,8 @@ export interface MarketStatusSelectProps {
   className?: string;
 }
 
-const STATUS_OPTIONS: { value: MarketStatus; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'active', label: 'Active' },
-];
-
 /**
- * All / Active status toggle matching Polymarket controls.
+ * Separate All / Active pill dropdowns matching Polymarket controls.
  */
 export function MarketStatusSelect({
   value,
@@ -23,31 +18,23 @@ export function MarketStatusSelect({
   className,
 }: MarketStatusSelectProps) {
   return (
-    <div
-      className={cn('inline-flex rounded-md border border-border bg-surface p-0.5', className)}
-      role="group"
-      aria-label="Market status"
-    >
-      {STATUS_OPTIONS.map((option) => {
-        const active = value === option.value;
-
-        return (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={active}
-            onClick={() => onChange(option.value)}
-            className={cn(
-              'rounded px-2.5 py-1 text-sm leading-5 font-medium transition-colors',
-              active
-                ? 'bg-surface-2 text-text'
-                : 'text-neutral-500 hover:text-text',
-            )}
-          >
-            {option.label}
-          </button>
-        );
-      })}
+    <div className={className}>
+      <div className="flex flex-wrap items-center gap-2">
+        <MarketFilterDropdown
+          label="All"
+          value={value}
+          options={[{ value: 'all', label: 'All' }]}
+          onChange={onChange}
+          menuLabel="Market scope"
+        />
+        <MarketFilterDropdown
+          label="Active"
+          value={value}
+          options={[{ value: 'active', label: 'Active' }]}
+          onChange={onChange}
+          menuLabel="Market status"
+        />
+      </div>
     </div>
   );
 }
