@@ -26,6 +26,7 @@ export function PageContainer({ children, className }: PageContainerProps) {
       transition={{ duration: reducedMotion ? 0 : 0.2 }}
       className={cn(
         'mx-auto w-full max-w-[1350px] px-6 py-6',
+        'pb-[calc(1.5rem+var(--mobile-bottom-nav-height,56px))] md:pb-6',
         className,
       )}
     >
