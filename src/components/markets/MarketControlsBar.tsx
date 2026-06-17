@@ -17,7 +17,7 @@ export interface MarketControlsBarProps {
 }
 
 /**
- * Controls row — sort/status on the left, optional trailing filters on the right.
+ * Single dense controls row — sort, status pills, then hide toggles (Polymarket parity).
  */
 export function MarketControlsBar({
   sort,
@@ -30,18 +30,13 @@ export function MarketControlsBar({
 }: MarketControlsBarProps) {
   return (
     <div
-      className={cn('flex flex-wrap items-center justify-between gap-3 pb-4', className)}
+      className={cn('flex flex-wrap items-center gap-2 pb-4', className)}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <MarketSortSelect value={sort} onChange={onSortChange} />
-        {showStatus && onStatusChange ? (
-          <MarketStatusSelect value={status} onChange={onStatusChange} />
-        ) : null}
-      </div>
-
-      {children ? (
-        <div className="flex flex-wrap items-center gap-4">{children}</div>
+      <MarketSortSelect value={sort} onChange={onSortChange} />
+      {showStatus && onStatusChange ? (
+        <MarketStatusSelect value={status} onChange={onStatusChange} />
       ) : null}
+      {children}
     </div>
   );
 }

@@ -88,7 +88,7 @@ export function HomeMarketsView() {
         status={status}
         onStatusChange={setStatus}
       >
-        <label className="inline-flex items-center gap-1.5 text-sm text-neutral-500">
+        <label className="inline-flex items-center gap-1.5 text-sm font-w490 text-neutral-500">
           <input
             type="checkbox"
             checked={hideToggles.hideSports}
@@ -102,7 +102,7 @@ export function HomeMarketsView() {
           />
           Hide sports
         </label>
-        <label className="inline-flex items-center gap-1.5 text-sm text-neutral-500">
+        <label className="inline-flex items-center gap-1.5 text-sm font-w490 text-neutral-500">
           <input
             type="checkbox"
             checked={hideToggles.hideCrypto}
@@ -116,7 +116,7 @@ export function HomeMarketsView() {
           />
           Hide crypto
         </label>
-        <label className="inline-flex items-center gap-1.5 text-sm text-neutral-500">
+        <label className="inline-flex items-center gap-1.5 text-sm font-w490 text-neutral-500">
           <input
             type="checkbox"
             checked={hideToggles.hideEarnings}
