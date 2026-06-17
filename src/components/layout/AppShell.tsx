@@ -36,7 +36,9 @@ export function AppShell({ children }: AppShellProps) {
       <TopBar />
       <CategoryNav />
       <MarketSearchToolbar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pb-[var(--mobile-bottom-nav-height,56px)] md:pb-0">
+        {children}
+      </main>
       <Footer />
       <BackToTopButton />
       <MobileBottomNav />

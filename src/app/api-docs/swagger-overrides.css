@@ -23,7 +23,7 @@
 .swagger-ui .opblock-tag {
   font-family: var(--font-inter), Inter, system-ui, sans-serif;
   font-size: 1.125rem;
-  border-bottom: 1px solid #e6e8ea;
+  border-bottom: 1px solid var(--neutral-100);
 }
 
 .swagger-ui .opblock.opblock-get {
@@ -48,7 +48,7 @@
 }
 
 .swagger-ui section.models {
-  border: 1px solid #e6e8ea;
+  border: 1px solid var(--neutral-100);
   border-radius: 12px;
 }
 

@@ -33,7 +33,7 @@ function FooterTopicLink({ item }: { item: FooterLinkItem }) {
       className={cn(
         'group block py-1.5',
         'text-sm leading-5 text-text',
-        'transition-colors hover:text-[#77808d]',
+        'transition-colors hover:text-neutral-500',
       )}
     >
       <span className="inline-flex items-center gap-1 font-medium">
@@ -41,7 +41,7 @@ function FooterTopicLink({ item }: { item: FooterLinkItem }) {
         {item.showChevron ? <FooterChevronDownIcon /> : null}
       </span>
       {item.secondaryLabel ? (
-        <span className="mt-0.5 block text-xs leading-4 text-[#77808d]">
+        <span className="mt-0.5 block text-xs leading-4 text-neutral-500">
           {item.secondaryLabel}
         </span>
       ) : null}
@@ -54,7 +54,7 @@ function FooterPlainLink({ item }: { item: FooterLinkItem }) {
 
   const className = cn(
     'block py-1 text-sm leading-5 font-medium text-text',
-    'transition-colors hover:text-[#77808d]',
+    'transition-colors hover:text-neutral-500',
   );
 
   if (isExternalRoute) {
@@ -125,7 +125,7 @@ function FooterTopicColumns({
 export function Footer() {
   return (
     <footer
-      className="mt-auto border-t border-border bg-surface pb-[var(--mobile-bottom-nav-height)] md:pb-0"
+      className="mt-auto border-t border-border bg-surface pb-(--mobile-bottom-nav-height) md:pb-0"
       style={
         {
           '--mobile-bottom-nav-height': `${MOBILE_BOTTOM_NAV_HEIGHT_PX}px`,
@@ -135,7 +135,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1350px] px-4 py-10 md:px-6 md:py-14">
         <div className="mb-8">
           <Logo />
-          <p className="mt-2 max-w-xs text-sm leading-5 text-[#77808d]">
+          <p className="mt-2 max-w-xs text-sm leading-5 text-neutral-500">
             {FOOTER_BRAND_SUBTITLE}
           </p>
         </div>
@@ -186,7 +186,7 @@ export function Footer() {
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-1 gap-y-1 text-xs leading-4 text-[#77808d] lg:flex-1 lg:justify-center">
+            <div className="flex flex-wrap items-center gap-x-1 gap-y-1 text-xs leading-4 text-neutral-500 lg:flex-1 lg:justify-center">
               <span className="whitespace-nowrap">{FOOTER_COMPANY_LINE}</span>
               {FOOTER_LEGAL_LINKS.map((item) => (
                 <span key={item.label} className="inline-flex items-center">
@@ -223,7 +223,7 @@ export function Footer() {
             </button>
           </div>
 
-          <p className="mt-4 text-[11px] leading-4 text-[#77808d] lg:mt-5">
+          <p className="mt-4 text-[11px] leading-4 text-neutral-500 lg:mt-5">
             {FOOTER_DISCLAIMER.split('Terms of Service & Privacy Policy.')[0]}
             <a href="#" className="underline hover:text-text">
               Terms of Service & Privacy Policy
@@ -231,7 +231,7 @@ export function Footer() {
             .
           </p>
 
-          <p className="mt-3 text-[10px] leading-4 text-[#77808d]/80">
+          <p className="mt-3 text-[10px] leading-4 text-neutral-500/80">
             bolymarket — not affiliated with Polymarket
           </p>
         </div>

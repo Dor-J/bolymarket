@@ -97,7 +97,7 @@ export function PriceChart({
 
   return (
     <div className={cn('relative w-full', className)}>
-      <div className="pointer-events-none absolute top-1/2 right-4 z-10 -translate-y-1/2 text-xs font-semibold tracking-[0.2em] text-[#aeb4bc]/40 uppercase">
+      <div className="pointer-events-none absolute top-1/2 right-4 z-10 -translate-y-1/2 text-xs font-semibold tracking-[0.2em] text-neutral-300/40 uppercase">
         bolymarket
       </div>
 
@@ -110,7 +110,7 @@ export function PriceChart({
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
               dataKey="label"
-              tick={{ fill: '#77808d', fontSize: 12 }}
+              tick={{ fill: 'var(--neutral-500)', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               minTickGap={24}
@@ -119,7 +119,7 @@ export function PriceChart({
               orientation="right"
               domain={[0, 1]}
               tickFormatter={(value: number) => formatPercent(value)}
-              tick={{ fill: '#77808d', fontSize: 12 }}
+              tick={{ fill: 'var(--neutral-500)', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               width={48}
