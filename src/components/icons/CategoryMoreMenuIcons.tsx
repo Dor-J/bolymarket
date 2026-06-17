@@ -31,7 +31,7 @@ export function CategoryMoreMenuIcon({ icon, className }: CategoryMoreMenuIconPr
   return (
     <Icon
       aria-hidden
-      className={cn('h-[18px] w-[18px] shrink-0 text-[#77808d]', className)}
+      className={cn('h-[18px] w-[18px] shrink-0 text-neutral-500', className)}
       strokeWidth={1.75}
     />
   );
