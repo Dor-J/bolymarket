@@ -1,10 +1,12 @@
-/** OkSurf news article shape returned by the public API. */
+/** News article shape returned by related-news providers. */
 export interface NewsArticle {
   title: string;
   link: string;
   og?: string;
   source?: string;
   source_icon?: string;
+  publishedAt?: string;
+  provider?: 'gdelt' | 'oksurf';
 }
 
 /** Ranked article with relevance score for featured preview display. */

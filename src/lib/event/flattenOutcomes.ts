@@ -30,6 +30,7 @@ export function flattenOutcomes(event: Event): DetailOutcomeRow[] {
         volume: market.volume,
         yesPrice,
         noPrice,
+        image: market.image,
       });
       continue;
     }
@@ -42,6 +43,7 @@ export function flattenOutcomes(event: Event): DetailOutcomeRow[] {
         volume: market.volume,
         yesPrice: outcome.price,
         noPrice: Math.max(0, 1 - outcome.price),
+        image: market.image,
       });
     }
   }

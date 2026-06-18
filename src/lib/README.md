@@ -19,7 +19,7 @@ lib/
 ├── filters/        Client-side search helpers
 ├── format/         Volume, market count, price display formatters
 ├── markets/        Home filter/sort/topic logic
-├── news/           Related news ranking (OKSurf)
+├── news/           Related news providers (GDELT primary, OkSurf fallback) + ranking
 ├── openapi/        OpenAPI 3.0 spec generator
 ├── prices/         Outcome key helpers, visible outcome seed extraction
 ├── query/          React Query client factory

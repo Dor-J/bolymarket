@@ -11,6 +11,7 @@ describe('buildOpenApiSpec', () => {
     expect(spec.paths?.['/api/events']?.get).toBeDefined();
     expect(spec.paths?.['/api/events/{slug}']?.get).toBeDefined();
     expect(spec.paths?.['/api/prices/{tokenId}']?.get).toBeDefined();
+    expect(spec.paths?.['/api/related-news']?.get).toBeDefined();
   });
 
   it('documents category tag query parameter', () => {

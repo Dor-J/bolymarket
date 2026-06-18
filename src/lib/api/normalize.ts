@@ -208,6 +208,7 @@ export function normalizeMarket(market: GammaMarket): Market | null {
     id: String(market.id),
     question,
     slug: market.slug,
+    image: market.image ?? market.icon,
     volume: parseVolume(market.volumeNum, market.volume),
     outcomes,
   };

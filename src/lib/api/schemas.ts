@@ -38,6 +38,8 @@ export const gammaMarketSchema = z
     id: z.union([z.string(), z.number()]),
     question: z.string().optional(),
     slug: z.string().optional(),
+    image: z.string().optional(),
+    icon: z.string().optional(),
     volume: z.union([z.string(), z.number()]).optional(),
     volumeNum: z.number().optional(),
     outcomes: jsonStringArraySchema.optional(),

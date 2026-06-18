@@ -12,6 +12,7 @@ export interface OutcomeRowProps {
   marketId: string;
   outcomeId: string;
   name: string;
+  image?: string;
   yesPrice: number;
   noPrice: number;
 }
@@ -57,6 +58,7 @@ export function getTopOutcomeRows(event: Event, limit = 2): OutcomeRowProps[] {
         marketId: market.id,
         outcomeId: yesOutcomeId,
         name: deriveBinaryMarketLabel(market.question),
+        image: market.image,
         yesPrice,
         noPrice,
       });
@@ -68,6 +70,7 @@ export function getTopOutcomeRows(event: Event, limit = 2): OutcomeRowProps[] {
         marketId: market.id,
         outcomeId: outcome.id,
         name: outcome.name,
+        image: market.image,
         yesPrice: outcome.price,
         noPrice: Math.max(0, 1 - outcome.price),
       });

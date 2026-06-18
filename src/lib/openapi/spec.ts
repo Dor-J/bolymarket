@@ -92,6 +92,48 @@ export const openApiSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
       description: 'Series values keyed by CLOB token id.',
     },
   },
+  NewsArticle: {
+    type: 'object',
+    required: ['title', 'link', 'score'],
+    properties: {
+      title: {
+        type: 'string',
+        example: 'Anthropic restores access to advanced AI models',
+      },
+      link: {
+        type: 'string',
+        format: 'uri',
+        example: 'https://example.com/anthropic-model-access',
+      },
+      source: { type: 'string', example: 'example.com' },
+      og: {
+        type: 'string',
+        format: 'uri',
+        description: 'Optional article preview image.',
+      },
+      source_icon: {
+        type: 'string',
+        format: 'uri',
+        description: 'Optional source favicon URL.',
+      },
+      publishedAt: {
+        type: 'string',
+        description: 'Provider-specific article publication timestamp when available.',
+        example: '20260614T070000Z',
+      },
+      provider: {
+        type: 'string',
+        enum: ['gdelt', 'oksurf'],
+        description: 'Upstream related-news provider.',
+      },
+      score: {
+        type: 'number',
+        format: 'float',
+        description: 'Local relevance score against the event context.',
+        example: 8,
+      },
+    },
+  },
   ErrorResponse: {
     type: 'object',
     required: ['error'],
@@ -157,6 +199,10 @@ export function buildOpenApiSpec({
       {
         name: 'Prices',
         description: 'Historical outcome prices from the Polymarket CLOB API.',
+      },
+      {
+        name: 'News',
+        description: 'Related event headlines from GDELT with OkSurf fallback.',
       },
     ],
     paths: {
@@ -293,6 +339,87 @@ export function buildOpenApiSpec({
                 'application/json': {
                   schema: { $ref: '#/components/schemas/ErrorResponse' },
                   example: { error: 'Invalid timeframe' },
+                },
+              },
+            },
+            '500': {
+              description: 'Server error.',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/ErrorResponse' },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/related-news': {
+        get: {
+          tags: ['News'],
+          summary: 'Get related news',
+          description:
+            'Returns event-related headlines from GDELT DOC 2.0, ranked locally ' +
+            'against the supplied event context. Falls back to OkSurf when GDELT ' +
+            'times out, errors, or returns no usable articles.',
+          operationId: 'getRelatedNews',
+          parameters: [
+            {
+              name: 'title',
+              in: 'query',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Event title used as the primary news search input.',
+              example: 'Claude Fable 5 restored for US customers by June?',
+            },
+            {
+              name: 'category',
+              in: 'query',
+              required: false,
+              schema: { type: 'string' },
+              description: 'Optional event category for ranking and fallback sections.',
+              example: 'technology',
+            },
+            {
+              name: 'tags',
+              in: 'query',
+              required: false,
+              schema: { type: 'string' },
+              description: 'Comma-separated event tags.',
+              example: 'ai,anthropic',
+            },
+            {
+              name: 'questions',
+              in: 'query',
+              required: false,
+              schema: { type: 'string' },
+              description: 'Pipe-separated market questions for ranking context.',
+              example: 'Will Anthropic restore Claude access?|Will access return by June?',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Ranked related headlines.',
+              headers: {
+                'Cache-Control': {
+                  schema: { type: 'string' },
+                  example: 'public, s-maxage=120, stale-while-revalidate=300',
+                },
+              },
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: { $ref: '#/components/schemas/NewsArticle' },
+                  },
+                },
+              },
+            },
+            '400': {
+              description: 'Missing event title.',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/ErrorResponse' },
+                  example: { error: 'Missing title' },
                 },
               },
             },
