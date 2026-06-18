@@ -2,11 +2,8 @@
 
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useAtomValue } from 'jotai';
 import Link from 'next/link';
-import { tradeActivityByEventAtom } from '@/lib/atoms/tradeActivity';
 import { relatedNewsQueryOptions } from '@/lib/api/queries';
-import { formatTradeActivityLine } from '@/lib/featured/formatTradeActivity';
 import type { Event } from '@/types/polymarket';
 import { cn } from '@/lib/cn';
 
@@ -17,7 +14,6 @@ export interface FeaturedActivityRailProps {
 
 interface ActivityItem {
   id: string;
-  kind: 'news' | 'trade';
   title: string;
   body: string;
   href?: string;
@@ -30,9 +26,6 @@ export function FeaturedActivityRail({
   event,
   className,
 }: FeaturedActivityRailProps) {
-  const tradesByEvent = useAtomValue(tradeActivityByEventAtom);
-  const trades = tradesByEvent[event.slug] ?? [];
-
   const { data: news = [], isLoading } = useQuery(
     relatedNewsQueryOptions({
       slug: event.slug,
@@ -44,33 +37,13 @@ export function FeaturedActivityRail({
   );
 
   const activityItems = useMemo<ActivityItem[]>(() => {
-    const newsItems: ActivityItem[] = news.map((article) => ({
+    return news.map((article) => ({
       id: article.link,
-      kind: 'news',
       title: article.source ?? 'News',
       body: article.title,
       href: article.link,
-    }));
-
-    if (newsItems.length > 0) {
-      return newsItems.slice(0, 8);
-    }
-
-    if (isLoading) {
-      return [];
-    }
-
-    return trades.map((trade): ActivityItem => {
-      const formatted = formatTradeActivityLine(trade);
-
-      return {
-        id: trade.id,
-        kind: 'trade',
-        title: formatted.title,
-        body: formatted.body,
-      };
-    }).slice(0, 8);
-  }, [isLoading, news, trades]);
+    })).slice(0, 8);
+  }, [news]);
 
   return (
     <div
@@ -95,36 +68,25 @@ export function FeaturedActivityRail({
 
           {!isLoading && activityItems.length === 0 ? (
             <p className="py-2 text-sm text-text-secondary">
-              No related headlines or live trades yet.
+              No related headlines yet.
             </p>
           ) : null}
 
           {activityItems.map((item) => (
-            <div key={`${item.kind}-${item.id}`} className="block shrink-0 py-2">
-              {item.kind === 'news' && item.href ? (
-                <Link
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-start gap-1.5"
-                >
-                  <div className="min-w-0 flex flex-col gap-0.5">
-                    <p className="text-sm font-normal text-text">{item.title}</p>
-                    <p className="line-clamp-2 text-xs text-text-secondary group-hover:underline">
-                      {item.body}
-                    </p>
-                  </div>
-                </Link>
-              ) : (
-                <div className="flex items-start gap-1.5">
-                  <div className="min-w-0 flex flex-col gap-0.5">
-                    <p className="text-sm font-normal text-text">{item.title}</p>
-                    <p className="line-clamp-2 text-xs text-text-secondary">
-                      {item.body}
-                    </p>
-                  </div>
+            <div key={`news-${item.id}`} className="block shrink-0 py-2">
+              <Link
+                href={item.href ?? '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-1.5"
+              >
+                <div className="min-w-0 flex flex-col gap-0.5">
+                  <p className="text-sm font-normal text-text">{item.title}</p>
+                  <p className="line-clamp-2 text-xs text-text-secondary group-hover:underline">
+                    {item.body}
+                  </p>
                 </div>
-              )}
+              </Link>
             </div>
           ))}
         </div>

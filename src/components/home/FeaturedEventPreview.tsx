@@ -87,8 +87,8 @@ export function FeaturedEventPreview({
           </div>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col-reverse gap-4 lg:flex-row lg:items-stretch lg:gap-6">
-          <div className="relative flex min-h-0 flex-col gap-4 lg:w-[40%] lg:justify-between">
+        <div className="flex min-h-0 flex-1 flex-col-reverse gap-4 overflow-hidden lg:flex-row lg:items-stretch lg:gap-6">
+          <div className="relative flex min-h-0 flex-col gap-4 overflow-hidden lg:w-[40%] lg:justify-between">
             <FeaturedOutcomeRows event={event} />
             <FeaturedActivityRail event={event} />
             <p className="text-sm text-text-secondary lg:hidden">
@@ -96,9 +96,12 @@ export function FeaturedEventPreview({
             </p>
           </div>
 
-          <FeaturedBidRail event={event} />
-
-          <div className="relative flex min-h-0 min-w-0 flex-1 flex-col justify-center">
+          <div className="relative flex min-h-0 min-w-0 flex-1 flex-col justify-center overflow-hidden">
+            <FeaturedBidRail
+              event={event}
+              outcomes={chartOutcomes}
+              className="pointer-events-none absolute top-1/2 left-1 z-20 -translate-y-1/2"
+            />
             {isActive ? (
               <FeaturedCompactChart
                 outcomes={chartOutcomes}
