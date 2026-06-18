@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { memo } from "react";
+import { useAtomValue } from "jotai";
+import { outcomePriceAtomFamily } from "@/lib/atoms/prices";
 import { BookmarkButton } from "@/components/ui/BookmarkButton";
 import { MarketThumbnail } from "@/components/market/MarketThumbnail";
 import { PriceDisplay } from "@/components/market/PriceDisplay";
 import { YesNoChip } from "@/components/market/YesNoChip";
 import { formatVolume } from "@/lib/format/volume";
 import type { MultiOutcomeCardProps } from "@/lib/cards/types";
+import { getOutcomePriceKey } from "@/lib/prices/outcomeKey";
 import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
@@ -15,6 +18,48 @@ const cardShellClasses = cn(
   "shadow-md shadow-black/4 transition hover:-translate-y-px hover:shadow-md hover:shadow-black/8",
   "focus-within:ring-2 focus-within:ring-ring focus-within:outline-none",
 );
+
+function MultiOutcomeRow({
+  outcome,
+}: {
+  outcome: MultiOutcomeCardProps["outcomes"][number];
+}) {
+  const outcomeKey = getOutcomePriceKey(outcome.marketId, outcome.outcomeId);
+  const livePrice = useAtomValue(outcomePriceAtomFamily(outcomeKey));
+
+  return (
+    <div className="flex min-h-10 w-full shrink-0 items-center justify-between gap-4">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <span className="truncate text-sm leading-5 font-w440 text-neutral-950">
+          {outcome.name}
+        </span>
+      </div>
+      <div className="pointer-events-auto flex shrink-0 items-center justify-end gap-1">
+        <PriceDisplay
+          marketId={outcome.marketId}
+          outcomeId={outcome.outcomeId}
+          initialPrice={outcome.yesPrice}
+          livePrice={livePrice}
+          className="mr-1 text-[15px] leading-[22.5px] font-semibold text-neutral-950"
+        />
+        <YesNoChip
+          side="yes"
+          price={outcome.yesPrice}
+          marketId={outcome.marketId}
+          outcomeId={outcome.outcomeId}
+          livePrice={livePrice}
+        />
+        <YesNoChip
+          side="no"
+          price={outcome.noPrice}
+          marketId={outcome.marketId}
+          outcomeId={outcome.outcomeId}
+          livePrice={livePrice}
+        />
+      </div>
+    </div>
+  );
+}
 
 /**
  * Multi-outcome market card — top two outcomes with Yes/No chips.
@@ -49,46 +94,18 @@ export const MultiOutcomeCard = memo(function MultiOutcomeCard({
 
         <div className="flex flex-col justify-end gap-1.5 px-3 pb-2">
           <div className="relative mt-0.5 h-20 w-full">
-          {outcomes.slice(0, 2).map((outcome) => (
-            <div
-              key={`${outcome.marketId}-${outcome.outcomeId}`}
-              className="flex min-h-10 w-full shrink-0 items-center justify-between gap-4"
-            >
-              <div className="flex min-w-0 flex-1 items-center gap-2">
-                <span className="truncate text-sm leading-5 font-w440 text-neutral-950">
-                  {outcome.name}
-                </span>
-              </div>
-              <div className="pointer-events-auto flex shrink-0 items-center justify-end gap-1">
-                <PriceDisplay
-                  marketId={outcome.marketId}
-                  outcomeId={outcome.outcomeId}
-                  initialPrice={outcome.yesPrice}
-                  className="mr-1 text-[15px] leading-[22.5px] font-semibold text-neutral-950"
-                />
-                <YesNoChip
-                  side="yes"
-                  price={outcome.yesPrice}
-                  marketId={outcome.marketId}
-                  outcomeId={outcome.outcomeId}
-                />
-                <YesNoChip
-                  side="no"
-                  price={outcome.noPrice}
-                  marketId={outcome.marketId}
-                  outcomeId={outcome.outcomeId}
-                />
-              </div>
-            </div>
-          ))}
+            {outcomes.slice(0, 2).map((outcome) => (
+              <MultiOutcomeRow
+                key={`${outcome.marketId}-${outcome.outcomeId}`}
+                outcome={outcome}
+              />
+            ))}
           </div>
 
-        <div className="pointer-events-auto flex w-full items-center justify-between text-[13px] leading-4 font-w490 text-neutral-500">
-          <p>
-            {formatVolume(volume)}
-          </p>
-          <BookmarkButton slug={slug} />
-        </div>
+          <div className="pointer-events-auto flex w-full items-center justify-between text-[13px] leading-4 font-w490 text-neutral-500">
+            <p>{formatVolume(volume)}</p>
+            <BookmarkButton slug={slug} />
+          </div>
         </div>
       </div>
     </article>

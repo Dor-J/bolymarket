@@ -112,7 +112,7 @@ export function OrderTicket({
                   >
                     {side === 'buy' ? 'Buy' : 'Sell'}
                     {active ? (
-                      <div className="absolute -bottom-[9px] left-0 h-0.5 w-full bg-text-primary" />
+                      <div className="absolute bottom-[-9px] left-0 h-0.5 w-full bg-text-primary" />
                     ) : null}
                   </button>
                 );

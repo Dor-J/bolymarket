@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { memo } from "react";
+import { useAtomValue } from "jotai";
+import { outcomePriceAtomFamily } from "@/lib/atoms/prices";
 import { LiveBadge } from "@/components/markets/LiveBadge";
 import { MarketThumbnail } from "@/components/market/MarketThumbnail";
 import { PriceDisplay } from "@/components/market/PriceDisplay";
@@ -9,6 +11,7 @@ import { YesNoChip } from "@/components/market/YesNoChip";
 import { BookmarkButton } from "@/components/ui/BookmarkButton";
 import type { CryptoUpDownCardProps } from "@/lib/cards/cryptoCardTypes";
 import { formatVolume } from "@/lib/format/volume";
+import { getOutcomePriceKey } from "@/lib/prices/outcomeKey";
 import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
@@ -34,6 +37,8 @@ export const CryptoUpDownCard = memo(function CryptoUpDownCard({
   isLive,
 }: CryptoUpDownCardProps) {
   const href = `/event/${slug}`;
+  const outcomeKey = getOutcomePriceKey(marketId, yesOutcomeId);
+  const livePrice = useAtomValue(outcomePriceAtomFamily(outcomeKey));
 
   return (
     <article className={cardShellClasses}>
@@ -82,6 +87,7 @@ export const CryptoUpDownCard = memo(function CryptoUpDownCard({
                   marketId={marketId}
                   outcomeId={yesOutcomeId}
                   initialPrice={yesPrice}
+                  livePrice={livePrice}
                   className="text-base leading-5 font-medium text-neutral-950"
                 />
                 <span className="text-body-xs line-clamp-2 text-center font-semibold text-text-secondary">
@@ -99,6 +105,7 @@ export const CryptoUpDownCard = memo(function CryptoUpDownCard({
               price={yesPrice}
               marketId={marketId}
               outcomeId={yesOutcomeId}
+              livePrice={livePrice}
               fullWidth
               label="Up"
               className="h-10 rounded-sm"
@@ -108,6 +115,7 @@ export const CryptoUpDownCard = memo(function CryptoUpDownCard({
               price={noPrice}
               marketId={marketId}
               outcomeId={yesOutcomeId}
+              livePrice={livePrice}
               fullWidth
               label="Down"
               className="h-10 rounded-sm"

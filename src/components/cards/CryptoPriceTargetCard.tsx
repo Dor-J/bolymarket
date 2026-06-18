@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { memo } from "react";
+import { useAtomValue } from "jotai";
+import { outcomePriceAtomFamily } from "@/lib/atoms/prices";
 import { BookmarkButton } from "@/components/ui/BookmarkButton";
 import { LiveBadge } from "@/components/markets/LiveBadge";
 import { MarketThumbnail } from "@/components/market/MarketThumbnail";
@@ -9,6 +11,7 @@ import { PriceDisplay } from "@/components/market/PriceDisplay";
 import { YesNoChip } from "@/components/market/YesNoChip";
 import type { CryptoPriceTargetCardProps } from "@/lib/cards/cryptoCardTypes";
 import { formatVolume } from "@/lib/format/volume";
+import { getOutcomePriceKey } from "@/lib/prices/outcomeKey";
 import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
@@ -17,6 +20,48 @@ const cardShellClasses = cn(
   "focus-within:ring-2 focus-within:ring-ring focus-within:outline-none",
   "[&_a]:relative [&_a]:z-30 [&_button]:relative [&_button]:z-30",
 );
+
+function CryptoPriceTargetRow({
+  outcome,
+}: {
+  outcome: CryptoPriceTargetCardProps["outcomes"][number];
+}) {
+  const outcomeKey = getOutcomePriceKey(outcome.marketId, outcome.outcomeId);
+  const livePrice = useAtomValue(outcomePriceAtomFamily(outcomeKey));
+
+  return (
+    <div className="flex min-h-10 w-full shrink-0 items-center justify-between gap-4">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <span className="truncate text-sm leading-5 font-w440 text-neutral-950">
+          {outcome.name}
+        </span>
+      </div>
+      <div className="pointer-events-auto flex shrink-0 items-center justify-end gap-1">
+        <PriceDisplay
+          marketId={outcome.marketId}
+          outcomeId={outcome.outcomeId}
+          initialPrice={outcome.yesPrice}
+          livePrice={livePrice}
+          className="mr-1 text-[15px] leading-[22.5px] font-semibold text-neutral-950"
+        />
+        <YesNoChip
+          side="yes"
+          price={outcome.yesPrice}
+          marketId={outcome.marketId}
+          outcomeId={outcome.outcomeId}
+          livePrice={livePrice}
+        />
+        <YesNoChip
+          side="no"
+          price={outcome.noPrice}
+          marketId={outcome.marketId}
+          outcomeId={outcome.outcomeId}
+          livePrice={livePrice}
+        />
+      </div>
+    </div>
+  );
+}
 
 /**
  * Crypto price-target card with threshold rows and asset metadata.
@@ -58,36 +103,10 @@ export const CryptoPriceTargetCard = memo(function CryptoPriceTargetCard({
         <div className="flex flex-col justify-end gap-1.5 px-3 pb-2">
           <div className="relative mt-0.5 h-20 w-full">
             {outcomes.slice(0, 2).map((outcome) => (
-              <div
+              <CryptoPriceTargetRow
                 key={`${outcome.marketId}-${outcome.outcomeId}`}
-                className="flex min-h-10 w-full shrink-0 items-center justify-between gap-4"
-              >
-                <div className="flex min-w-0 flex-1 items-center gap-2">
-                  <span className="truncate text-sm leading-5 font-w440 text-neutral-950">
-                    {outcome.name}
-                  </span>
-                </div>
-                <div className="pointer-events-auto flex shrink-0 items-center justify-end gap-1">
-                  <PriceDisplay
-                    marketId={outcome.marketId}
-                    outcomeId={outcome.outcomeId}
-                    initialPrice={outcome.yesPrice}
-                    className="mr-1 text-[15px] leading-[22.5px] font-semibold text-neutral-950"
-                  />
-                  <YesNoChip
-                    side="yes"
-                    price={outcome.yesPrice}
-                    marketId={outcome.marketId}
-                    outcomeId={outcome.outcomeId}
-                  />
-                  <YesNoChip
-                    side="no"
-                    price={outcome.noPrice}
-                    marketId={outcome.marketId}
-                    outcomeId={outcome.outcomeId}
-                  />
-                </div>
-              </div>
+                outcome={outcome}
+              />
             ))}
           </div>
 

@@ -2,12 +2,16 @@
 
 import Link from "next/link";
 import { memo } from "react";
+import { useAtomValue } from "jotai";
+import { outcomePriceAtomFamily } from "@/lib/atoms/prices";
 import { MarketThumbnail } from "@/components/market/MarketThumbnail";
 import { PriceDisplay } from "@/components/market/PriceDisplay";
 import { ProbabilityBar } from "@/components/market/ProbabilityBar";
 import { YesNoChip } from "@/components/market/YesNoChip";
 import type { BinaryCardProps } from "@/lib/cards/types";
 import { formatVolume } from "@/lib/format/volume";
+import { getOutcomePriceKey } from "@/lib/prices/outcomeKey";
+import type { MarketPriceState } from "@/types/polymarket";
 import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
@@ -20,12 +24,14 @@ function ChanceMeter({
   marketId,
   outcomeId,
   initialPrice,
+  livePrice,
 }: {
   marketId: string;
   outcomeId: string;
   initialPrice: number;
+  livePrice: MarketPriceState | null;
 }) {
-  const progress = Math.min(1, Math.max(0, initialPrice));
+  const progress = Math.min(1, Math.max(0, livePrice?.value ?? initialPrice));
 
   return (
     <div className="flex w-[58px] shrink-0 flex-col items-end">
@@ -59,6 +65,7 @@ function ChanceMeter({
           marketId={marketId}
           outcomeId={outcomeId}
           initialPrice={initialPrice}
+          livePrice={livePrice}
           className="text-center text-heading-lg font-medium text-neutral-950"
         />
         <p className="line-clamp-2 text-center text-body-xs font-semibold text-text-secondary">
@@ -83,6 +90,8 @@ export const BinaryCard = memo(function BinaryCard({
   noPrice,
 }: BinaryCardProps) {
   const href = `/event/${slug}`;
+  const outcomeKey = getOutcomePriceKey(marketId, yesOutcomeId);
+  const livePrice = useAtomValue(outcomePriceAtomFamily(outcomeKey));
 
   return (
     <article className={cardShellClasses}>
@@ -104,6 +113,7 @@ export const BinaryCard = memo(function BinaryCard({
               marketId={marketId}
               outcomeId={yesOutcomeId}
               initialPrice={yesPrice}
+              livePrice={livePrice}
             />
           </div>
         </div>
@@ -115,6 +125,7 @@ export const BinaryCard = memo(function BinaryCard({
             marketId={marketId}
             yesOutcomeId={yesOutcomeId}
             yesPrice={yesPrice}
+            livePrice={livePrice}
           />
 
           <div className="pointer-events-auto flex gap-2">
@@ -123,6 +134,7 @@ export const BinaryCard = memo(function BinaryCard({
               price={yesPrice}
               marketId={marketId}
               outcomeId={yesOutcomeId}
+              livePrice={livePrice}
               fullWidth
             />
             <YesNoChip
@@ -130,6 +142,7 @@ export const BinaryCard = memo(function BinaryCard({
               price={noPrice}
               marketId={marketId}
               outcomeId={yesOutcomeId}
+              livePrice={livePrice}
               fullWidth
             />
           </div>

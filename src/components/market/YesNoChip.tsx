@@ -1,6 +1,7 @@
 "use client";
 
 import { Chip, type ChipVariant } from "@/components/ui/Chip";
+import type { MarketPriceState } from "@/types/polymarket";
 import { PriceDisplay } from "./PriceDisplay";
 
 export interface YesNoChipProps {
@@ -12,6 +13,7 @@ export interface YesNoChipProps {
   label?: string;
   className?: string;
   onClick?: () => void;
+  livePrice?: MarketPriceState | null;
 }
 
 /**
@@ -26,6 +28,7 @@ export function YesNoChip({
   label: customLabel,
   className,
   onClick,
+  livePrice,
 }: YesNoChipProps) {
   const label = customLabel ?? (side === "yes" ? "Yes" : "No");
   const initialPrice = side === "no" ? Math.max(0, 1 - price) : price;
@@ -49,6 +52,7 @@ export function YesNoChip({
         outcomeId={outcomeId}
         initialPrice={initialPrice}
         side={side}
+        livePrice={livePrice}
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100"
       />
     </Chip>
