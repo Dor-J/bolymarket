@@ -16,6 +16,12 @@ import { generateChartData } from '@/lib/chart/generateChartData';
 import { mergeChartSeries } from '@/lib/api/clob';
 import { priceHistoryQueryOptions } from '@/lib/api/queries';
 import type { ChartOutcome, Timeframe } from '@/lib/chart/types';
+import {
+  formatXAxisTick,
+  getChartTimeSpan,
+  getChartYDomain,
+  getChartYTicks,
+} from '@/lib/chart/axis';
 import { formatPercent } from '@/lib/format/price';
 import { cn } from '@/lib/cn';
 
@@ -91,6 +97,17 @@ export function PriceChart({
     return merged;
   }, [eventId, historyQueries, outcomes, timeframe]);
 
+  const outcomeIds = useMemo(
+    () => outcomes.map((outcome) => outcome.id),
+    [outcomes],
+  );
+  const yDomain = useMemo(
+    () => getChartYDomain(chartData, outcomeIds),
+    [chartData, outcomeIds],
+  );
+  const yTicks = useMemo(() => getChartYTicks(yDomain), [yDomain]);
+  const xSpanMs = useMemo(() => getChartTimeSpan(chartData), [chartData]);
+
   if (outcomes.length === 0) {
     return null;
   }
@@ -109,7 +126,12 @@ export function PriceChart({
           >
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
-              dataKey="label"
+              dataKey="timestamp"
+              type="number"
+              domain={['dataMin', 'dataMax']}
+              tickFormatter={(value: number | string) =>
+                formatXAxisTick(value, timeframe, xSpanMs)
+              }
               tick={{ fill: 'var(--neutral-500)', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
@@ -117,7 +139,8 @@ export function PriceChart({
             />
             <YAxis
               orientation="right"
-              domain={[0, 1]}
+              domain={yDomain}
+              ticks={yTicks}
               tickFormatter={(value: number) => formatPercent(value)}
               tick={{ fill: 'var(--neutral-500)', fontSize: 12 }}
               axisLine={false}
@@ -136,7 +159,7 @@ export function PriceChart({
                   outcome?.name ?? seriesName,
                 ];
               }}
-              labelFormatter={(label) => String(label)}
+              labelFormatter={(label) => formatXAxisTick(label, timeframe, xSpanMs)}
               contentStyle={{
                 borderRadius: '8px',
                 borderColor: 'var(--border)',
