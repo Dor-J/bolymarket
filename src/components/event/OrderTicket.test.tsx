@@ -13,16 +13,23 @@ describe('OrderTicket', () => {
       <OrderTicket
         marketId="market-1"
         yesOutcomeId="yes-1"
+        eventTitle="World Cup Winner"
+        outcomeName="France"
         yesPrice={0.6}
         noPrice={0.4}
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Buy' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Sell' })).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Sign up to trade' }),
-    ).toBeDisabled();
+    expect(screen.getByRole('radio', { name: 'Buy' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Sell' })).toBeInTheDocument();
+    expect(screen.getByText('World Cup Winner')).toBeInTheDocument();
+    expect(screen.getByText('France')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Trade' })).toBeInTheDocument();
+    expect(screen.getByText(/By trading, you agree/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Terms of Use' })).toHaveAttribute(
+      'href',
+      '/tos',
+    );
   });
 
   it('calculates payout from amount input', () => {
@@ -30,6 +37,8 @@ describe('OrderTicket', () => {
       <OrderTicket
         marketId="market-1"
         yesOutcomeId="yes-1"
+        eventTitle="World Cup Winner"
+        outcomeName="France"
         yesPrice={0.5}
         noPrice={0.5}
       />,
@@ -39,6 +48,6 @@ describe('OrderTicket', () => {
       target: { value: '10' },
     });
 
-    expect(screen.getByText('$20.00')).toBeInTheDocument();
+    expect(screen.getByText(/Potential payout \$20.00/)).toBeInTheDocument();
   });
 });
