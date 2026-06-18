@@ -25,6 +25,7 @@ import { useLivePrices } from '@/hooks/useLivePrices';
 import { getFeaturedOutcomeSeedsFromEvents } from '@/lib/prices/visibleOutcomeKeys';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { HomeFeaturedSection } from './HomeFeaturedSection';
+import { WorldCupOddsCard } from './WorldCupOddsCard';
 import { MarketControlsBar } from '@/components/markets/MarketControlsBar';
 import { MarketTopicRail } from '@/components/markets/MarketTopicRail';
 import { MarketsPageBody } from '@/components/markets/MarketsPageBody';
@@ -175,6 +176,7 @@ export function HomeMarketsView() {
         }}
         controls={controls}
         showSectionToolbar
+        thirdGridCard={<WorldCupOddsCard />}
         emptyMessage={
           searchQuery.trim()
             ? `No markets found for "${searchQuery.trim()}"`

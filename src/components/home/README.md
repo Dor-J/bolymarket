@@ -10,6 +10,7 @@ Client-heavy home page UI — featured carousel, sidebar, and the trending marke
 | `HomeMarketsView` | Topic rails, filter controls, featured section, `MarketsPageBody` |
 | `HomeFeaturedSection` | Desktop two-column row (carousel + sidebar); mobile carousel |
 | `MarketsPageBody` | Shared grid body (also used outside home when needed) |
+| `WorldCupOddsCard` | Fixed third-slot home grid promo for World Cup odds |
 
 ## Featured carousel
 
@@ -36,6 +37,7 @@ Client-heavy home page UI — featured carousel, sidebar, and the trending marke
 | Component | Role |
 | --------- | ---- |
 | `EventsGridView` | Legacy/presentational grid wrapper |
+| `WorldCupOddsCard` | Polymarket-style flag wheel card linked to World Cup games |
 | `EventsGridSkeleton` | Loading skeleton (optional featured strip) |
 | `EventsGridError` | Retry UI |
 | `EventListEmpty` | Empty search/filter copy |
