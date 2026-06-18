@@ -1,4 +1,6 @@
 import { getYesNoFromMarket } from "@/lib/cards/mapEventToCardProps";
+import { deriveBinaryMarketLabel } from "@/lib/cards/deriveMarketLabel";
+import { deriveOutcomeDisplayName } from "@/lib/event/deriveOutcomeDisplayName";
 import type { Event } from "@/types/polymarket";
 
 /** Flattened outcome row for the event detail list. */
@@ -26,7 +28,11 @@ export function flattenOutcomes(event: Event): DetailOutcomeRow[] {
       rows.push({
         marketId: market.id,
         outcomeId: yesOutcomeId,
-        name: market.question,
+        name: deriveOutcomeDisplayName({
+          eventTitle: event.title,
+          marketQuestion: market.question,
+          fallback: deriveBinaryMarketLabel(market.question),
+        }),
         volume: market.volume,
         yesPrice,
         noPrice,

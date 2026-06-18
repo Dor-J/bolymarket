@@ -57,6 +57,39 @@ describe("flattenOutcomes", () => {
 
     expect(flattenOutcomes(event)).toHaveLength(2);
   });
+
+  it("uses ellipsis replacements for binary bundle row names", () => {
+    const event = createMockEvent({
+      id: "4",
+      slug: "netanyahu-out-by",
+      title: "Netanyahu out by...?",
+      markets: [
+        {
+          id: "m1",
+          question: "Netanyahu out by end of 2026?",
+          volume: 50,
+          outcomes: [
+            { id: "yes-a", name: "Yes", price: 0.64 },
+            { id: "no-a", name: "No", price: 0.36 },
+          ],
+        },
+        {
+          id: "m2",
+          question: "Netanyahu out by June 30?",
+          volume: 75,
+          outcomes: [
+            { id: "yes-b", name: "Yes", price: 0.01 },
+            { id: "no-b", name: "No", price: 0.99 },
+          ],
+        },
+      ],
+    });
+
+    expect(flattenOutcomes(event).map((row) => row.name)).toEqual([
+      "end of 2026",
+      "June 30",
+    ]);
+  });
 });
 
 describe("getChartOutcomes", () => {
