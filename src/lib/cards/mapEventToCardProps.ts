@@ -6,6 +6,7 @@ import type {
   CryptoUpDownCardProps,
 } from "@/lib/cards/cryptoCardTypes";
 import { deriveBinaryMarketLabel } from "./deriveMarketLabel";
+import { deriveOutcomeDisplayName } from "@/lib/event/deriveOutcomeDisplayName";
 import { resolveCardVariant } from "./resolveCardVariant";
 
 export interface OutcomeRowProps {
@@ -57,7 +58,11 @@ export function getTopOutcomeRows(event: Event, limit = 2): OutcomeRowProps[] {
       rows.push({
         marketId: market.id,
         outcomeId: yesOutcomeId,
-        name: deriveBinaryMarketLabel(market.question),
+        name: deriveOutcomeDisplayName({
+          eventTitle: event.title,
+          marketQuestion: market.question,
+          fallback: deriveBinaryMarketLabel(market.question),
+        }),
         image: market.image,
         yesPrice,
         noPrice,

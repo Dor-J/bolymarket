@@ -138,6 +138,38 @@ describe("getTopOutcomeRows", () => {
 
     expect(rows.map((row) => row.name)).toEqual(["France", "Spain"]);
   });
+
+  it("uses ellipsis replacements for binary submarkets", () => {
+    const event = createMockEvent({
+      id: "3",
+      slug: "netanyahu-out-by",
+      title: "Netanyahu out by...?",
+      markets: [
+        {
+          id: "m1",
+          question: "Netanyahu out by end of 2026?",
+          volume: 100,
+          outcomes: [
+            { id: "end-2026-yes", name: "Yes", price: 0.64 },
+            { id: "end-2026-no", name: "No", price: 0.36 },
+          ],
+        },
+        {
+          id: "m2",
+          question: "Netanyahu out by July 31?",
+          volume: 100,
+          outcomes: [
+            { id: "july-yes", name: "Yes", price: 0.05 },
+            { id: "july-no", name: "No", price: 0.95 },
+          ],
+        },
+      ],
+    });
+
+    const rows = getTopOutcomeRows(event, 2);
+
+    expect(rows.map((row) => row.name)).toEqual(["end of 2026", "July 31"]);
+  });
 });
 
 describe("mapEventToBinaryProps", () => {
