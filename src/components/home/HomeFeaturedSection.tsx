@@ -17,22 +17,16 @@ export function HomeFeaturedSection({ events, className }: HomeFeaturedSectionPr
   }
 
   return (
-    <>
-      <div className={cn('mb-6 lg:hidden', className)}>
-        <FeaturedCarousel events={events} layout="standalone" />
+    <div
+      className={cn(
+        'mb-6 w-full lg:mx-auto lg:mb-3 lg:max-w-[1350px] lg:px-6',
+        className,
+      )}
+    >
+      <div className="flex w-full flex-col items-stretch gap-8 lg:flex-row lg:pt-6">
+        <FeaturedCarousel events={events} layout="sidebar" />
+        <HomeFeaturedSidebar />
       </div>
-
-      <div
-        className={cn(
-          'hidden w-full flex-col px-4 lg:mx-auto lg:mb-3 lg:flex lg:max-w-[1350px] lg:px-6',
-          className,
-        )}
-      >
-        <div className="flex w-full flex-row items-stretch gap-8 pt-0 lg:pt-6">
-          <FeaturedCarousel events={events} layout="sidebar" />
-          <HomeFeaturedSidebar />
-        </div>
-      </div>
-    </>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useMemo } from "react";
-import { PriceChart } from "@/components/chart/PriceChart";
 import { getOutcomeColor } from "@/lib/chart/colors";
 import type { ChartOutcome } from "@/lib/chart/types";
 import { getChartOutcomes } from "@/lib/event/flattenOutcomes";
@@ -22,6 +22,16 @@ import { EventTimeWindowNav } from "./EventTimeWindowNav";
 import { OrderTicket } from "./OrderTicket";
 import { OutcomeLegend } from "./OutcomeLegend";
 import { OutcomeList } from "./OutcomeList";
+
+const PriceChart = dynamic(
+  () => import("@/components/chart/PriceChart").then((module) => module.PriceChart),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[240px] w-full rounded-lg bg-surface-2/60 lg:h-[400px]" />
+    ),
+  },
+);
 
 export interface EventDetailPageProps {
   slug: string;

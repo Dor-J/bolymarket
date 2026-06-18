@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { Event } from '@/types/polymarket';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { cn } from '@/lib/cn';
@@ -42,22 +42,7 @@ export function FeaturedCarousel({
   const resolvedIndex =
     slideCount === 0 ? 0 : Math.min(activeIndex, slideCount - 1);
   const activeEvent = events[resolvedIndex];
-  const activeEventId = activeEvent?.id ?? '';
-  const hasMountedSlide = useRef(false);
-  const previousEventId = useRef(activeEventId);
-  const shouldAnimateSlide =
-    hasMountedSlide.current &&
-    previousEventId.current !== activeEventId &&
-    !reducedMotion;
-
-  useEffect(() => {
-    if (!activeEventId) {
-      return;
-    }
-
-    hasMountedSlide.current = true;
-    previousEventId.current = activeEventId;
-  }, [activeEventId]);
+  const shouldAnimateSlide = !reducedMotion;
 
   if (events.length === 0 || !activeEvent) {
     return null;

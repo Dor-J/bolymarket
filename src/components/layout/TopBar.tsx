@@ -2,9 +2,9 @@
 
 import { Info } from 'lucide-react';
 import { useAtom } from 'jotai';
+import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { AuthModal, HowItWorksModal } from '@/components/ui/Modal';
 import { HeaderSearchIcon } from '@/components/icons/HeaderSearchIcon';
 import { UserMenu } from '@/components/layout/UserMenu';
 import { searchQueryAtom } from '@/lib/atoms/search';
@@ -12,20 +12,34 @@ import { useSearchShortcut } from '@/hooks/useSearchShortcut';
 import { cn } from '@/lib/cn';
 import { Logo } from './Logo';
 
+const AuthModal = dynamic(
+  () => import('@/components/ui/Modal').then((module) => module.AuthModal),
+  { ssr: false },
+);
+
+const HowItWorksModal = dynamic(
+  () => import('@/components/ui/Modal').then((module) => module.HowItWorksModal),
+  { ssr: false },
+);
+
 /**
  * Sticky top navigation bar — pixel-aligned with polymarket.com.
  */
 export function TopBar() {
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const searchRef = useRef<HTMLInputElement>(null);
-  const [isXlUp, setIsXlUp] = useState(false);
+  const [isXlUp, setIsXlUp] = useState(() =>
+    typeof window === 'undefined'
+      ? false
+      : window.matchMedia('(min-width: 1280px)').matches,
+  );
   const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null);
   const [howItWorksOpen, setHowItWorksOpen] = useState(false);
+  const [hasLoadedAuthModal, setHasLoadedAuthModal] = useState(false);
+  const [hasLoadedHowItWorksModal, setHasLoadedHowItWorksModal] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1280px)');
-    setIsXlUp(mq.matches);
-
     function handleChange() {
       setIsXlUp(mq.matches);
     }
@@ -35,6 +49,16 @@ export function TopBar() {
   }, []);
 
   useSearchShortcut(searchRef, isXlUp);
+
+  function openAuthModal(mode: 'login' | 'signup') {
+    setHasLoadedAuthModal(true);
+    setAuthMode(mode);
+  }
+
+  function openHowItWorksModal() {
+    setHasLoadedHowItWorksModal(true);
+    setHowItWorksOpen(true);
+  }
 
   return (
     <>
@@ -82,7 +106,7 @@ export function TopBar() {
               variant="ghost-brand"
               className="hidden h-9 shrink-0 px-3 xl:inline-flex"
               aria-label="How it works"
-              onClick={() => setHowItWorksOpen(true)}
+              onClick={openHowItWorksModal}
             >
               <Info className="mr-1.5 h-4 w-4" aria-hidden />
               How it works
@@ -93,7 +117,7 @@ export function TopBar() {
             <Button
               variant="ghost-brand"
               className="hidden h-9 xl:inline-flex"
-              onClick={() => setAuthMode('login')}
+              onClick={() => openAuthModal('login')}
             >
               Log In
             </Button>
@@ -101,7 +125,7 @@ export function TopBar() {
             <Button
               variant="brand"
               className="h-9 rounded-[7.2px] px-4"
-              onClick={() => setAuthMode('signup')}
+              onClick={() => openAuthModal('signup')}
             >
               Sign Up
             </Button>
@@ -111,15 +135,19 @@ export function TopBar() {
         </div>
       </header>
 
-      <AuthModal
-        open={authMode !== null}
-        onClose={() => setAuthMode(null)}
-        mode={authMode ?? 'login'}
-      />
-      <HowItWorksModal
-        open={howItWorksOpen}
-        onClose={() => setHowItWorksOpen(false)}
-      />
+      {hasLoadedAuthModal ? (
+        <AuthModal
+          open={authMode !== null}
+          onClose={() => setAuthMode(null)}
+          mode={authMode ?? 'login'}
+        />
+      ) : null}
+      {hasLoadedHowItWorksModal ? (
+        <HowItWorksModal
+          open={howItWorksOpen}
+          onClose={() => setHowItWorksOpen(false)}
+        />
+      ) : null}
     </>
   );
 }

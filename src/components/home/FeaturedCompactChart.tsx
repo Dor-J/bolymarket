@@ -43,7 +43,7 @@ interface FeaturedChartTooltipProps {
   active?: boolean;
   label?: string | number;
   outcomes: ChartOutcome[];
-  payload?: FeaturedTooltipPayload[];
+  payload?: readonly FeaturedTooltipPayload[];
   spanMs: number;
   timeframe: '1d';
 }
@@ -163,23 +163,37 @@ export function FeaturedCompactChart({
     };
   }, []);
 
-  const historyQueries = useQueries({
+  const history = useQueries({
     queries: liveOutcomes.map((outcome) =>
       priceHistoryQueryOptions(outcome.id, timeframe),
     ),
+    combine: (results) => ({
+      allFailedOrEmpty: results.every(
+        (query) =>
+          query.isError ||
+          !query.data ||
+          (Array.isArray(query.data) && query.data.length === 0),
+      ),
+      series: results.map((query) => query.data ?? []),
+      signature: results
+        .map((query) => {
+          const first = query.data?.[0];
+          const last = query.data?.[query.data.length - 1];
+          return [
+            query.isError ? 'error' : 'ok',
+            query.data?.length ?? 0,
+            first?.timestamp ?? '',
+            last?.timestamp ?? '',
+            last ? JSON.stringify(last) : '',
+          ].join(':');
+        })
+        .join('|'),
+    }),
   });
-
   const chartData = useMemo(() => {
-    const allFailedOrEmpty = historyQueries.every(
-      (query) =>
-        query.isError ||
-        !query.data ||
-        (Array.isArray(query.data) && query.data.length === 0),
-    );
-
     let merged;
 
-    if (allFailedOrEmpty) {
+    if (history.allFailedOrEmpty) {
       merged = generateChartData(
         liveOutcomes.map((outcome) => ({
           id: outcome.id,
@@ -190,9 +204,8 @@ export function FeaturedCompactChart({
         eventId,
       );
     } else {
-      const series = historyQueries.map((query) => query.data ?? []);
       merged = mergeChartSeries(
-        series,
+        history.series,
         liveOutcomes.map((outcome) => outcome.id),
       );
 
@@ -223,7 +236,7 @@ export function FeaturedCompactChart({
     }
 
     return next;
-  }, [eventId, historyQueries, liveOutcomes, timeframe]);
+  }, [eventId, history, liveOutcomes, timeframe]);
 
   const outcomeIds = useMemo(
     () => liveOutcomes.map((outcome) => outcome.id),
@@ -317,7 +330,9 @@ export function FeaturedCompactChart({
                   active={props.active}
                   label={props.label}
                   outcomes={liveOutcomes}
-                  payload={props.payload as FeaturedTooltipPayload[] | undefined}
+                  payload={props.payload as
+                    | readonly FeaturedTooltipPayload[]
+                    | undefined}
                   spanMs={xSpanMs}
                   timeframe={timeframe}
                 />

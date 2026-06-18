@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
 import { BookmarkButton } from '@/components/ui/BookmarkButton';
 import { MarketThumbnail } from '@/components/market/MarketThumbnail';
@@ -13,8 +14,23 @@ import type { Event } from '@/types/polymarket';
 import { cn } from '@/lib/cn';
 import { FeaturedActivityRail } from './FeaturedActivityRail';
 import { FeaturedBidRail } from './FeaturedBidRail';
-import { FeaturedCompactChart } from './FeaturedCompactChart';
 import { FeaturedOutcomeRows } from './FeaturedOutcomeRows';
+
+const chartPlaceholder = (
+  <div
+    data-testid="featured-chart"
+    className="h-[200px] w-full rounded-lg bg-surface-2/60 lg:h-[240px]"
+  />
+);
+
+const FeaturedCompactChart = dynamic(
+  () =>
+    import('./FeaturedCompactChart').then((module) => module.FeaturedCompactChart),
+  {
+    ssr: false,
+    loading: () => chartPlaceholder,
+  },
+);
 
 export interface FeaturedEventPreviewProps {
   event: Event;
@@ -108,7 +124,7 @@ export function FeaturedEventPreview({
                 eventId={event.id}
               />
             ) : (
-              <div className="h-[200px] w-full rounded-lg bg-surface-2/60 lg:h-[240px]" />
+              chartPlaceholder
             )}
             <p className="mt-2 hidden text-sm text-text-secondary lg:block">
               {formatVolume(event.volume)}

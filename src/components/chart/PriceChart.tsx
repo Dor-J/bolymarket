@@ -41,21 +41,35 @@ export function PriceChart({
   timeframe,
   className,
 }: PriceChartProps) {
-  const historyQueries = useQueries({
+  const history = useQueries({
     queries: outcomes.map((outcome) =>
       priceHistoryQueryOptions(outcome.id, timeframe),
     ),
+    combine: (results) => ({
+      allFailedOrEmpty: results.every(
+        (query) =>
+          query.isError ||
+          !query.data ||
+          (Array.isArray(query.data) && query.data.length === 0),
+      ),
+      series: results.map((query) => query.data ?? []),
+      signature: results
+        .map((query) => {
+          const first = query.data?.[0];
+          const last = query.data?.[query.data.length - 1];
+          return [
+            query.isError ? 'error' : 'ok',
+            query.data?.length ?? 0,
+            first?.timestamp ?? '',
+            last?.timestamp ?? '',
+            last ? JSON.stringify(last) : '',
+          ].join(':');
+        })
+        .join('|'),
+    }),
   });
-
   const chartData = useMemo(() => {
-    const allFailedOrEmpty = historyQueries.every(
-      (query) =>
-        query.isError ||
-        !query.data ||
-        (Array.isArray(query.data) && query.data.length === 0),
-    );
-
-    if (allFailedOrEmpty) {
+    if (history.allFailedOrEmpty) {
       return generateChartData(
         outcomes.map((outcome) => ({
           id: outcome.id,
@@ -67,9 +81,8 @@ export function PriceChart({
       );
     }
 
-    const series = historyQueries.map((query) => query.data ?? []);
     const merged = mergeChartSeries(
-      series,
+      history.series,
       outcomes.map((outcome) => outcome.id),
     );
 
@@ -95,7 +108,7 @@ export function PriceChart({
     }
 
     return merged;
-  }, [eventId, historyQueries, outcomes, timeframe]);
+  }, [eventId, history, outcomes, timeframe]);
 
   const outcomeIds = useMemo(
     () => outcomes.map((outcome) => outcome.id),
