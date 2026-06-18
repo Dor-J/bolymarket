@@ -1,15 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { AppShell } from "@/components/layout/AppShell";
 import { Providers } from "./providers";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-  adjustFontFallback: true,
-});
 
 export const metadata: Metadata = {
   title: "bolymarket",
@@ -26,7 +18,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme="light"
-      className={`${inter.variable} h-full antialiased`}
+      className="h-full antialiased"
       suppressHydrationWarning
     >
       <head>
