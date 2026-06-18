@@ -70,6 +70,7 @@ describe('useSportsGameResults', () => {
     });
 
     expect(mockedPrune).toHaveBeenCalledWith(
+      expect.any(Object),
       new Set([
         'game-1',
         'home-away-1',
@@ -157,6 +158,7 @@ describe('useSportsGameResults', () => {
     expect(mockRelease).toHaveBeenCalledTimes(1);
     expect(mockAcquire).toHaveBeenCalledTimes(1);
     expect(mockedPrune).toHaveBeenCalledWith(
+      expect.any(Object),
       new Set(['game-2', 'home-away-2', 'home-vs-away-2']),
     );
   });

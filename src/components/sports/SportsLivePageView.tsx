@@ -1,13 +1,17 @@
 'use client';
 
 import { useAtomValue } from 'jotai';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { searchQueryAtom } from '@/lib/atoms/search';
 import { groupGamesByLeague } from '@/lib/sports/buildSportsGameCard';
 import { getVisibleOutcomeSeedsFromSportsGames } from '@/lib/prices/visibleOutcomeKeys';
 import { useSportsGameResults } from '@/hooks/useSportsGameResults';
 import { useSportsLiveGames } from '@/hooks/useSportsLiveGames';
 import { useLivePrices } from '@/hooks/useLivePrices';
+import {
+  SEARCH_DEBOUNCE_MS,
+  useDebouncedValue,
+} from '@/hooks/useDebouncedValue';
 import { MarketTopicRail } from '@/components/markets/MarketTopicRail';
 import { EventsGridError } from '@/components/home/EventsGridError';
 import { EventsGridSkeleton } from '@/components/home/EventsGridSkeleton';
@@ -18,6 +22,9 @@ import { SportsPageLayout } from './SportsPageLayout';
 import { SportsSidebar } from './SportsSidebar';
 import { SportsTradeWidget } from './SportsTradeWidget';
 import { SportsWorldCupBanner } from './SportsWorldCupBanner';
+
+const EMPTY_GAMES: SportsGame[] = [];
+const EMPTY_LEAGUES: SportsLeagueSummary[] = [];
 
 function formatSectionLabel(label: string): string {
   if (label === 'WORLD CUP') {
@@ -58,18 +65,19 @@ function filterGames(
 export function SportsLivePageView() {
   const { data, isLoading, isError, error, refetch } = useSportsLiveGames();
   const searchQuery = useAtomValue(searchQueryAtom);
+  const debouncedSearch = useDebouncedValue(searchQuery, SEARCH_DEBOUNCE_MS);
   const [viewTab, setViewTab] = useState<'live' | 'futures'>('live');
   const [filterId, setFilterId] = useState('all');
   const [selection, setSelection] = useState<SportsSelection | null>(null);
 
-  const liveGames = data?.games ?? [];
-  const futuresGames = data?.futuresGames ?? [];
-  const leagues: SportsLeagueSummary[] = data?.leagues ?? [];
+  const liveGames: SportsGame[] = data?.games ?? EMPTY_GAMES;
+  const futuresGames: SportsGame[] = data?.futuresGames ?? EMPTY_GAMES;
+  const leagues: SportsLeagueSummary[] = data?.leagues ?? EMPTY_LEAGUES;
   const sourceGames = viewTab === 'live' ? liveGames : futuresGames;
 
   const visibleGames = useMemo(
-    () => filterGames(sourceGames, filterId, searchQuery),
-    [sourceGames, filterId, searchQuery],
+    () => filterGames(sourceGames, filterId, debouncedSearch),
+    [sourceGames, filterId, debouncedSearch],
   );
 
   const sections = useMemo(() => {
@@ -102,24 +110,21 @@ export function SportsLivePageView() {
     );
   }, [visibleGames, selection]);
 
-  useEffect(() => {
-    if (visibleGames.length === 0) {
-      setSelection(null);
-      return;
+  const effectiveSelection = useMemo<SportsSelection | null>(() => {
+    if (!selectedGame) {
+      return null;
     }
 
-    if (
-      !selection ||
-      !visibleGames.some((game) => game.gameId === selection.gameId)
-    ) {
-      const first = visibleGames[0]!;
-      setSelection({
-        gameId: first.gameId,
-        marketType: 'moneyline',
-        outcomeIndex: 0,
-      });
+    if (selection?.gameId === selectedGame.gameId) {
+      return selection;
     }
-  }, [visibleGames, selection]);
+
+    return {
+      gameId: selectedGame.gameId,
+      marketType: 'moneyline',
+      outcomeIndex: 0,
+    };
+  }, [selectedGame, selection]);
 
   const sidebarItems = useMemo<SportsLeagueSummary[]>(
     () =>
@@ -162,7 +167,7 @@ export function SportsLivePageView() {
       tradePanel={
         <SportsTradeWidget
           game={selectedGame}
-          selection={selection}
+          selection={effectiveSelection}
           onSelectOutcome={setSelection}
         />
       }
@@ -213,7 +218,7 @@ export function SportsLivePageView() {
               label={formatSectionLabel(section.label)}
               games={section.games}
               selectedGameId={selectedGame?.gameId}
-              selection={selection}
+              selection={effectiveSelection}
               onSelectOutcome={setSelection}
             />
           ))

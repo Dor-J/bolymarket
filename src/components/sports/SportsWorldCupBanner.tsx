@@ -45,8 +45,6 @@ export function SportsWorldCupBanner({ className, onSelect }: SportsWorldCupBann
       return undefined;
     }
 
-    setVisibleIndices(pickVisibleFlagIndices(GRID_CELLS, VISIBLE_FLAGS));
-
     const interval = window.setInterval(() => {
       setVisibleIndices(pickVisibleFlagIndices(GRID_CELLS, VISIBLE_FLAGS));
     }, CYCLE_MS);

@@ -1,5 +1,8 @@
 import type { Store } from 'jotai/vanilla/store';
-import { sportsGameStateAtomFamily } from '@/lib/atoms/sportsGameState';
+import {
+  setSportsGameStateAliases,
+  sportsGameStateAtomFamily,
+} from '@/lib/atoms/sportsGameState';
 import { normalizeMatchupKey } from '@/lib/sports/buildSportsGameCard';
 import type { SportsGameState } from '@/types/polymarket';
 
@@ -44,11 +47,10 @@ function storeGameState(store: Store, state: SportsGameState): void {
   store.set(sportsGameStateAtomFamily(state.gameId), state);
 
   if (state.slug) {
-    store.set(sportsGameStateAtomFamily(state.slug), state);
-    store.set(
-      sportsGameStateAtomFamily(normalizeMatchupKey(state.slug)),
-      state,
-    );
+    setSportsGameStateAliases(store, state.gameId, [
+      state.slug,
+      normalizeMatchupKey(state.slug),
+    ]);
   }
 }
 
