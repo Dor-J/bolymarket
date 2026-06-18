@@ -30,6 +30,18 @@ bun run lint
 bun run format:check
 ```
 
+## Deploying to Vercel
+
+Use the **Next.js** framework preset and set the project root to `bolymarket/` when importing the
+broader `BoliMarket/` workspace. If this folder is imported as its own repository, leave the root
+directory as `.`.
+
+- **Install command:** `bun install --frozen-lockfile`
+- **Build command:** `bun run build`
+- **Environment variables:** set `NEXT_PUBLIC_LIVE_PRICE_MODE=auto` unless you need `websocket` or
+  `simulation`. `REDIS_URL` is optional; leave it unset to use the in-memory cache fallback, or set it
+  to a managed Redis URL. Do not use the local example value (`redis://localhost:6379`) on Vercel.
+
 ## Repository layout
 
 This app is the git repository. It lives inside the broader `BoliMarket/` workspace, which also
