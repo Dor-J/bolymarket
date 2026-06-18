@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { PriceChart } from "@/components/chart/PriceChart";
-import { TimeframeToggle } from "@/components/chart/TimeframeToggle";
 import { getOutcomeColor } from "@/lib/chart/colors";
 import type { ChartOutcome } from "@/lib/chart/types";
 import { getChartOutcomes } from "@/lib/event/flattenOutcomes";
@@ -11,7 +10,6 @@ import { getOutcomeSeedsFromEvent } from "@/lib/prices/visibleOutcomeKeys";
 import { useChartTimeframe } from "@/hooks/useChartTimeframe";
 import { useEvent } from "@/hooks/useEvent";
 import { useLivePrices } from "@/hooks/useLivePrices";
-import { getYesNoFromMarket } from "@/lib/cards/mapEventToCardProps";
 import { ChartMetaRow } from "./ChartMetaRow";
 import { EventDetailError } from "./EventDetailError";
 import { EventDetailSkeleton } from "./EventDetailSkeleton";
@@ -65,9 +63,19 @@ export function EventDetailPage({ slug }: EventDetailPageProps) {
       return null;
     }
 
-    const market = event.markets[0];
-    const { yesPrice, noPrice, yesOutcomeId } = getYesNoFromMarket(market);
-    return { marketId: market.id, yesOutcomeId, yesPrice, noPrice };
+    const [row] = getChartOutcomes(event, 1);
+    if (!row) {
+      return null;
+    }
+
+    return {
+      marketId: row.marketId,
+      yesOutcomeId: row.outcomeId,
+      outcomeName: row.name,
+      yesPrice: row.yesPrice,
+      noPrice: row.noPrice,
+      image: row.image ?? event.image,
+    };
   }, [event]);
 
   useLivePrices(priceSeeds);
@@ -104,10 +112,13 @@ export function EventDetailPage({ slug }: EventDetailPageProps) {
             eventId={event.id}
             timeframe={timeframe}
           />
-          <TimeframeToggle value={timeframe} onChange={selectTimeframe} />
+          <ChartMetaRow
+            volume={event.volume}
+            endDate={event.endDate}
+            timeframe={timeframe}
+            onTimeframeChange={selectTimeframe}
+          />
         </div>
-
-        <ChartMetaRow volume={event.volume} endDate={event.endDate} />
 
         {showSportsLayout ? (
           <EventSportsDetail event={event} />
@@ -124,9 +135,12 @@ export function EventDetailPage({ slug }: EventDetailPageProps) {
         <OrderTicket
           marketId={primaryMarket.marketId}
           yesOutcomeId={primaryMarket.yesOutcomeId}
+          eventTitle={event.title}
+          outcomeName={primaryMarket.outcomeName}
+          image={primaryMarket.image}
           yesPrice={primaryMarket.yesPrice}
           noPrice={primaryMarket.noPrice}
-          className="w-full shrink-0 lg:sticky lg:top-[calc(var(--navbar-height)+1rem)] lg:w-[360px]"
+          className="w-full shrink-0 lg:sticky lg:top-[calc(var(--navbar-height)+1rem)] lg:w-[340px]"
         />
       ) : null}
     </div>
