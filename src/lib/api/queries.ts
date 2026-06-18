@@ -61,6 +61,7 @@ export function relatedNewsQueryOptions(input: {
       input.title,
       input.category ?? '',
       (input.tags ?? []).join(','),
+      (input.marketQuestions ?? []).join('|'),
     ],
     queryFn: ({ signal }) =>
       fetchRelatedNewsClient({

@@ -9,7 +9,7 @@ import { mapCategoryToNewsSections } from './rankRelatedNews';
 import type { NewsArticle, RelatedNewsInput } from './types';
 
 const NEWS_CACHE_TTL_MS = 5 * 60_000;
-const GDELT_TIMEOUT_MS = 120_000;
+const GDELT_TIMEOUT_MS = 8_000;
 
 type CacheReader = (key: string) => Promise<CacheEnvelope<NewsArticle[]> | null>;
 type CacheWriter = (
