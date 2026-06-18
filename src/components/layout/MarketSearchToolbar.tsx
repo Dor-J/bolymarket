@@ -19,12 +19,14 @@ export function MarketSearchToolbar() {
   const setBookmarksOnly = useSetAtom(bookmarksOnlyAtom);
   const [filtersVisible, setFiltersVisible] = useAtom(marketFiltersVisibleAtom);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isXlUp, setIsXlUp] = useState(false);
+  const [isXlUp, setIsXlUp] = useState(() =>
+    typeof window === 'undefined'
+      ? false
+      : window.matchMedia('(min-width: 1280px)').matches,
+  );
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1280px)');
-    setIsXlUp(mq.matches);
-
     function handleChange() {
       setIsXlUp(mq.matches);
     }

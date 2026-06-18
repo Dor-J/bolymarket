@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test/test-utils';
+import { createMockEvent } from '@/test/fixtures/events';
 import { CryptoPageView } from './CryptoPageView';
 
 vi.mock('@/hooks/useCategoryEvents', () => ({
@@ -104,5 +105,55 @@ describe('CryptoPageView', () => {
 
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Newest' })).toBeInTheDocument();
+  });
+
+  it('applies the selected newest sort to visible markets', () => {
+    mockedUseCategoryEvents.mockReturnValue({
+      events: [
+        createMockEvent({
+          id: 'older',
+          slug: 'older-market',
+          title: 'Older Market',
+          category: 'crypto',
+          tags: ['crypto'],
+          volume: 1_000,
+          endDate: '2026-01-01T00:00:00.000Z',
+        }),
+        createMockEvent({
+          id: 'newer',
+          slug: 'newer-market',
+          title: 'Newer Market',
+          category: 'crypto',
+          tags: ['crypto'],
+          volume: 1,
+          endDate: '2026-02-01T00:00:00.000Z',
+        }),
+      ],
+      isLoading: false,
+      isError: false,
+      isFetching: false,
+      error: null,
+      refetch: vi.fn(),
+    } as ReturnType<typeof useCategoryEvents>);
+
+    renderWithProviders(<CryptoPageView />);
+
+    expect(
+      screen
+        .getByText('Older Market')
+        .compareDocumentPosition(screen.getByText('Newer Market')) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Toggle filters' }));
+    fireEvent.click(screen.getByRole('button', { name: '24hr Volume' }));
+    fireEvent.click(within(screen.getByRole('menu')).getByRole('menuitem', { name: 'Newest' }));
+
+    expect(
+      screen
+        .getByText('Newer Market')
+        .compareDocumentPosition(screen.getByText('Older Market')) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

@@ -45,7 +45,7 @@ export function useShowMoreMarkets(totalCount: number) {
       ...current,
       visibleCount: current.visibleCount + MARKETS_PAGE_SIZE,
     }));
-  }, []);
+  }, [setState]);
 
   const hasMore = state.visibleCount < totalCount;
 

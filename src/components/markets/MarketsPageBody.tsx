@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
+import type { ReactNode } from 'react';
 import type { Event } from '@/types/polymarket';
 import { EventCard } from '@/components/cards/EventCard';
 import { EVENTS_GRID_CLASSES } from '@/lib/constants/eventsGrid';
@@ -28,6 +29,7 @@ export interface MarketsPageBodyProps {
   hideHeading?: boolean;
   gridClassName?: string;
   gridWrapperClassName?: string;
+  thirdGridCard?: ReactNode;
 }
 
 /**
@@ -47,6 +49,7 @@ export function MarketsPageBody({
   hideHeading = false,
   gridClassName = EVENTS_GRID_CLASSES,
   gridWrapperClassName,
+  thirdGridCard,
 }: MarketsPageBodyProps) {
   const { visibleCount, showMore, hasMore } = useShowMoreMarkets(events.length);
   const visibleEvents = useMemo(
@@ -122,9 +125,13 @@ export function MarketsPageBody({
         )}
       >
         <div className={gridClassName}>
-          {visibleEvents.map((event) => (
-            <EventCard key={event.id} event={event} />
+          {visibleEvents.map((event, index) => (
+            <Fragment key={event.id}>
+              {index === 2 && thirdGridCard ? thirdGridCard : null}
+              <EventCard event={event} />
+            </Fragment>
           ))}
+          {visibleEvents.length === 2 && thirdGridCard ? thirdGridCard : null}
         </div>
       </div>
 

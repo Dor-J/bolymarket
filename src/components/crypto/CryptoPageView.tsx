@@ -58,6 +58,10 @@ const CRYPTO_SORT_FILTER_ITEMS = [
 
 type CryptoSortFilterId = (typeof CRYPTO_SORT_FILTER_ITEMS)[number]["id"];
 
+function mapCryptoSortToMarketSort(sortId: CryptoSortFilterId): MarketSort {
+  return sortId === "newest" ? "newest" : "volume";
+}
+
 function SearchIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 18 18" fill="none" aria-hidden className={className}>
@@ -408,23 +412,26 @@ function CryptoSidebar({
 function CryptoHeader({
   selectedTypeId,
   selectedTopicId,
+  selectedSortId,
   searchQuery,
   onTypeSelect,
   onTopicSelect,
+  onSortSelect,
   onSearchChange,
 }: {
   selectedTypeId: string;
   selectedTopicId: string;
+  selectedSortId: CryptoSortFilterId;
   searchQuery: string;
   onTypeSelect: (id: string) => void;
   onTopicSelect: (id: string) => void;
+  onSortSelect: (id: CryptoSortFilterId) => void;
   onSearchChange: (value: string) => void;
 }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const [periodMenuOpen, setPeriodMenuOpen] = useState(false);
-  const [selectedSortId, setSelectedSortId] = useState<CryptoSortFilterId>("volume-24h");
   const inputRef = useRef<HTMLInputElement>(null);
   const sortMenuRef = useRef<HTMLDivElement>(null);
   const periodMenuRef = useRef<HTMLDivElement>(null);
@@ -460,13 +467,6 @@ function CryptoHeader({
       width: activeRect.width,
     });
   }, [selectedTypeId]);
-
-  useEffect(() => {
-    if (!filtersOpen) {
-      setSortMenuOpen(false);
-      setPeriodMenuOpen(false);
-    }
-  }, [filtersOpen]);
 
   useEffect(() => {
     if (!sortMenuOpen && !periodMenuOpen) {
@@ -644,7 +644,13 @@ function CryptoHeader({
             aria-label="Toggle filters"
             aria-pressed={filtersOpen}
             className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md hover:bg-surface"
-            onClick={() => setFiltersOpen((isOpen) => !isOpen)}
+            onClick={() => {
+              if (filtersOpen) {
+                setSortMenuOpen(false);
+                setPeriodMenuOpen(false);
+              }
+              setFiltersOpen(!filtersOpen);
+            }}
           >
             <div className="flex select-none items-center justify-center rounded-md p-2">
               <SlidersIcon className="size-[18px]" />
@@ -697,7 +703,7 @@ function CryptoHeader({
                         "hover:bg-neutral-50 focus:bg-neutral-50",
                       )}
                       onClick={() => {
-                        setSelectedSortId(item.id);
+                        onSortSelect(item.id);
                         setSortMenuOpen(false);
                       }}
                     >
@@ -796,8 +802,9 @@ export function CryptoPageView() {
   const bookmarksOnly = useAtomValue(bookmarksOnlyAtom);
   const [topicId, setTopicId] = useState("all");
   const [typeId, setTypeId] = useState("all");
+  const [sortId, setSortId] = useState<CryptoSortFilterId>("volume-24h");
   const [authOpen, setAuthOpen] = useState(false);
-  const sort: MarketSort = "volume";
+  const sort = mapCryptoSortToMarketSort(sortId);
   const status: MarketStatus = "all";
 
   const topicCounts = useMemo(
@@ -900,9 +907,11 @@ export function CryptoPageView() {
           <CryptoHeader
             selectedTypeId={typeId}
             selectedTopicId={topicId}
+            selectedSortId={sortId}
             searchQuery={searchQuery}
             onTypeSelect={setTypeId}
             onTopicSelect={setTopicId}
+            onSortSelect={setSortId}
             onSearchChange={setSearchQuery}
           />
           {renderBody()}

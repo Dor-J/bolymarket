@@ -5,8 +5,7 @@ import { renderWithProviders } from '@/test/test-utils';
 
 function createMatchMedia(matches: boolean) {
   const listeners = new Set<() => void>();
-
-  return {
+  const mediaQuery = {
     matches,
     addEventListener: (_event: string, listener: () => void) => {
       listeners.add(listener);
@@ -15,12 +14,14 @@ function createMatchMedia(matches: boolean) {
       listeners.delete(listener);
     },
     dispatchChange(nextMatches: boolean) {
-      (this as any).matches = nextMatches;
+      mediaQuery.matches = nextMatches;
       for (const listener of listeners) {
         listener();
       }
     },
   };
+
+  return mediaQuery;
 }
 
 describe('MarketSearchToolbar', () => {
