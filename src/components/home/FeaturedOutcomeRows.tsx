@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { MarketThumbnail } from '@/components/market/MarketThumbnail';
 import { PriceDisplay } from '@/components/market/PriceDisplay';
 import { formatPercent } from '@/lib/format/price';
 import { resolveCardVariant } from '@/lib/cards/resolveCardVariant';
@@ -56,21 +57,33 @@ export function FeaturedOutcomeRows({
   const rows = getTopOutcomeRows(event, 4);
 
   return (
-    <div className={cn('flex flex-col gap-0', className)}>
+    <div className={cn('rounded-lg flex flex-col gap-2', className)}>
       {rows.map((row) => (
         <Link
           key={`${row.marketId}-${row.outcomeId}`}
           href={`/event/${event.slug}`}
           className="group flex min-h-10 items-center justify-between gap-3 border-b border-neutral-50 pb-2"
         >
-          <p className="min-w-0 truncate text-[15px] font-w490 tracking-[-0.01em] text-text group-hover:underline">
-            {row.name}
-          </p>
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <div className="shrink-0">
+              <MarketThumbnail
+                title={row.name}
+                image={row.image ?? event.image}
+                size={30}
+                className="rounded-[2px]"
+              />
+            </div>
+            <div className="flex min-w-0 items-center gap-1.5">
+              <p className="truncate text-[15px] font-w490 tracking-[-0.01em] text-text group-hover:underline">
+                {row.name}
+              </p>
+            </div>
+          </div>
           <PriceDisplay
             marketId={row.marketId}
             outcomeId={row.outcomeId}
             initialPrice={row.yesPrice}
-            className="shrink-0 text-xl font-semibold text-text"
+            className="text-heading-xl font-semibold text-text"
           />
         </Link>
       ))}

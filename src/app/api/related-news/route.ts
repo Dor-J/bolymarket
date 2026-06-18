@@ -1,16 +1,10 @@
 import { NextResponse } from 'next/server';
-import { readServerCache, writeServerCache } from '@/lib/cache/serverCache';
-import { fetchOkSurfNewsSections } from '@/lib/news/oksurf';
-import {
-  mapCategoryToNewsSections,
-  rankRelatedNews,
-} from '@/lib/news/rankRelatedNews';
-import type { NewsArticle, RankedNewsArticle } from '@/lib/news/types';
-
-const NEWS_CACHE_TTL_MS = 5 * 60_000;
+import { fetchRelatedNewsArticles } from '@/lib/news/relatedNews';
+import { rankRelatedNews } from '@/lib/news/rankRelatedNews';
+import type { RankedNewsArticle } from '@/lib/news/types';
 
 /**
- * Returns OkSurf headlines ranked for relevance to an event.
+ * Returns GDELT headlines ranked for relevance to an event, with OkSurf fallback.
  */
 export async function GET(request: Request): Promise<NextResponse> {
   try {
@@ -30,21 +24,14 @@ export async function GET(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'Missing title' }, { status: 400 });
     }
 
-    const sections = mapCategoryToNewsSections(category, tags);
-    const cacheKey = `bolymarket:oksurf-news:${sections.join(',')}`;
-    let cachedArticles = await readServerCache<NewsArticle[]>(cacheKey);
-
-    if (!cachedArticles) {
-      const fetched = await fetchOkSurfNewsSections(sections);
-      cachedArticles = await writeServerCache(
-        cacheKey,
-        fetched,
-        NEWS_CACHE_TTL_MS,
-      );
-    }
-
+    const articles = await fetchRelatedNewsArticles({
+      title,
+      category,
+      tags,
+      marketQuestions,
+    });
     const rankedForEvent = rankRelatedNews(
-      cachedArticles.data,
+      articles,
       { title, category, tags, marketQuestions },
       6,
     );

@@ -87,8 +87,8 @@ export function FeaturedEventPreview({
           </div>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col-reverse gap-4 lg:flex-row lg:items-stretch lg:gap-4">
-          <div className="relative flex min-h-0 flex-col gap-4 lg:w-[38%] lg:justify-between">
+        <div className="flex min-h-0 flex-1 flex-col-reverse gap-4 lg:flex-row lg:items-stretch lg:gap-6">
+          <div className="relative flex min-h-0 flex-col gap-4 lg:w-[40%] lg:justify-between">
             <FeaturedOutcomeRows event={event} />
             <FeaturedActivityRail event={event} />
             <p className="text-sm text-text-secondary lg:hidden">

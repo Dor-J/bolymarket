@@ -8,7 +8,7 @@ Next.js App Router route handlers under `src/app/api/`. All routes return JSON u
 | `/api/events/[slug]` | GET | Single normalized event by slug |
 | `/api/prices/[tokenId]` | GET | CLOB price history. Optional `?timeframe=1d` |
 | `/api/sports/live` | GET | Sports live games + league summaries (server-cached) |
-| `/api/related-news` | GET | Related news articles for event context |
+| `/api/related-news` | GET | Related GDELT news articles for event context, with OkSurf fallback |
 | `/api/openapi` | GET | OpenAPI 3.0 specification JSON |
 
 ## Caching
@@ -26,7 +26,7 @@ Next.js App Router route handlers under `src/app/api/`. All routes return JSON u
 | `events/[slug]/` | Single-event lookup |
 | `prices/[tokenId]/` | CLOB `/prices-history` proxy |
 | `sports/live/` | Sports live games aggregation |
-| `related-news/` | OKSurf news proxy + ranking |
+| `related-news/` | GDELT DOC 2.0 news proxy + ranking; OkSurf fallback after timeout/error |
 | `openapi/` | Static spec from `lib/openapi/spec.ts` |
 
 ## Client access

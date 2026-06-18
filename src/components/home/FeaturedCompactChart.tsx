@@ -133,30 +133,39 @@ export function FeaturedCompactChart({
 
   return (
     <div className={cn('relative w-full', className)}>
-      <div className="mb-2 flex flex-wrap gap-x-3 gap-y-1">
-        {liveOutcomes.map((outcome, index) => (
-          <div
-            key={outcome.id}
-            className="inline-flex items-center gap-1.5 text-xs text-text-secondary"
-          >
-            <span
-              className="size-2 rounded-full"
-              style={{
-                backgroundColor: outcome.color ?? getOutcomeColor(index),
-              }}
-              aria-hidden
-            />
-            <span>{outcome.name}</span>
-            <span className="font-semibold text-text">
-              {formatPercent(outcome.price)}
-            </span>
+      <div className="mt-1.5">
+        <div className="flex w-full gap-3">
+          <div className="flex h-auto w-full flex-col justify-center gap-3">
+            <div className="flex flex-col items-start gap-y-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3">
+              {liveOutcomes.map((outcome, index) => (
+                <div
+                  key={outcome.id}
+                  className="flex items-center gap-1.5 whitespace-nowrap"
+                >
+                  <span
+                    className="size-2 rounded-full"
+                    style={{
+                      backgroundColor: outcome.color ?? getOutcomeColor(index),
+                    }}
+                    aria-hidden
+                  />
+                  <p className="text-body-sm text-text-secondary">
+                    {outcome.name}
+                    <span className="ml-0.5 font-semibold text-neutral-800 dark:text-text">
+                      &nbsp;{formatPercent(outcome.price)}
+                    </span>
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
+        </div>
       </div>
 
       <div
         ref={chartContainerRef}
-        className="h-[200px] min-h-[200px] w-full min-w-0 lg:h-[240px] lg:min-h-[240px]"
+        id="group-chart-container"
+        className="mt-7 h-[200px] min-h-[200px] w-full min-w-0 lg:h-[240px] lg:min-h-[240px]"
       >
         {chartSize.width > 0 && chartSize.height > 0 ? (
           <LineChart
