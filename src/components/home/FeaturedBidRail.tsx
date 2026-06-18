@@ -1,7 +1,7 @@
 'use client';
 
 import { useAtomValue } from 'jotai';
-import { tradeActivityByEventAtom } from '@/lib/atoms/tradeActivity';
+import { tradeActivityForEventAtomFamily } from '@/lib/atoms/tradeActivity';
 import {
   formatTradeSizeUsd,
   getTradeNotionalUsd,
@@ -48,8 +48,7 @@ export function FeaturedBidRail({
   outcomes,
   className,
 }: FeaturedBidRailProps) {
-  const tradesByEvent = useAtomValue(tradeActivityByEventAtom);
-  const trades = tradesByEvent[event.slug] ?? [];
+  const trades = useAtomValue(tradeActivityForEventAtomFamily(event.slug));
 
   const bidItems = trades
     .map((trade) => {

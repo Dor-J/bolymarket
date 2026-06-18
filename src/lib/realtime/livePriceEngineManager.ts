@@ -1,4 +1,9 @@
 import type { Store } from 'jotai/vanilla/store';
+import {
+  commitOutcomePriceTick,
+  pruneStaleOutcomePrices,
+} from '@/lib/atoms/prices';
+import { configureCoalesceFlush } from '@/lib/prices/coalesceTicks';
 import type { OutcomePriceSeed } from '@/lib/prices/visibleOutcomeKeys';
 import { createLivePriceEngine } from './priceSourceFactory';
 import type { PriceSource } from './types';
@@ -8,12 +13,46 @@ const STOP_DEBOUNCE_MS = 300;
 interface LivePriceSubscriber {
   outcomeKeys: string[];
   seeds: OutcomePriceSeed[];
+  outcomeKeysSignature: string;
+  seedsSignature: string;
 }
 
 let engine: PriceSource | null = null;
 let store: Store | null = null;
 const subscribers = new Map<symbol, LivePriceSubscriber>();
 let pendingStop: ReturnType<typeof setTimeout> | null = null;
+let coalesceFlushConfigured = false;
+
+function getOutcomeKeysSignature(outcomeKeys: string[]): string {
+  return outcomeKeys.join('|');
+}
+
+function getSeedsSignature(seeds: OutcomePriceSeed[]): string {
+  return seeds
+    .map((seed) =>
+      [
+        seed.outcomeKey,
+        seed.price.toFixed(6),
+        seed.assetId ?? '',
+        seed.eventSlug ?? '',
+        seed.marketSlug ?? '',
+      ].join(':'),
+    )
+    .sort()
+    .join('|');
+}
+
+function createSubscriber(
+  outcomeKeys: string[],
+  seeds: OutcomePriceSeed[],
+): LivePriceSubscriber {
+  return {
+    outcomeKeys,
+    seeds,
+    outcomeKeysSignature: getOutcomeKeysSignature(outcomeKeys),
+    seedsSignature: getSeedsSignature(seeds),
+  };
+}
 
 function getEngine(): PriceSource {
   if (!engine) {
@@ -52,7 +91,30 @@ function syncEngine(): void {
   }
 
   const { outcomeKeys, seeds } = mergeSubscriberState();
+  pruneStaleOutcomePrices(new Set(outcomeKeys));
+
+  if (outcomeKeys.length === 0) {
+    engine?.stop();
+    return;
+  }
+
   getEngine().start(outcomeKeys, store, seeds);
+}
+
+function configureFlushForStore(activeStore: Store): void {
+  configureCoalesceFlush(({ outcomeKey, value }) => {
+    commitOutcomePriceTick(activeStore, outcomeKey, value);
+  });
+  coalesceFlushConfigured = true;
+}
+
+function resetFlush(): void {
+  if (!coalesceFlushConfigured) {
+    return;
+  }
+
+  configureCoalesceFlush(null);
+  coalesceFlushConfigured = false;
 }
 
 function scheduleStop(): void {
@@ -64,6 +126,7 @@ function scheduleStop(): void {
     pendingStop = null;
     if (subscribers.size === 0 && engine) {
       engine.stop();
+      resetFlush();
     }
   }, STOP_DEBOUNCE_MS);
 }
@@ -89,8 +152,9 @@ export function acquireLivePriceEngine(
   }
 
   store = activeStore;
+  configureFlushForStore(activeStore);
   const id = Symbol('live-price-subscriber');
-  subscribers.set(id, { outcomeKeys, seeds });
+  subscribers.set(id, createSubscriber(outcomeKeys, seeds));
   syncEngine();
 
   return {
@@ -99,10 +163,16 @@ export function acquireLivePriceEngine(
         return;
       }
 
-      subscribers.set(id, {
-        outcomeKeys: nextOutcomeKeys,
-        seeds: nextSeeds,
-      });
+      const current = subscribers.get(id);
+      const next = createSubscriber(nextOutcomeKeys, nextSeeds);
+      if (
+        current?.outcomeKeysSignature === next.outcomeKeysSignature &&
+        current.seedsSignature === next.seedsSignature
+      ) {
+        return;
+      }
+
+      subscribers.set(id, next);
       syncEngine();
     },
     release() {
@@ -125,6 +195,7 @@ export function resetLivePriceEngineForTests(): void {
   }
 
   engine?.stop();
+  resetFlush();
   engine = null;
   store = null;
   subscribers.clear();

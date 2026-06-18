@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import type { Store } from 'jotai/vanilla/store';
+import { atomFamily } from 'jotai-family';
 
 const MAX_TRADES_PER_EVENT = 20;
 
@@ -27,6 +28,11 @@ export interface TradeActivityItem {
 /** Recent trades keyed by event slug. */
 export const tradeActivityByEventAtom = atom<Record<string, TradeActivityItem[]>>(
   {},
+);
+
+/** Recent trades for a single event slug. */
+export const tradeActivityForEventAtomFamily = atomFamily((eventSlug: string) =>
+  atom((get) => get(tradeActivityByEventAtom)[eventSlug] ?? []),
 );
 
 /**

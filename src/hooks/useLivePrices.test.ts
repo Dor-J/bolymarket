@@ -31,6 +31,7 @@ describe("useLivePrices", () => {
     expect(() => {
       renderHookWithProviders(() => useLivePrices([]));
     }).not.toThrow();
+    expect(mockStart).not.toHaveBeenCalled();
   });
 
   it("seeds outcome atoms from API snapshots", async () => {

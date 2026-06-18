@@ -1,8 +1,3 @@
-import {
-  ConnectionStatus,
-  RealTimeDataClient,
-  type Message,
-} from '@polymarket/real-time-data-client';
 import type { Store } from 'jotai/vanilla/store';
 import { appendTradeActivity } from '@/lib/atoms/tradeActivity';
 import { enqueuePriceTick } from '@/lib/prices/coalesceTicks';
@@ -12,83 +7,119 @@ import {
   getRealtimeSubscriptionSignature,
 } from './subscriptionIndex';
 import { clampTradePrice, parseTradePayload } from './tradePayload';
-import {
-  disablePolymarketWsLogSuppression,
-  enablePolymarketWsLogSuppression,
-} from './suppressPolymarketWsLogs';
 import type { PriceSource } from './types';
 
+const POLYMARKET_WS_URL = 'wss://ws-live-data.polymarket.com';
 const ACTIVITY_TOPIC = 'activity';
 const TRADE_TYPES = new Set(['trades', 'orders_matched']);
+const PING_INTERVAL_MS = 5_000;
+const RECONNECT_DELAY_MS = 2_000;
 
-export interface WebSocketEngineOptions {
-  /** When true, falls back to no-op ticks when disconnected. */
-  trackConnection?: boolean;
+interface ActivitySubscription {
+  topic: typeof ACTIVITY_TOPIC;
+  type: 'trades' | 'orders_matched';
+  filters?: string;
+}
+
+interface SubscriptionMessage {
+  subscriptions: ActivitySubscription[];
+}
+
+interface ActivityMessage {
+  topic?: string;
+  type?: string;
+  payload?: object;
 }
 
 /**
- * Creates a WebSocket price source backed by `@polymarket/real-time-data-client`.
+ * Creates a WebSocket price source backed by Polymarket's activity stream.
  */
-export function createWebSocketEngine(
-  options: WebSocketEngineOptions = {},
-): PriceSource & { isConnected: () => boolean } {
-  let client: RealTimeDataClient | null = null;
+export function createWebSocketEngine(): PriceSource & {
+  isConnected: () => boolean;
+} {
+  let socket: WebSocket | null = null;
   let activeStore: Store | null = null;
   let assetToOutcomeKey = new Map<string, string>();
   let assetToEventSlug = new Map<string, string>();
   let subscribedEventSlugs: string[] = [];
+  let activeSubscriptionMessage: SubscriptionMessage | null = null;
   let subscriptionSignature = "";
   let connected = false;
-  let disableLogTimer: ReturnType<typeof setTimeout> | null = null;
+  let shouldReconnect = false;
+  let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  let pingTimer: ReturnType<typeof setInterval> | null = null;
 
-  function cancelPendingLogSuppressionDisable(): void {
-    if (disableLogTimer) {
-      clearTimeout(disableLogTimer);
-      disableLogTimer = null;
+  function clearReconnectTimer(): void {
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
     }
   }
 
-  function scheduleLogSuppressionDisable(): void {
-    cancelPendingLogSuppressionDisable();
-    disableLogTimer = setTimeout(() => {
-      disableLogTimer = null;
-      disablePolymarketWsLogSuppression();
-    }, 500);
+  function clearPingTimer(): void {
+    if (pingTimer) {
+      clearInterval(pingTimer);
+      pingTimer = null;
+    }
   }
 
-  function subscribeToVisibleEvents(nextClient: RealTimeDataClient): void {
+  function buildSubscriptionMessage(): SubscriptionMessage | null {
     if (subscribedEventSlugs.length === 0) {
-      nextClient.subscribe({
-        subscriptions: [
-          {
-            topic: ACTIVITY_TOPIC,
-            type: "trades",
-          },
-        ],
-      });
+      return null;
+    }
+
+    return {
+      subscriptions: subscribedEventSlugs.flatMap((eventSlug) => [
+        {
+          topic: ACTIVITY_TOPIC,
+          type: 'trades',
+          filters: JSON.stringify({ event_slug: eventSlug }),
+        },
+        {
+          topic: ACTIVITY_TOPIC,
+          type: 'orders_matched',
+          filters: JSON.stringify({ event_slug: eventSlug }),
+        },
+      ]),
+    };
+  }
+
+  function sendSocketMessage(
+    action: 'subscribe' | 'unsubscribe',
+    message: SubscriptionMessage,
+  ): void {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
       return;
     }
 
-    for (const eventSlug of subscribedEventSlugs) {
-      nextClient.subscribe({
-        subscriptions: [
-          {
-            topic: ACTIVITY_TOPIC,
-            type: "trades",
-            filters: JSON.stringify({ event_slug: eventSlug }),
-          },
-          {
-            topic: ACTIVITY_TOPIC,
-            type: "orders_matched",
-            filters: JSON.stringify({ event_slug: eventSlug }),
-          },
-        ],
-      });
-    }
+    socket.send(JSON.stringify({ action, ...message }));
   }
 
-  function handleMessage(_rtClient: RealTimeDataClient, message: Message): void {
-    if (message.topic !== ACTIVITY_TOPIC || !TRADE_TYPES.has(message.type)) {
+  function syncVisibleEventSubscriptions(): void {
+    if (activeSubscriptionMessage) {
+      sendSocketMessage('unsubscribe', activeSubscriptionMessage);
+      activeSubscriptionMessage = null;
+    }
+
+    const nextMessage = buildSubscriptionMessage();
+    if (!nextMessage) {
+      return;
+    }
+
+    sendSocketMessage('subscribe', nextMessage);
+    activeSubscriptionMessage = nextMessage;
+  }
+
+  function handleActivityMessage(message: ActivityMessage): void {
+    if (
+      message.topic !== ACTIVITY_TOPIC ||
+      typeof message.type !== 'string' ||
+      !TRADE_TYPES.has(message.type)
+    ) {
+      return;
+    }
+
+    if (!message.payload) {
       return;
     }
 
@@ -98,12 +129,11 @@ export function createWebSocketEngine(
     }
 
     const outcomeKey = assetToOutcomeKey.get(trade.asset);
-    if (!outcomeKey) {
-      return;
-    }
-
     const clampedPrice = clampTradePrice(trade.price);
-    enqueuePriceTick(outcomeKey, clampedPrice);
+
+    if (outcomeKey) {
+      enqueuePriceTick(outcomeKey, clampedPrice);
+    }
 
     const eventSlug =
       trade.eventSlug ?? assetToEventSlug.get(trade.asset ?? '');
@@ -121,40 +151,84 @@ export function createWebSocketEngine(
     }
   }
 
-  function connectClient(): void {
-    if (client || typeof window === "undefined") {
+  function handleMessage(event: MessageEvent): void {
+    if (typeof event.data !== 'string' || event.data.length === 0) {
       return;
     }
 
-    client = new RealTimeDataClient({
-      autoReconnect: true,
-      onConnect: (nextClient) => {
-        connected = true;
-        subscribeToVisibleEvents(nextClient);
-      },
-      onMessage: handleMessage,
-      onStatusChange: (status) => {
-        connected = status === ConnectionStatus.CONNECTED;
-        if (options.trackConnection !== false && !connected) {
-          // Connection state is observable via isConnected().
-        }
-      },
+    if (event.data === 'pong' || event.data === 'ping') {
+      return;
+    }
+
+    try {
+      handleActivityMessage(JSON.parse(event.data) as ActivityMessage);
+    } catch {
+      // Ignore non-JSON protocol frames from the Polymarket stream.
+    }
+  }
+
+  function startHeartbeat(): void {
+    clearPingTimer();
+    pingTimer = setInterval(() => {
+      if (socket?.readyState === WebSocket.OPEN) {
+        socket.send('ping');
+      }
+    }, PING_INTERVAL_MS);
+  }
+
+  function scheduleReconnect(): void {
+    if (!shouldReconnect || reconnectTimer) {
+      return;
+    }
+
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = null;
+      connectClient();
+    }, RECONNECT_DELAY_MS);
+  }
+
+  function connectClient(): void {
+    if (socket || typeof window === 'undefined') {
+      return;
+    }
+
+    shouldReconnect = true;
+    socket = new WebSocket(POLYMARKET_WS_URL);
+
+    socket.addEventListener('open', () => {
+      connected = true;
+      clearReconnectTimer();
+      startHeartbeat();
+      activeSubscriptionMessage = null;
+      syncVisibleEventSubscriptions();
     });
 
-    cancelPendingLogSuppressionDisable();
-    enablePolymarketWsLogSuppression();
-    client.connect();
+    socket.addEventListener('message', handleMessage);
+
+    socket.addEventListener('close', () => {
+      socket = null;
+      connected = false;
+      clearPingTimer();
+      activeSubscriptionMessage = null;
+      scheduleReconnect();
+    });
+
+    socket.addEventListener('error', () => {
+      // The close event drives reconnect and fallback; avoid noisy console.error
+      // events from transient browser WebSocket failures.
+      if (socket && socket.readyState !== WebSocket.CLOSING) {
+        socket.close();
+      }
+    });
   }
 
   function disconnectClient(): void {
-    if (!client) {
-      return;
-    }
-
-    client.disconnect();
-    client = null;
+    shouldReconnect = false;
+    clearReconnectTimer();
+    clearPingTimer();
+    socket?.close(1000, 'Client shutdown');
+    socket = null;
     connected = false;
-    scheduleLogSuppressionDisable();
   }
 
   function updateSubscriptions(seeds: OutcomePriceSeed[]): void {
@@ -170,8 +244,8 @@ export function createWebSocketEngine(
 
     subscriptionSignature = nextSignature;
 
-    if (client && connected) {
-      subscribeToVisibleEvents(client);
+    if (socket && connected) {
+      syncVisibleEventSubscriptions();
     }
   }
 
@@ -187,12 +261,12 @@ export function createWebSocketEngine(
     },
 
     stop() {
-      cancelPendingLogSuppressionDisable();
       disconnectClient();
       activeStore = null;
       assetToOutcomeKey = new Map();
       assetToEventSlug = new Map();
       subscribedEventSlugs = [];
+      activeSubscriptionMessage = null;
       subscriptionSignature = "";
     },
   };

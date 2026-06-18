@@ -41,13 +41,17 @@ lib/
 
 | Module | Purpose |
 | ------ | ------- |
-| `livePriceEngineManager.ts` | Ref-counted shared price engine |
-| `websocketEngine.ts` | Polymarket activity WebSocket → price atoms |
+| `livePriceEngineManager.ts` | Ref-counted shared price engine; owns merged active keys, pruning, and coalesced flush |
+| `websocketEngine.ts` | Polymarket activity WebSocket → price atoms; subscribes only to visible event filters |
 | `simulationEngine.ts` | Random-walk fallback |
 | `sportsWebSocketEngine.ts` | Sports live scores / game updates |
 | `tradePayload.ts` | Parse WS trade payloads for featured activity |
 
 Mode: `NEXT_PUBLIC_LIVE_PRICE_MODE` (`auto` | `websocket` | `simulation`).
+
+Empty visible price seed sets are treated as no subscription. Multiple mounted views can call
+`useLivePrices()` simultaneously; the manager merges their keys before starting the engine or
+pruning atom-family entries.
 
 ## Testing
 

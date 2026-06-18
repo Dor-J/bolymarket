@@ -71,15 +71,21 @@ useLivePrices(priceSeeds)
         ↓
 seedOutcomePrices()            → Jotai outcomePriceAtomFamily
         ↓
-acquireLivePriceEngine()       → websocketEngine and/or simulationEngine
+acquireLivePriceEngine()       → shared manager merges active keys across callers
         ↓
-commitOutcomePriceTick()       → RAF-coalesced atom writes
+websocketEngine / simulationEngine
         ↓
-PriceDisplay · ProbabilityBar · YesNoChip   → leaf useAtomValue only
+commitOutcomePriceTick()       → manager-owned RAF-coalesced atom writes
+        ↓
+PriceDisplay · ProbabilityBar · YesNoChip
 ```
 
 Mode is controlled by `NEXT_PUBLIC_LIVE_PRICE_MODE` (`auto` | `websocket` | `simulation`) via
 `priceSourceFactory`.
+
+`useLivePrices()` callers hold a stable lease and update it when visible seeds change. The shared
+manager owns stale atom pruning and coalesced tick flushing so one view cannot remove another
+view's active price atoms or disable tick delivery while subscribers remain mounted.
 
 ### Search shortcut
 
