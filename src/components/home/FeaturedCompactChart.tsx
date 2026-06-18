@@ -44,14 +44,21 @@ interface FeaturedChartTooltipProps {
   label?: string | number;
   outcomes: ChartOutcome[];
   payload?: FeaturedTooltipPayload[];
+  spanMs: number;
+  timeframe: '1d';
 }
 
-function formatTooltipTimestamp(point: ChartPoint | undefined, label: string | number | undefined) {
+function formatTooltipTimestamp(
+  point: ChartPoint | undefined,
+  label: string | number | undefined,
+  timeframe: '1d',
+  spanMs: number,
+) {
   if (typeof point?.timestamp !== 'number') {
     return label ? String(label) : '';
   }
 
-  return formatXAxisTick(point.timestamp, '1d', 24 * 60 * 60 * 1000);
+  return formatXAxisTick(point.timestamp, timeframe, spanMs);
 }
 
 function FeaturedChartTooltip({
@@ -59,6 +66,8 @@ function FeaturedChartTooltip({
   label,
   outcomes,
   payload,
+  spanMs,
+  timeframe,
 }: FeaturedChartTooltipProps) {
   if (!active || !payload || payload.length === 0) {
     return null;
@@ -92,7 +101,7 @@ function FeaturedChartTooltip({
   return (
     <div className="min-w-[170px] rounded-lg border border-border bg-background/95 px-3 py-2 text-xs shadow-lg backdrop-blur">
       <p className="mb-2 font-semibold text-text">
-        {formatTooltipTimestamp(point, label)}
+        {formatTooltipTimestamp(point, label, timeframe, spanMs)}
       </p>
       <div className="flex flex-col gap-1.5">
         {visibleItems.map((item) => (
@@ -309,6 +318,8 @@ export function FeaturedCompactChart({
                   label={props.label}
                   outcomes={liveOutcomes}
                   payload={props.payload as FeaturedTooltipPayload[] | undefined}
+                  spanMs={xSpanMs}
+                  timeframe={timeframe}
                 />
               )}
             />

@@ -27,7 +27,15 @@ export function TimeframeToggle({
   className,
 }: TimeframeToggleProps) {
   return (
-    <div className={cn("flex flex-wrap gap-1", className)}>
+    <div
+      role="tablist"
+      aria-label="Select chart window"
+      className={cn(
+        "relative inline-flex h-9 items-start justify-center overflow-hidden bg-transparent",
+        "p-0 font-medium text-zinc-500",
+        className,
+      )}
+    >
       {TIMEFRAMES.map((timeframe) => {
         const isActive = timeframe.key === value;
 
@@ -35,15 +43,18 @@ export function TimeframeToggle({
           <button
             key={timeframe.key}
             type="button"
-            aria-pressed={isActive}
+            role="tab"
+            aria-selected={isActive}
+            data-state={isActive ? "active" : "inactive"}
             onClick={() => onChange(timeframe.key)}
             className={cn(
-              "inline-flex h-9 items-center rounded-md px-1.5",
-              "text-sm leading-5 font-semibold transition-colors",
-              "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+              "z-1 inline-flex h-full cursor-pointer items-center justify-center rounded-md px-1.5 py-1",
+              "text-body-base font-semibold whitespace-nowrap uppercase ring-offset-background",
+              "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+              "disabled:pointer-events-none disabled:opacity-50",
               isActive
-                ? "bg-surface-2 text-text"
-                : "text-muted hover:bg-black/5 hover:text-text",
+                ? "text-tabs-text-active"
+                : "text-tabs-text hover:text-tabs-text-hover",
             )}
           >
             {timeframe.label}

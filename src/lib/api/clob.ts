@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { ChartPoint, Timeframe } from '@/lib/chart/types';
+import { formatChartPointLabel } from '@/lib/chart/axis';
 
 const CLOB_BASE_URL = 'https://clob.polymarket.com';
 
@@ -42,26 +43,6 @@ function clampPrice(price: number): number {
   return Math.min(1, Math.max(0, price));
 }
 
-function formatAxisLabel(timestamp: number, timeframe: Timeframe): string {
-  const date = new Date(timestamp);
-
-  if (timeframe === '1h' || timeframe === '6h') {
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  }
-
-  if (timeframe === '1d') {
-    return date.toLocaleTimeString('en-US', { hour: 'numeric' });
-  }
-
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
 /**
  * Maps a CLOB history response to chart points for a single outcome series.
  */
@@ -70,10 +51,16 @@ export function normalizePriceHistory(
   history: Array<{ t: number; p: number }>,
   timeframe: Timeframe,
 ): ChartPoint[] {
+  const timestamps = history.map((point) => point.t * 1000);
+  const spanMs =
+    timestamps.length >= 2
+      ? Math.max(...timestamps) - Math.min(...timestamps)
+      : getClobParamsForTimeframe(timeframe).durationMs;
+
   return history
     .map((point) => ({
       timestamp: point.t * 1000,
-      label: formatAxisLabel(point.t * 1000, timeframe),
+      label: formatChartPointLabel(point.t * 1000, timeframe, spanMs),
       [tokenId]: clampPrice(point.p),
     }))
     .sort((a, b) => a.timestamp - b.timestamp);
