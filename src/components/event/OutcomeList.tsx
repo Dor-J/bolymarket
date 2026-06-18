@@ -29,7 +29,7 @@ export function OutcomeList({ event }: OutcomeListProps) {
           volume={row.volume}
           yesPrice={row.yesPrice}
           noPrice={row.noPrice}
-          image={event.image}
+          image={row.image ?? event.image}
         />
       ))}
     </section>
