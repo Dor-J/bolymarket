@@ -34,6 +34,48 @@ const quickAmountButtonClass = cn(
   'hover:bg-neutral-25 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
 );
 
+const TWO_WORD_TEAM_NICKNAMES = new Set([
+  'blue jackets',
+  'blue jays',
+  'golden knights',
+  'maple leafs',
+  'red sox',
+  'red wings',
+  'trail blazers',
+  'white sox',
+]);
+
+function getCompactTeamName(teamName: string | undefined): string {
+  const normalized = teamName?.trim();
+  if (!normalized) {
+    return '';
+  }
+
+  const parts = normalized.split(/\s+/);
+  if (parts.length <= 1) {
+    return normalized;
+  }
+
+  const lastTwo = parts.slice(-2).join(' ');
+  if (TWO_WORD_TEAM_NICKNAMES.has(lastTwo.toLowerCase())) {
+    return lastTwo;
+  }
+
+  return parts.at(-1) ?? normalized;
+}
+
+function getCompactMatchupTitle(game: SportsGame): string {
+  const [awayTeam, homeTeam] = game.teams;
+  const awayName = getCompactTeamName(awayTeam.name);
+  const homeName = getCompactTeamName(homeTeam.name);
+
+  if (awayName && homeName) {
+    return `${awayName} vs ${homeName}`;
+  }
+
+  return game.title.replace(/\s+vs\.?\s+/i, ' vs ');
+}
+
 function getMarketForSelection(
   game: SportsGame,
   selection: SportsSelection,
@@ -96,6 +138,11 @@ export function SportsTradeWidget({
     activeTeam?.color,
   );
   const outcomeAccentColor = activeTeam ? activeTeamColors.background : '#E04000';
+  const compactTitle = game ? getCompactMatchupTitle(game) : '';
+  const activeOutcomeLabel =
+    activeSelection?.marketType === 'total'
+      ? activeOutcome?.name
+      : getCompactTeamName(activeTeam?.name) || activeOutcome?.name;
 
   return (
     <div className={cn('not-lg:hidden hidden shrink-0 lg:flex lg:w-[372px]', className)}>
@@ -141,15 +188,15 @@ export function SportsTradeWidget({
                       </span>
                     )}
                   </div>
-                  <div className="flex min-w-0 w-full flex-col">
+                  <div className="flex w-full min-w-0 flex-col">
                     <span className="truncate text-sm font-medium text-text-secondary">
-                      {game.title}
+                      {compactTitle}
                     </span>
                     <span
                       className="flex min-w-0 items-center text-base font-semibold dark:brightness-150"
                       style={{ color: outcomeAccentColor }}
                     >
-                      <span className="min-w-0 truncate">{activeOutcome.name}</span>
+                      <span className="min-w-0 truncate">{activeOutcomeLabel}</span>
                     </span>
                   </div>
                 </div>
@@ -321,20 +368,6 @@ export function SportsTradeWidget({
                 </div>
               </div>
 
-              <div className="mt-4 flex w-full flex-col items-center gap-4">
-                <p className="w-full bg-transparent text-center text-body-sm text-neutral-500 outline-none">
-                  By trading, you agree to the{' '}
-                  <a
-                    href="/tos"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-inherit underline"
-                  >
-                    Terms of Use
-                  </a>
-                  .
-                </p>
-              </div>
             </div>
           ) : (
             <div
@@ -349,6 +382,20 @@ export function SportsTradeWidget({
               </p>
             </div>
           )}
+          {game && activeMarket && activeOutcome ? (
+            <p className="mt-3 w-[340px] bg-transparent text-center text-body-sm text-neutral-500 outline-none">
+              By trading, you agree to the{' '}
+              <a
+                href="/tos"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-inherit underline"
+              >
+                Terms of Use
+              </a>
+              .
+            </p>
+          ) : null}
         </div>
       </div>
     </div>
