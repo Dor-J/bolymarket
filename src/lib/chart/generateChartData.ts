@@ -1,5 +1,6 @@
 import type { Outcome } from "@/types/polymarket";
 import type { ChartPoint, Timeframe } from "./types";
+import { formatChartPointLabel } from "./axis";
 
 const TIMEFRAME_CONFIG: Record<
   Timeframe,
@@ -37,28 +38,6 @@ function clampPrice(price: number): number {
   return Math.min(1, Math.max(0, price));
 }
 
-function formatAxisLabel(timestamp: number, timeframe: Timeframe): string {
-  const date = new Date(timestamp);
-
-  if (timeframe === "1h" || timeframe === "6h") {
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  }
-
-  if (timeframe === "1d") {
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-    });
-  }
-
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
-}
-
 /**
  * Generates deterministic simulated historical chart data from current prices.
  */
@@ -82,7 +61,7 @@ export function generateChartData(
 
     backwardPoints.unshift({
       timestamp,
-      label: formatAxisLabel(timestamp, timeframe),
+      label: formatChartPointLabel(timestamp, timeframe, durationMs),
       ...Object.fromEntries(
         seriesKeys.map((key, seriesIndex) => [
           key,

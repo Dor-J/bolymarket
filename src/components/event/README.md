@@ -16,7 +16,7 @@ Client orchestrator and sections for `/event/[slug]`.
 | --------- | ---- |
 | `EventHeader` | Breadcrumb, title, share/embed/bookmark actions |
 | `EventMarketContext` | Volume, end date, category metadata |
-| `ChartMetaRow` | Chart footer stats |
+| `ChartMetaRow` | Chart footer stats, timeframe tabs, and chart utility controls |
 
 ## Markets & chart
 
@@ -24,11 +24,12 @@ Client orchestrator and sections for `/event/[slug]`.
 | --------- | ---- |
 | `OutcomeLegend` | Colored dots + live percentages |
 | `OutcomeList` | Full outcome list container |
-| `OutcomeRow` | `React.memo` — probability bar + visual Buy buttons |
-| `OrderTicket` | Visual-only buy/sell sidebar (sticky on `lg+`) |
+| `OutcomeRow` | `React.memo` — Polymarket-style outcome row with volume, probability, and Buy buttons |
+| `OrderTicket` | Visual-only buy/sell sidebar with selected outcome header and terms footer |
 | `OrderSidebarPlaceholder` | Legacy static panel (unused in page flow) |
 
 Chart rendering lives in `components/chart/` (`PriceChart`, `TimeframeToggle`).
+`TimeframeToggle` is composed into `ChartMetaRow` on event detail pages.
 
 ## Variant routing
 
