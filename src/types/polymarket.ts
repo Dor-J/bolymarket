@@ -22,6 +22,7 @@ export interface Market {
   id: string;
   question: string;
   slug?: string;
+  image?: string;
   volume: number;
   outcomes: Outcome[];
 }
