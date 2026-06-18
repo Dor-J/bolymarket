@@ -21,6 +21,7 @@ Custom React hooks for bolymarket. All paths are relative to `src/hooks/`.
 | `useLiveChartOutcomes` | Merges Jotai live prices into chart outcome metadata (stable snapshots) |
 | `useSportsLiveGames` | React Query — sports live games from `/api/sports/live`                 |
 | `useSportsGameResults` | Subscribes ref-counted sports WebSocket for visible game ids            |
+| `useSportsGameState` | Resolves live sports row state by game id, slug, then matchup key        |
 
 ## Data flow
 
@@ -115,6 +116,7 @@ Hook tests colocate with source files and use the shared wrapper in
 | `useLiveChartOutcomes.test.ts`        | Live price merge, snapshot stability, atom updates              |
 | `useSportsLiveGames.test.ts`          | Query options, loading, success, error                          |
 | `useSportsGameResults.test.ts`        | Prune, WebSocket lease acquire/release, id changes            |
+| `useSportsGameState.test.ts`          | Game id, slug, matchup fallback, missing-state null             |
 
 Related lib tests (realtime, not hooks but coupled):
 

@@ -13,10 +13,10 @@ states — without trading, wallet, or real authentication.
 No environment variables are required for local dev — the app reads public Gamma API data through
 cached API routes. Optional:
 
-| Variable | Purpose |
-| -------- | ------- |
-| `REDIS_URL` | Server-side cache for Gamma responses (e.g. `redis://localhost:6379`). Without it, an in-memory fallback is used. |
-| `NEXT_PUBLIC_LIVE_PRICE_MODE` | `auto` (default) · `websocket` · `simulation` |
+| Variable                      | Purpose                                                                                                           |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `REDIS_URL`                   | Server-side cache for Gamma responses (e.g. `redis://localhost:6379`). Without it, an in-memory fallback is used. |
+| `NEXT_PUBLIC_LIVE_PRICE_MODE` | `auto` (default) · `websocket` · `simulation`                                                                     |
 
 From the `bolymarket/` directory:
 
@@ -115,15 +115,15 @@ URLs fetch by slug.
 
 ## Routing
 
-| Route           | Description                                                           |
-| --------------- | --------------------------------------------------------------------- |
+| Route           | Description                                                              |
+| --------------- | ------------------------------------------------------------------------ |
 | `/`             | Home — featured carousel + hot-topics sidebar, topic rails, markets grid |
-| `/crypto`       | Crypto markets — tag-specific fetch via `/api/events?tag=crypto`      |
-| `/sports`       | Sports markets — tag-specific fetch via `/api/events?tag=sports`      |
-| `/sports/live`  | Sports live games — league-grouped rows, trade widget, sports WS      |
-| `/politics`     | Politics markets — tag-specific fetch via `/api/events?tag=politics` |
-| `/event/[slug]` | Event detail — header, CLOB chart, outcome rows, order ticket UI      |
-| `/api-docs`     | Interactive Swagger UI — OpenAPI explorer for REST routes           |
+| `/crypto`       | Crypto markets — Polymarket-style sidebar, tabs, and 3-column grid       |
+| `/sports`       | Sports markets — tag-specific fetch via `/api/events?tag=sports`         |
+| `/sports/live`  | Sports live games — league-grouped rows, trade widget, sports WS         |
+| `/politics`     | Politics markets — tag-specific fetch via `/api/events?tag=politics`     |
+| `/event/[slug]` | Event detail — header, CLOB chart, outcome rows, order ticket UI         |
+| `/api-docs`     | Interactive Swagger UI — OpenAPI explorer for REST routes                |
 
 Category nav uses Next.js links with URL-based active state (`CategoryPathSync` keeps
 `selectedCategoryAtom` in sync). Home (`/`) shows aggregated trending + category data with
@@ -154,15 +154,15 @@ synced to live Jotai price atoms.
 
 Application chrome is mounted in `AppShell` (skipped on `/api-docs`).
 
-| Layer | Component | Notes |
-| ----- | --------- | ----- |
-| Header | `TopBar` | Logo, search (`xl+`), How it works, Log In, Sign Up, `UserMenu` hamburger (`xl+`) |
-| Nav | `CategoryNav` | Sticky category rail; functional links for Trending, Politics, Sports, Crypto |
-| Toolbar | `MarketSearchToolbar` | Search + filter/bookmark icons below nav when header search hidden (`xl:hidden`) |
-| Main | `PageContainer` | max-w 1350px, route fade transition |
-| Footer | `Footer` | Polymarket-style topic grid, support links, social icons, legal row, disclaimer |
-| Mobile | `MobileBottomNav` | Fixed bottom nav — Home, Search, Breaking, More (`md:hidden`) |
-| Mobile | `BackToTopButton` | Scroll-to-top pill above bottom nav (`md:hidden`) |
+| Layer   | Component             | Notes                                                                             |
+| ------- | --------------------- | --------------------------------------------------------------------------------- |
+| Header  | `TopBar`              | Logo, search (`xl+`), How it works, Log In, Sign Up, `UserMenu` hamburger (`xl+`) |
+| Nav     | `CategoryNav`         | Sticky category rail; functional links for Trending, Politics, Sports, Crypto     |
+| Toolbar | `MarketSearchToolbar` | Search + filter/bookmark icons below nav when header search hidden (`xl:hidden`)  |
+| Main    | `PageContainer`       | max-w 1350px, route fade transition                                               |
+| Footer  | `Footer`              | Polymarket-style topic grid, support links, social icons, legal row, disclaimer   |
+| Mobile  | `MobileBottomNav`     | Fixed bottom nav — Home, Search, Breaking, More (`md:hidden`)                     |
+| Mobile  | `BackToTopButton`     | Scroll-to-top pill above bottom nav (`md:hidden`)                                 |
 
 **Responsive breakpoints (header):** at `xl` (1280px) and above, search lives in the header; below
 `xl`, search moves to `MarketSearchToolbar`. Mobile header shows logo + Sign Up only.
@@ -201,14 +201,14 @@ pre-hydration script in `layout.tsx` avoids flash.
 Interactive **Swagger UI** is available at [`/api-docs`](http://localhost:3000/api-docs) when the
 dev server is running. Uses OpenAPI 3.0 + `swagger-ui-dist` (compatible with Next.js Turbopack).
 
-| Endpoint | Description |
-| -------- | ----------- |
-| `GET /api/openapi` | OpenAPI 3.0 JSON specification |
-| `GET /api/events` | List open events (`?tag=crypto\|sports\|politics` optional) |
-| `GET /api/events/{slug}` | Single event by slug |
-| `GET /api/prices/{tokenId}` | CLOB price history (`?timeframe=1d` optional) |
-| `GET /api/sports/live` | Sports live games and league summaries |
-| `GET /api/related-news` | Related news for event context |
+| Endpoint                    | Description                                                 |
+| --------------------------- | ----------------------------------------------------------- |
+| `GET /api/openapi`          | OpenAPI 3.0 JSON specification                              |
+| `GET /api/events`           | List open events (`?tag=crypto\|sports\|politics` optional) |
+| `GET /api/events/{slug}`    | Single event by slug                                        |
+| `GET /api/prices/{tokenId}` | CLOB price history (`?timeframe=1d` optional)               |
+| `GET /api/sports/live`      | Sports live games and league summaries                      |
+| `GET /api/related-news`     | Related GDELT news for event context, with OkSurf fallback  |
 
 ## Performance
 
@@ -227,13 +227,13 @@ leaves, not the full grid.
 bun run test
 ```
 
-**79 test files · 258 tests** (Vitest). Every hook under `src/hooks/` has a colocated test.
+**87 test files · 283 tests** (Vitest). Every hook under `src/hooks/` has a colocated test.
 Coverage highlights:
 
 - **API / cache:** Gamma fetch/normalize, CLOB chart normalizer, sports live cache, OpenAPI spec
 - **Cards / filters:** Card mapping, category filters, search filter, volume/price formatters
-- **Hooks:** All 15 hooks in `src/hooks/` including `useLiveChartOutcomes`, `useSportsLiveGames`,
-  `useIsMounted`, `useSportsGameResults`
+- **Hooks:** All 16 hooks in `src/hooks/` including `useLiveChartOutcomes`, `useSportsLiveGames`,
+  `useIsMounted`, `useSportsGameResults`, `useSportsGameState`
 - **Realtime:** `livePriceEngineManager`, sports WebSocket, simulation engine, trade payload
 - **Layout chrome:** `Footer`, `MobileBottomNav`, `MarketSearchToolbar`, `CategoryNav`
 - **Home:** `FeaturedCarousel`, carousel controls, hot-topics sidebar, `EventsGrid`
@@ -256,17 +256,17 @@ src/
 
 ## Implementation progress
 
-| Phase               | Status   | Deliverable                                              |
-| ------------------- | -------- | -------------------------------------------------------- |
-| 0 — Foundation      | Complete | Tokens, providers, Gamma API, types                      |
-| 1 — App shell       | Complete | TopBar, CategoryNav, category filter, path sync         |
-| 2 — Events grid     | Complete | BinaryCard, MultiOutcomeCard, featured carousel, grid    |
-| 3 — Event detail    | Complete | `/event/[slug]`, chart, outcome rows, order ticket       |
-| 4 — Realtime        | Complete | WebSocket + simulation, flash, leaf-only updates         |
-| 5 — Polish & README | Complete | UX audit, performance docs, submission README            |
-| 6 — Chrome fidelity | Complete | Footer, mobile bottom nav, market search toolbar, nav QA |
-| 7 — Home featured   | Complete | Carousel controls, hot-topics sidebar, activity/bid rails |
-| 8 — Sports live     | In progress | `/sports/live` page, sports API, WebSocket game state |
+| Phase               | Status      | Deliverable                                               |
+| ------------------- | ----------- | --------------------------------------------------------- |
+| 0 — Foundation      | Complete    | Tokens, providers, Gamma API, types                       |
+| 1 — App shell       | Complete    | TopBar, CategoryNav, category filter, path sync           |
+| 2 — Events grid     | Complete    | BinaryCard, MultiOutcomeCard, featured carousel, grid     |
+| 3 — Event detail    | Complete    | `/event/[slug]`, chart, outcome rows, order ticket        |
+| 4 — Realtime        | Complete    | WebSocket + simulation, flash, leaf-only updates          |
+| 5 — Polish & README | Complete    | UX audit, performance docs, submission README             |
+| 6 — Chrome fidelity | Complete    | Footer, mobile bottom nav, market search toolbar, nav QA  |
+| 7 — Home featured   | Complete    | Carousel controls, hot-topics sidebar, activity/bid rails |
+| 8 — Sports live     | In progress | `/sports/live` page, sports API, WebSocket game state     |
 
 ## Planning
 
