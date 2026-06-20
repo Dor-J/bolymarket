@@ -8,7 +8,7 @@ export interface LogoProps {
 }
 
 /**
- * Polymarket-style geometric mark + bolymarket wordmark.
+ * Polymarket-style geometric mark + Bolymarket wordmark.
  */
 export function Logo({ className, variant = 'default' }: LogoProps) {
   const isFooter = variant === 'footer';

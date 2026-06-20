@@ -4,7 +4,7 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "bolymarket",
+  title: "Bolymarket",
   description:
     "Polymarket-style prediction market UI for the PLAEE frontend assignment.",
 };

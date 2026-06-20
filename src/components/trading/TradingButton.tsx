@@ -32,9 +32,9 @@ const VARIANT_STYLES: Record<
     shadow: 'inset 0 calc(-1 * var(--btn-shadow-height, 4px)) 0 rgba(0,0,0,0.2)',
   },
   gray: {
-    background: '#f5f5f5',
-    color: '#171717',
-    shadow: 'inset 0 calc(-1 * var(--btn-shadow-height, 4px)) 0 rgba(0,0,0,0.08)',
+    background: 'var(--button-secondary-bg, #f5f5f5)',
+    color: 'var(--button-secondary-text, #171717)',
+    shadow: 'inset 0 calc(-1 * var(--btn-shadow-height, 4px)) 0 var(--button-secondary-shadow, rgba(0,0,0,0.08))',
   },
   blue: {
     background: '#2E5CFF',

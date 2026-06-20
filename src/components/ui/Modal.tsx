@@ -309,7 +309,7 @@ export function AuthModal({ open, onClose, mode }: AuthModalProps) {
                     "inline-flex h-14 w-full cursor-pointer items-center justify-center gap-2",
                     "whitespace-nowrap rounded-sm border border-[#E6E8EA] p-2",
                     "text-body-base font-semibold text-button-outline-text transition duration-150",
-                    "active:scale-[97%] hover:bg-neutral-25 focus-visible:ring-1",
+                    "active:scale-[97%] hover:bg-surface-2 focus-visible:ring-1",
                     "focus-visible:ring-ring focus-visible:outline-none disabled:pointer-events-none",
                     "disabled:cursor-default disabled:opacity-50",
                   )}
@@ -325,7 +325,7 @@ export function AuthModal({ open, onClose, mode }: AuthModalProps) {
                   "group inline-flex h-14 w-full cursor-pointer items-center justify-center gap-2",
                   "whitespace-nowrap rounded-sm border border-[#E6E8EA] p-2",
                   "text-body-base font-semibold text-text-secondary transition duration-150",
-                  "active:scale-[97%] hover:bg-neutral-25 focus-visible:ring-1",
+                  "active:scale-[97%] hover:bg-surface-2 focus-visible:ring-1",
                   "focus-visible:ring-ring focus-visible:outline-none disabled:pointer-events-none",
                 )}
               >

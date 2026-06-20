@@ -24,6 +24,7 @@ const DOCS_PATH_PREFIX = '/api-docs';
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const isApiDocs = pathname.startsWith(DOCS_PATH_PREFIX);
+  const showMarketSearchToolbar = pathname === '/' || pathname === '/politics';
 
   if (isApiDocs) {
     return <>{children}</>;
@@ -35,7 +36,7 @@ export function AppShell({ children }: AppShellProps) {
       <CategoryPathSync />
       <TopBar />
       <CategoryNav />
-      <MarketSearchToolbar />
+      {showMarketSearchToolbar ? <MarketSearchToolbar /> : null}
       <main className="flex-1 pb-20 md:pb-0">
         {children}
       </main>
