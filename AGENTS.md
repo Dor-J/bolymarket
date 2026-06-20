@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 <!-- END:nextjs-agent-rules -->
 
-# bolymarket agent notes
+# Bolymarket agent notes
 
 Polymarket-style UI clone — **Phases 0–6 complete** (including chrome fidelity: footer,
 mobile bottom nav, market search toolbar). Stack: Next.js 16, TypeScript, Tailwind v4, Jotai (UI +

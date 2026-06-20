@@ -1,27 +1,27 @@
 # Hooks
 
-Custom React hooks for bolymarket. All paths are relative to `src/hooks/`.
+Custom React hooks for Bolymarket. All paths are relative to `src/hooks/`.
 
 ## Hook reference
 
-| Hook                | Purpose                                                                 |
-| ------------------- | ----------------------------------------------------------------------- |
-| `useEvents`         | React Query wrapper — fetches aggregated open events                    |
-| `useFilteredEvents` | Category + debounced search filter on home aggregated cache             |
-| `useCategoryEvents` | React Query per-tag fetch for `/crypto`, `/sports`, `/politics` + search |
-| `useEvent`          | React Query — single event by slug, cache-first                         |
-| `useChartTimeframe` | Local state for chart timeframe toggle (`1h` … `all`)                   |
-| `useLivePrices`     | Seeds outcome atoms; shared WebSocket/simulation engine for visible keys |
-| `usePriceFlash`     | Flash direction + CSS class from price delta                            |
-| `useReducedMotion`  | Reads `prefers-reduced-motion` for accessible price updates             |
-| `useDebouncedValue` | Generic debounce helper (search uses 300ms)                             |
-| `useSearchShortcut` | Focuses search input on `/` key (`enabled` param for breakpoint gating)   |
-| `useShowMoreMarkets` | Paginates visible market count with responsive initial size + show more   |
-| `useIsMounted`       | `true` after client mount — defers hydration-sensitive UI                 |
-| `useLiveChartOutcomes` | Merges Jotai live prices into chart outcome metadata (stable snapshots) |
-| `useSportsLiveGames` | React Query — sports live games from `/api/sports/live`                 |
-| `useSportsGameResults` | Subscribes ref-counted sports WebSocket for visible game ids            |
-| `useSportsGameState` | Resolves live sports row state by game id, slug, then matchup key        |
+| Hook                   | Purpose                                                                  |
+| ---------------------- | ------------------------------------------------------------------------ |
+| `useEvents`            | React Query wrapper — fetches aggregated open events                     |
+| `useFilteredEvents`    | Category + debounced search filter on home aggregated cache              |
+| `useCategoryEvents`    | React Query per-tag fetch for `/crypto`, `/sports`, `/politics` + search |
+| `useEvent`             | React Query — single event by slug, cache-first                          |
+| `useChartTimeframe`    | Local state for chart timeframe toggle (`1h` … `all`)                    |
+| `useLivePrices`        | Seeds outcome atoms; shared WebSocket/simulation engine for visible keys |
+| `usePriceFlash`        | Flash direction + CSS class from price delta                             |
+| `useReducedMotion`     | Reads `prefers-reduced-motion` for accessible price updates              |
+| `useDebouncedValue`    | Generic debounce helper (search uses 300ms)                              |
+| `useSearchShortcut`    | Focuses search input on `/` key (`enabled` param for breakpoint gating)  |
+| `useShowMoreMarkets`   | Paginates visible market count with responsive initial size + show more  |
+| `useIsMounted`         | `true` after client mount — defers hydration-sensitive UI                |
+| `useLiveChartOutcomes` | Merges Jotai live prices into chart outcome metadata (stable snapshots)  |
+| `useSportsLiveGames`   | React Query — sports live games from `/api/sports/live`                  |
+| `useSportsGameResults` | Subscribes ref-counted sports WebSocket for visible game ids             |
+| `useSportsGameState`   | Resolves live sports row state by game id, slug, then matchup key        |
 
 ## Data flow
 
@@ -104,41 +104,41 @@ view's active price atoms or disable tick delivery while subscribers remain moun
 Hook tests colocate with source files and use the shared wrapper in
 [`src/test/test-utils.tsx`](../test/test-utils.tsx):
 
-| Test file                             | Hook / scope                                                    |
-| ------------------------------------- | --------------------------------------------------------------- |
-| `useEvents.test.ts`                   | Loading, success, error, query key                              |
-| `useFilteredEvents.test.ts`           | Category filter, volume sort, search, error forwarding          |
-| `useEvent.test.ts`                    | Cache-first slug lookup; cold-cache API fallback                |
-| `useLivePrices.test.ts`               | Seeds atoms, engine lease, cleanup                              |
-| `useDebouncedValue.test.ts`           | Debounce timing                                                 |
-| `usePriceFlash.test.ts`               | Up/down/none flash classes                                      |
-| `usePriceFlash.reducedMotion.test.ts` | Reduced-motion neutral path via usePriceFlash                   |
-| `useChartTimeframe.test.ts`           | Initial timeframe + selectTimeframe updates                     |
-| `useReducedMotion.test.ts`            | matchMedia preference + change listener                         |
-| `useCategoryEvents.test.ts`           | Tag fetch, error forwarding, debounced search filter              |
-| `useSearchShortcut.test.ts`           | `/` focus, disabled state, editable guard, cleanup              |
-| `useShowMoreMarkets.test.ts`          | Initial count, show more, hasMore, totalCount reset             |
-| `useIsMounted.test.ts`                | Mount detection, stable true across rerenders                   |
-| `useLiveChartOutcomes.test.ts`        | Live price merge, snapshot stability, atom updates              |
-| `useSportsLiveGames.test.ts`          | Query options, loading, success, error                          |
-| `useSportsGameResults.test.ts`        | Prune, WebSocket lease acquire/release, id changes            |
-| `useSportsGameState.test.ts`          | Game id, slug, matchup fallback, missing-state null             |
+| Test file                             | Hook / scope                                           |
+| ------------------------------------- | ------------------------------------------------------ |
+| `useEvents.test.ts`                   | Loading, success, error, query key                     |
+| `useFilteredEvents.test.ts`           | Category filter, volume sort, search, error forwarding |
+| `useEvent.test.ts`                    | Cache-first slug lookup; cold-cache API fallback       |
+| `useLivePrices.test.ts`               | Seeds atoms, engine lease, cleanup                     |
+| `useDebouncedValue.test.ts`           | Debounce timing                                        |
+| `usePriceFlash.test.ts`               | Up/down/none flash classes                             |
+| `usePriceFlash.reducedMotion.test.ts` | Reduced-motion neutral path via usePriceFlash          |
+| `useChartTimeframe.test.ts`           | Initial timeframe + selectTimeframe updates            |
+| `useReducedMotion.test.ts`            | matchMedia preference + change listener                |
+| `useCategoryEvents.test.ts`           | Tag fetch, error forwarding, debounced search filter   |
+| `useSearchShortcut.test.ts`           | `/` focus, disabled state, editable guard, cleanup     |
+| `useShowMoreMarkets.test.ts`          | Initial count, show more, hasMore, totalCount reset    |
+| `useIsMounted.test.ts`                | Mount detection, stable true across rerenders          |
+| `useLiveChartOutcomes.test.ts`        | Live price merge, snapshot stability, atom updates     |
+| `useSportsLiveGames.test.ts`          | Query options, loading, success, error                 |
+| `useSportsGameResults.test.ts`        | Prune, WebSocket lease acquire/release, id changes     |
+| `useSportsGameState.test.ts`          | Game id, slug, matchup fallback, missing-state null    |
 
 Related lib tests (realtime, not hooks but coupled):
 
-| Test file                                   | Scope                               |
-| ------------------------------------------- | ----------------------------------- |
-| `lib/realtime/livePriceEngineManager.test.ts` | Shared engine reference counting  |
-| `lib/realtime/simulationEngine.test.ts`     | Simulation start/stop               |
-| `lib/realtime/tradePayload.test.ts`         | WebSocket trade → price mapping     |
-| `lib/realtime/subscriptionIndex.test.ts`    | Event slug subscription index       |
+| Test file                                     | Scope                            |
+| --------------------------------------------- | -------------------------------- |
+| `lib/realtime/livePriceEngineManager.test.ts` | Shared engine reference counting |
+| `lib/realtime/simulationEngine.test.ts`       | Simulation start/stop            |
+| `lib/realtime/tradePayload.test.ts`           | WebSocket trade → price mapping  |
+| `lib/realtime/subscriptionIndex.test.ts`      | Event slug subscription index    |
 
 Component tests that exercise hooks indirectly:
 
-| Test file                                     | Scope                                   |
-| --------------------------------------------- | --------------------------------------- |
-| `src/components/home/EventsGrid.test.tsx`     | Loading skeleton, error, empty, success |
-| `src/components/category/CategoryPageView.test.tsx` | Tag page data flow                  |
+| Test file                                           | Scope                                   |
+| --------------------------------------------------- | --------------------------------------- |
+| `src/components/home/EventsGrid.test.tsx`           | Loading skeleton, error, empty, success |
+| `src/components/category/CategoryPageView.test.tsx` | Tag page data flow                      |
 
 Mock event fixtures: [`src/test/fixtures/events.ts`](../test/fixtures/events.ts)
 

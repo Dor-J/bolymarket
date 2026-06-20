@@ -1,6 +1,6 @@
 # Components
 
-UI components for bolymarket. All paths are relative to `src/components/`.
+UI components for Bolymarket. All paths are relative to `src/components/`.
 
 ## Directory map
 
@@ -26,67 +26,67 @@ components/
 
 Mounted by `AppShell` on all routes except `/api-docs`.
 
-| Component            | Type         | Notes                                                                 |
-| -------------------- | ------------ | --------------------------------------------------------------------- |
-| `AppShell`           | Client       | Chrome wrapper — TopBar, nav, toolbar, main, footer, mobile chrome    |
-| `TopBar`             | Client       | Sticky header — logo, search (`xl+`), auth, `UserMenu` (`xl+`)        |
-| `CategoryNav`        | Client, memo | Sticky 48px category rail with scroll + `CategoryNavMore`           |
-| `CategoryNavLink`    | Client       | Single nav item; active = darker text only (no underline)           |
-| `CategoryNavMore`    | Client       | "More" dropdown; panel portaled to avoid overflow clip                |
-| `CategoryPathSync`   | Client       | Syncs `selectedCategoryAtom` from pathname                            |
-| `MarketSearchToolbar`| Client       | Below-nav search + filter/bookmark icons (`xl:hidden`)              |
-| `UserMenu`           | Client       | Desktop hamburger — theme, language, APIs link (`xl+`)                |
-| `Footer`             | Server       | Polymarket-style responsive footer grid + legal region                |
-| `MobileBottomNav`    | Client       | Fixed bottom nav — Home, Search, Breaking, More (`md:hidden`)         |
-| `BackToTopButton`    | Client       | Mobile scroll-to-top pill above bottom nav (`md:hidden`)              |
-| `PageContainer`      | Client       | max-w 1350px, px-6 gutters, route fade transition                     |
-| `Logo`               | Server       | bolymarket wordmark                                                   |
-| `ThemeToggle`        | Client       | Standalone theme toggle (used inside `UserMenu`)                      |
+| Component             | Type         | Notes                                                              |
+| --------------------- | ------------ | ------------------------------------------------------------------ |
+| `AppShell`            | Client       | Chrome wrapper — TopBar, nav, toolbar, main, footer, mobile chrome |
+| `TopBar`              | Client       | Sticky header — logo, search (`xl+`), auth, `UserMenu` (`xl+`)     |
+| `CategoryNav`         | Client, memo | Sticky 48px category rail with scroll + `CategoryNavMore`          |
+| `CategoryNavLink`     | Client       | Single nav item; active = darker text only (no underline)          |
+| `CategoryNavMore`     | Client       | "More" dropdown; panel portaled to avoid overflow clip             |
+| `CategoryPathSync`    | Client       | Syncs `selectedCategoryAtom` from pathname                         |
+| `MarketSearchToolbar` | Client       | Below-nav search + filter/bookmark icons (`xl:hidden`)             |
+| `UserMenu`            | Client       | Desktop hamburger — theme, language, APIs link (`xl+`)             |
+| `Footer`              | Server       | Polymarket-style responsive footer grid + legal region             |
+| `MobileBottomNav`     | Client       | Fixed bottom nav — Home, Search, Breaking, More (`md:hidden`)      |
+| `BackToTopButton`     | Client       | Mobile scroll-to-top pill above bottom nav (`md:hidden`)           |
+| `PageContainer`       | Client       | max-w 1350px, px-6 gutters, route fade transition                  |
+| `Logo`                | Server       | Bolymarket wordmark                                                |
+| `ThemeToggle`         | Client       | Standalone theme toggle (used inside `UserMenu`)                   |
 
 ## Home (`home/`)
 
 See [`home/README.md`](home/README.md) for the full map.
 
-| Component | Notes |
-| --------- | ----- |
-| `HomeMarketsView` | Home orchestrator — filters, featured section, grid |
-| `HomeFeaturedSection` | Desktop carousel + hot-topics sidebar row |
-| `FeaturedCarousel` | Hero carousel with bottom dot/nav controls |
+| Component              | Notes                                                  |
+| ---------------------- | ------------------------------------------------------ |
+| `HomeMarketsView`      | Home orchestrator — filters, featured section, grid    |
+| `HomeFeaturedSection`  | Desktop carousel + hot-topics sidebar row              |
+| `FeaturedCarousel`     | Hero carousel with bottom dot/nav controls             |
 | `FeaturedEventPreview` | Polymarket-style featured card (chart, activity, bids) |
-| `HomeFeaturedSidebar` | World Cup combo + hot topics (`lg+`) |
-| `EventsGrid` | Thin entry → `HomeMarketsView` |
-| `EventsGridSkeleton` | Skeleton grid matching card silhouette |
-| `EventsGridError` | Retry UI when events query fails |
-| `EventListEmpty` | Empty filter/search state |
+| `HomeFeaturedSidebar`  | World Cup combo + hot topics (`lg+`)                   |
+| `EventsGrid`           | Thin entry → `HomeMarketsView`                         |
+| `EventsGridSkeleton`   | Skeleton grid matching card silhouette                 |
+| `EventsGridError`      | Retry UI when events query fails                       |
+| `EventListEmpty`       | Empty filter/search state                              |
 
 ## Markets listing (`markets/`)
 
 Shared controls used on the home page and category views.
 
-| Component | Notes |
-| --------- | ----- |
-| `MarketsPageBody` | Grid body with loading states, controls slot, show-more |
-| `MarketSectionHeader` | “All markets” row + desktop search/filter/watchlist |
-| `MarketTopicRail` | Topic chips (Breaking, Politics, …) |
-| `MarketControlsBar` | Sort, status, hide toggles (when filters expanded) |
-| `MarketSortSelect` / `MarketStatusSelect` | Filter dropdowns |
-| `ShowMoreMarketsButton` | Paginated “Show more” CTA |
+| Component                                 | Notes                                                   |
+| ----------------------------------------- | ------------------------------------------------------- |
+| `MarketsPageBody`                         | Grid body with loading states, controls slot, show-more |
+| `MarketSectionHeader`                     | “All markets” row + desktop search/filter/watchlist     |
+| `MarketTopicRail`                         | Topic chips (Breaking, Politics, …)                     |
+| `MarketControlsBar`                       | Sort, status, hide toggles (when filters expanded)      |
+| `MarketSortSelect` / `MarketStatusSelect` | Filter dropdowns                                        |
+| `ShowMoreMarketsButton`                   | Paginated “Show more” CTA                               |
 
 ## Sports (`sports/`)
 
 See [`sports/README.md`](sports/README.md).
 
-| Component | Notes |
-| --------- | ----- |
-| `SportsLivePageView` | `/sports/live` orchestrator |
-| `SportsLeagueSection` | League-grouped live games |
-| `SportsMarketRow` | Single game row with market buttons |
-| `SportsTradeWidget` | Visual trade panel for selected market |
+| Component             | Notes                                  |
+| --------------------- | -------------------------------------- |
+| `SportsLivePageView`  | `/sports/live` orchestrator            |
+| `SportsLeagueSection` | League-grouped live games              |
+| `SportsMarketRow`     | Single game row with market buttons    |
+| `SportsTradeWidget`   | Visual trade panel for selected market |
 
 ## Category pages (`category/`)
 
-| Component          | Notes                                                        |
-| ------------------ | ------------------------------------------------------------ |
+| Component          | Notes                                                         |
+| ------------------ | ------------------------------------------------------------- |
 | `CategoryPageView` | `/crypto`, `/sports`, `/politics` — tag fetch + grid + header |
 
 ## Cards (`cards/`)
@@ -94,7 +94,7 @@ See [`sports/README.md`](sports/README.md).
 | Component          | Notes                                                 |
 | ------------------ | ----------------------------------------------------- |
 | `BinaryCard`       | `React.memo` — single market, Yes/No, probability bar |
-| `MultiOutcomeCard` | `React.memo` — top 2 outcomes + Yes/No chips        |
+| `MultiOutcomeCard` | `React.memo` — top 2 outcomes + Yes/No chips          |
 | `EventCard`        | Variant router: binary vs multi-outcome               |
 | `CardSkeleton`     | Shimmer placeholder matching card anatomy             |
 
@@ -109,10 +109,10 @@ See [`sports/README.md`](sports/README.md).
 
 ## Chart (`chart/`)
 
-| Component         | Notes                                              |
-| ----------------- | -------------------------------------------------- |
-| `PriceChart`      | Recharts line chart; CLOB history + sim fallback   |
-| `TimeframeToggle` | 1H 6H 1D 1W 1M ALL                                 |
+| Component         | Notes                                            |
+| ----------------- | ------------------------------------------------ |
+| `PriceChart`      | Recharts line chart; CLOB history + sim fallback |
+| `TimeframeToggle` | 1H 6H 1D 1W 1M ALL                               |
 
 ## Event detail (`event/`)
 
@@ -140,16 +140,16 @@ See [`event/README.md`](event/README.md).
 
 ## Client vs server map
 
-| Area | `'use client'` | Notes |
-| ---- | -------------- | ----- |
-| `layout/AppShell`, `TopBar`, `CategoryNav*`, `MarketSearchToolbar`, `UserMenu`, `MobileBottomNav`, `BackToTopButton`, `PageContainer` | Yes | Chrome + pathname / Jotai / motion |
-| `layout/Footer`, `layout/Logo` | No | Static server markup |
-| `home/EventsGrid`, `EventsGridView`, `EventsGridError`, `FeaturedCarousel` | Yes | Query + live prices |
-| `home/EventsGridSkeleton`, `EventListEmpty` | No | Static presentational |
-| `category/CategoryPageView` | Yes | Tag query + search filter |
-| `cards/*`, `market/*` | Yes | Links + Jotai leaf subscriptions |
-| `event/EventDetailPage` | Yes | Detail orchestrator |
-| `chart/*` | Yes | Recharts + timeframe state |
+| Area                                                                                                                                  | `'use client'` | Notes                              |
+| ------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ---------------------------------- |
+| `layout/AppShell`, `TopBar`, `CategoryNav*`, `MarketSearchToolbar`, `UserMenu`, `MobileBottomNav`, `BackToTopButton`, `PageContainer` | Yes            | Chrome + pathname / Jotai / motion |
+| `layout/Footer`, `layout/Logo`                                                                                                        | No             | Static server markup               |
+| `home/EventsGrid`, `EventsGridView`, `EventsGridError`, `FeaturedCarousel`                                                            | Yes            | Query + live prices                |
+| `home/EventsGridSkeleton`, `EventListEmpty`                                                                                           | No             | Static presentational              |
+| `category/CategoryPageView`                                                                                                           | Yes            | Tag query + search filter          |
+| `cards/*`, `market/*`                                                                                                                 | Yes            | Links + Jotai leaf subscriptions   |
+| `event/EventDetailPage`                                                                                                               | Yes            | Detail orchestrator                |
+| `chart/*`                                                                                                                             | Yes            | Recharts + timeframe state         |
 
 ## Memoized list items
 
@@ -177,22 +177,22 @@ Footer and mobile nav height: `MOBILE_BOTTOM_NAV_HEIGHT_PX` in `lib/constants/fo
 
 Component tests colocate with source (`*.test.tsx`). Key suites:
 
-| Test file | Scope |
-| --------- | ----- |
-| `layout/Footer.test.tsx` | Footer content, topic grid, legal row |
-| `layout/MobileBottomNav.test.tsx` | Mobile nav items, search focus |
-| `layout/BackToTopButton.test.tsx` | Scroll-to-top behavior |
-| `layout/MarketSearchToolbar.test.tsx` | Toolbar search, shortcut scope |
-| `layout/CategoryNav.test.tsx` | Nav items, active state |
-| `layout/CategoryNavMore.test.tsx` | More dropdown |
-| `home/EventsGrid.test.tsx` | Loading, error, empty, success |
-| `home/FeaturedCarousel.test.tsx` | Carousel render + navigation |
-| `home/FeaturedCarouselControls.test.tsx` | Dot + pill controls |
-| `home/HomeFeaturedSidebar.test.tsx` | Sidebar promo + hot topics |
-| `home/EventListEmpty.test.tsx` | Empty copy |
-| `markets/markets.test.tsx` | Show more button |
-| `category/CategoryPageView.test.tsx` | Category page grid |
-| `event/OrderTicket.test.tsx` | Visual order ticket |
+| Test file                                | Scope                                 |
+| ---------------------------------------- | ------------------------------------- |
+| `layout/Footer.test.tsx`                 | Footer content, topic grid, legal row |
+| `layout/MobileBottomNav.test.tsx`        | Mobile nav items, search focus        |
+| `layout/BackToTopButton.test.tsx`        | Scroll-to-top behavior                |
+| `layout/MarketSearchToolbar.test.tsx`    | Toolbar search, shortcut scope        |
+| `layout/CategoryNav.test.tsx`            | Nav items, active state               |
+| `layout/CategoryNavMore.test.tsx`        | More dropdown                         |
+| `home/EventsGrid.test.tsx`               | Loading, error, empty, success        |
+| `home/FeaturedCarousel.test.tsx`         | Carousel render + navigation          |
+| `home/FeaturedCarouselControls.test.tsx` | Dot + pill controls                   |
+| `home/HomeFeaturedSidebar.test.tsx`      | Sidebar promo + hot topics            |
+| `home/EventListEmpty.test.tsx`           | Empty copy                            |
+| `markets/markets.test.tsx`               | Show more button                      |
+| `category/CategoryPageView.test.tsx`     | Category page grid                    |
+| `event/OrderTicket.test.tsx`             | Visual order ticket                   |
 
 ```bash
 bun run test

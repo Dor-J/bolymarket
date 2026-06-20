@@ -1,4 +1,4 @@
-# bolymarket
+# Bolymarket
 
 bolymarket is a Next.js App Router clone of the [Polymarket](https://polymarket.com) homepage and
 event detail experience. It focuses on UI fidelity
