@@ -15,7 +15,7 @@ import { getOutcomePriceKey } from "@/lib/prices/outcomeKey";
 import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
-  "group/card relative isolate flex min-h-[180px] h-full flex-col justify-between overflow-hidden rounded-xl border border-neutral-100 bg-background pt-3",
+  "group/card relative isolate flex min-h-[180px] h-full flex-col justify-between overflow-hidden rounded-xl border border-border bg-card pt-3",
   "shadow-md shadow-black/4 transition hover:-translate-y-px hover:shadow-md hover:shadow-black/8",
   "focus-within:ring-2 focus-within:ring-ring focus-within:outline-none",
   "[&_a]:relative [&_a]:z-30 [&_button]:relative [&_button]:z-30",
@@ -88,7 +88,7 @@ export const CryptoUpDownCard = memo(function CryptoUpDownCard({
                   outcomeId={yesOutcomeId}
                   initialPrice={yesPrice}
                   livePrice={livePrice}
-                  className="text-base leading-5 font-medium text-neutral-950"
+                  className="text-base leading-5 font-medium text-text-primary"
                 />
                 <span className="text-body-xs line-clamp-2 text-center font-semibold text-text-secondary">
                   Up

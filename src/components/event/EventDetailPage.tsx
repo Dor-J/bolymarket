@@ -150,7 +150,7 @@ export function EventDetailPage({ slug }: EventDetailPageProps) {
           image={primaryMarket.image}
           yesPrice={primaryMarket.yesPrice}
           noPrice={primaryMarket.noPrice}
-          className="w-full shrink-0 lg:sticky lg:top-[calc(var(--navbar-height)+1rem)] lg:w-[340px]"
+          className="hidden w-full shrink-0 lg:block lg:sticky lg:top-[var(--navbar-height)] lg:w-[372px] min-[1440px]:top-[calc(var(--navbar-height)+1rem)] min-[1440px]:w-[340px]"
         />
       ) : null}
     </div>

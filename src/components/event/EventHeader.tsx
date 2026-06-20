@@ -104,14 +104,14 @@ export function EventHeader({ event }: EventHeaderProps) {
   }
 
   return (
-    <header className="sticky top-[116px] z-20 mb-2 flex w-full flex-col justify-center bg-background py-1">
-      <div className="pointer-events-none absolute top-0 left-full h-[72px] w-3 bg-background" />
-      <div className="pointer-events-none absolute top-0 right-full h-[72px] w-3 bg-background" />
+    <header className="relative mb-2 flex w-full flex-col justify-center bg-background py-1 lg:sticky lg:top-[116px] lg:z-20">
+      <div className="pointer-events-none absolute top-0 left-full hidden h-[72px] w-3 bg-background lg:block" />
+      <div className="pointer-events-none absolute top-0 right-full hidden h-[72px] w-3 bg-background lg:block" />
       <div className="absolute bottom-0 left-0 h-px w-full bg-border opacity-0" />
 
-      <div className="relative flex w-full items-center justify-between gap-4">
-        <div className="flex w-full min-w-0 items-center gap-4">
-          <div className="shrink-0 overflow-hidden rounded-sm">
+      <div className="relative flex w-full flex-col items-center justify-center gap-2 text-center lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:text-left">
+        <div className="flex w-full min-w-0 flex-col items-center gap-2 lg:flex-row lg:items-center lg:gap-4">
+          <div className="hidden shrink-0 overflow-hidden rounded-sm lg:block">
             <MarketThumbnail
               title={event.title}
               image={event.image}
@@ -120,7 +120,7 @@ export function EventHeader({ event }: EventHeaderProps) {
             />
           </div>
 
-          <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
+          <div className="flex min-w-0 flex-1 flex-col items-center gap-1 lg:items-start">
             <div className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out">
               <div className="relative z-10 flex items-center gap-1 text-sm text-text-secondary">
                 {category ? (
@@ -143,13 +143,13 @@ export function EventHeader({ event }: EventHeaderProps) {
               </div>
             </div>
 
-            <h1 className="min-w-0 text-heading-2xl font-semibold text-pretty text-text">
+            <h1 className="min-w-0 text-center text-[22px] leading-7 font-semibold text-pretty text-text lg:text-left lg:text-heading-2xl">
               {event.title}
             </h1>
           </div>
         </div>
 
-        <div className="ml-4 flex shrink-0 items-center gap-3">
+        <div className="absolute top-0 right-0 ml-0 flex shrink-0 items-center gap-2 lg:static lg:ml-4 lg:gap-3">
           <div className="relative flex items-center gap-1">
             <button
               type="button"

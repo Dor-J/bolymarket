@@ -32,7 +32,7 @@ export function TimeframeToggle({
       aria-label="Select chart window"
       className={cn(
         "relative inline-flex h-9 items-start justify-center overflow-hidden bg-transparent",
-        "p-0 font-medium text-zinc-500",
+        "p-0 font-medium text-text-secondary",
         className,
       )}
     >
@@ -48,16 +48,24 @@ export function TimeframeToggle({
             data-state={isActive ? "active" : "inactive"}
             onClick={() => onChange(timeframe.key)}
             className={cn(
-              "z-1 inline-flex h-full cursor-pointer items-center justify-center rounded-md px-1.5 py-1",
+              "z-1 h-full cursor-pointer items-center justify-center rounded-md px-1.5 py-1",
               "text-body-base font-semibold whitespace-nowrap uppercase ring-offset-background",
               "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
               "disabled:pointer-events-none disabled:opacity-50",
+              timeframe.key === "6h" ? "hidden lg:inline-flex" : "inline-flex",
               isActive
                 ? "text-tabs-text-active"
                 : "text-tabs-text hover:text-tabs-text-hover",
             )}
           >
-            {timeframe.label}
+            {timeframe.key === "all" ? (
+              <>
+                <span className="hidden lg:inline">ALL</span>
+                <span className="lg:hidden">MAX</span>
+              </>
+            ) : (
+              timeframe.label
+            )}
           </button>
         );
       })}

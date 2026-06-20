@@ -91,7 +91,7 @@ export const OutcomeRow = memo(function OutcomeRow({
   return (
     <article className="[&+&]:border-t [&+&]:border-border">
       <div className="group relative flex w-full cursor-pointer flex-col gap-3 overflow-visible py-3 transition">
-        <div className="absolute -top-px -right-3 -bottom-px -left-3 rounded-md transition-colors group-hover:bg-neutral-50/50" />
+        <div className="absolute -top-px -right-3 -bottom-px -left-3 rounded-md transition-colors group-hover:bg-surface-2/50" />
 
         <div className="relative z-1 flex min-h-12 w-full flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex min-w-0 flex-1 items-center gap-4">
@@ -114,7 +114,7 @@ export const OutcomeRow = memo(function OutcomeRow({
                   aria-label="Rewards"
                   className={cn(
                     "inline-flex size-5 items-center justify-center rounded-sm",
-                    "bg-button-ghost-bg text-text-secondary hover:bg-black/5",
+                    "bg-button-ghost-bg text-text-secondary hover:bg-surface-2",
                     "focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none",
                   )}
                 >

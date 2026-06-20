@@ -107,7 +107,7 @@ export function ChartMetaRow({
             {formatDetailVolume(volume)}
           </p>
         </div>
-        <div className="h-[10px] w-[1.5px] shrink-0 rounded-full bg-neutral-100" />
+        <div className="h-[10px] w-[1.5px] shrink-0 rounded-full bg-border" />
         <div className="flex items-center gap-1.5 whitespace-nowrap text-[13px] font-medium tracking-[-0.09px] text-text-secondary">
           <ClockIcon />
           <span>{formatDate(endDate)}</span>

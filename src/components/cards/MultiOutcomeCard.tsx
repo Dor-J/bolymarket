@@ -14,7 +14,7 @@ import { getOutcomePriceKey } from "@/lib/prices/outcomeKey";
 import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
-  "group/card relative isolate flex min-h-[180px] h-full flex-col justify-between overflow-hidden rounded-xl border border-neutral-100 bg-card pt-3",
+  "group/card relative isolate flex min-h-[180px] h-full flex-col justify-between overflow-hidden rounded-xl border border-border bg-card pt-3",
   "shadow-md shadow-black/4 transition hover:-translate-y-px hover:shadow-md hover:shadow-black/8",
   "focus-within:ring-2 focus-within:ring-ring focus-within:outline-none",
 );
@@ -30,7 +30,7 @@ function MultiOutcomeRow({
   return (
     <div className="flex min-h-10 w-full shrink-0 items-center justify-between gap-4">
       <div className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="truncate text-sm leading-5 font-w440 text-neutral-950">
+        <span className="truncate text-sm leading-5 font-w440 text-text-primary">
           {outcome.name}
         </span>
       </div>
@@ -40,7 +40,7 @@ function MultiOutcomeRow({
           outcomeId={outcome.outcomeId}
           initialPrice={outcome.yesPrice}
           livePrice={livePrice}
-          className="mr-1 text-[15px] leading-[22.5px] font-semibold text-neutral-950"
+          className="mr-1 text-[15px] leading-[22.5px] font-semibold text-text-primary"
         />
         <YesNoChip
           side="yes"

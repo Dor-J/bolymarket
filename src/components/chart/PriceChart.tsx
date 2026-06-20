@@ -128,7 +128,7 @@ export function PriceChart({
   return (
     <div className={cn('relative w-full', className)}>
       <div className="pointer-events-none absolute top-1/2 right-4 z-10 -translate-y-1/2 text-xs font-semibold tracking-[0.2em] text-neutral-300/40 uppercase">
-        bolymarket
+        Bolymarket
       </div>
 
       <div className="h-[240px] w-full lg:h-[400px]">

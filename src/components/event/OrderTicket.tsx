@@ -166,7 +166,7 @@ export function OrderTicket({
                 'px-3 text-base font-semibold transition-colors',
                 outcomeSide === 'no'
                   ? 'bg-red-500 text-white'
-                  : 'bg-neutral-100 text-text-secondary hover:bg-neutral-200',
+                  : 'bg-surface-2 text-text-secondary hover:bg-surface-2/80',
               )}
             >
               <span>No</span>
@@ -204,7 +204,7 @@ export function OrderTicket({
                     className={cn(
                       'inline-flex h-7.5 cursor-pointer items-center justify-center rounded-md',
                       'border border-button-outline-border px-2.5 text-xs font-semibold',
-                      'text-text-secondary transition duration-150 active:scale-[97%] hover:bg-neutral-25',
+                      'text-text-secondary transition duration-150 active:scale-[97%] hover:bg-surface-2',
                     )}
                   >
                     +${value}

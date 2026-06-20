@@ -15,7 +15,7 @@ import type { MarketPriceState } from "@/types/polymarket";
 import { cn } from "@/lib/cn";
 
 const cardShellClasses = cn(
-  "group/card relative isolate flex min-h-[180px] h-full flex-col justify-between overflow-hidden rounded-xl border border-neutral-100 bg-card pt-3",
+  "group/card relative isolate flex min-h-[180px] h-full flex-col justify-between overflow-hidden rounded-xl border border-border bg-card pt-3",
   "shadow-md shadow-black/4 transition hover:-translate-y-px hover:shadow-md hover:shadow-black/8",
   "focus-within:ring-2 focus-within:ring-ring focus-within:outline-none",
 );
@@ -66,7 +66,7 @@ function ChanceMeter({
           outcomeId={outcomeId}
           initialPrice={initialPrice}
           livePrice={livePrice}
-          className="text-center text-heading-lg font-medium text-neutral-950"
+          className="text-center text-heading-lg font-medium text-text-primary"
         />
         <p className="line-clamp-2 text-center text-body-xs font-semibold text-text-secondary">
           chance
