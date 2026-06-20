@@ -577,11 +577,11 @@ function CryptoHeader({
   return (
     <>
       <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-2 lg:flex-nowrap">
-        <h1 className="order-1 shrink-0 text-heading-xl font-semibold lg:order-none">
+        <h1 className="order-1 shrink-0 text-heading-xl font-semibold lg:order-0">
           Crypto
         </h1>
 
-        <div className="no-scrollbar order-3 w-full min-w-0 flex-none overflow-x-auto lg:order-none lg:flex-1">
+        <div className="no-scrollbar order-3 w-full min-w-0 flex-none overflow-x-auto lg:order-0 lg:flex-1">
           <div className="relative">
             <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-2 w-8 bg-linear-to-r from-background via-background to-transparent opacity-0 transition-opacity duration-200 md:w-16" />
             <div
@@ -657,7 +657,7 @@ function CryptoHeader({
           </div>
         </div>
 
-        <div className="order-2 ml-auto flex shrink-0 items-center gap-0.5 lg:order-none">
+        <div className="order-2 ml-auto flex shrink-0 items-center gap-0.5 lg:order-0">
           <div className="relative flex items-center">
             <div
               className={cn(
@@ -918,7 +918,7 @@ export function CryptoPageView() {
         <EventsGridSkeleton
           hideHeading
           gridClassName={CRYPTO_GRID_CLASSES}
-          gridWrapperClassName="px-3 lg:px-0"
+          gridWrapperClassName="lg:px-0"
         />
       );
     }
@@ -954,7 +954,7 @@ export function CryptoPageView() {
           </p>
         ) : null}
 
-        <div className="relative flex h-auto w-full shrink-0 flex-col gap-3 px-3 pt-px pb-10 lg:px-0">
+        <div className="relative flex h-auto w-full shrink-0 flex-col gap-3 pt-px pb-10 lg:px-0">
           <div className={CRYPTO_GRID_CLASSES}>
             {visibleEvents.map((event) => (
               <EventCard key={event.id} event={event} />

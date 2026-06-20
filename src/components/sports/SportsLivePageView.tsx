@@ -198,7 +198,7 @@ export function SportsLivePageView() {
         />
       }
     >
-      <div className="relative h-fit w-full max-w-[756px] pt-8 max-lg:w-[calc(100vw-2rem)] max-lg:px-0 max-lg:pt-0 md:max-w-none lg:min-w-full lg:pl-8 xl:max-w-[756px]">
+      <div className="relative h-fit w-full max-w-[756px] pt-8 max-lg:mx-auto max-lg:w-[calc(100vw-2rem)] max-lg:px-0 max-lg:pt-0 md:max-w-none lg:min-w-full lg:pl-8 xl:max-w-[756px]">
         <div className="mb-2 pt-2 lg:hidden">
           {sportsTopicRail}
         </div>

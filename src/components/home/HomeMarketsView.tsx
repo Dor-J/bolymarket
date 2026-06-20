@@ -176,7 +176,6 @@ export function HomeMarketsView() {
         }}
         controls={controls}
         showSectionToolbar
-        gridWrapperClassName="lg:max-[1279px]:max-w-[646px]"
         thirdGridCard={<WorldCupOddsCard />}
         emptyMessage={
           searchQuery.trim()
