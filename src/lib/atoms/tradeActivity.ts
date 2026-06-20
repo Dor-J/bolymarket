@@ -23,6 +23,7 @@ export interface TradeActivityItem {
   size?: number;
   outcome?: string;
   userName?: string;
+  transactionHash?: string;
 }
 
 /** Recent trades keyed by event slug. */
@@ -47,7 +48,9 @@ export function appendTradeActivity(
   const existing = current[eventSlug] ?? [];
   const nextItem: TradeActivityItem = {
     ...item,
-    id: `${item.timestamp}-${item.assetId ?? 'trade'}-${++tradeActivityIdSeq}`,
+    id:
+      item.transactionHash ??
+      `${item.timestamp}-${item.assetId ?? 'trade'}-${++tradeActivityIdSeq}`,
     eventSlug,
   };
 

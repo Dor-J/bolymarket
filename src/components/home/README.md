@@ -20,7 +20,7 @@ Client-heavy home page UI — featured carousel, sidebar, and the trending marke
 | `FeaturedCarouselControls` | Bottom bar — pagination dots (left), prev/next pills (right, `lg+`) |
 | `FeaturedEventPreview` | Polymarket-style featured card — outcomes, bid rail, chart, activity |
 | `FeaturedOutcomeRows` | Outcome list inside the featured card |
-| `FeaturedBidRail` | Vertical trade notionals between outcomes and chart (`lg+`) |
+| `FeaturedBidRail` | Vertical trade notionals between outcomes and chart (`lg+`), seeded by historical trades and refreshed by live activity |
 | `FeaturedCompactChart` | ResizeObserver + Recharts multi-line chart with live prices |
 | `FeaturedActivityRail` | News-first activity feed with trade fallback |
 
@@ -49,6 +49,7 @@ HomeMarketsView
   useFilteredEvents() → topic/sort/status/bookmark filters
   useLivePrices(featuredSeeds)
   HomeFeaturedSection → FeaturedCarousel + HomeFeaturedSidebar
+    FeaturedBidRail → /api/trades + tradeActivityByEventAtom
   MarketsPageBody → EventCard grid + show more
 ```
 
@@ -58,6 +59,7 @@ HomeMarketsView
 | ---- | ----- |
 | `FeaturedCarousel.test.tsx` | Carousel render, navigation, dots |
 | `FeaturedCarouselControls.test.tsx` | Dots + adjacent-market nav buttons |
+| `FeaturedBidRail.test.tsx` | Historical/live bid rail merge behavior |
 | `HomeFeaturedSidebar.test.tsx` | Combo card, hot topics, explore link |
 | `EventsGrid.test.tsx` | Loading, error, empty, success |
 | `EventListEmpty.test.tsx` | Empty copy |

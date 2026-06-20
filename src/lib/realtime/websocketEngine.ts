@@ -147,6 +147,7 @@ export function createWebSocketEngine(): PriceSource & {
         size: trade.size,
         outcome: trade.outcome,
         userName: trade.userName,
+        transactionHash: trade.transactionHash,
       });
     }
   }

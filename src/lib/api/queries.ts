@@ -4,6 +4,7 @@ import type { Timeframe } from '@/lib/chart/types';
 import { fetchEventBySlugClient, fetchEventsClient } from './eventsClient';
 import { fetchPriceHistoryClient } from './pricesClient';
 import { fetchRelatedNewsClient } from './relatedNewsClient';
+import { fetchTradeHistoryClient } from './tradesClient';
 
 /** React Query options for the aggregated open events list. */
 export const eventsQueryOptions = queryOptions({
@@ -75,5 +76,22 @@ export function relatedNewsQueryOptions(input: {
     staleTime: 120_000,
     gcTime: 10 * 60_000,
     enabled: input.enabled ?? true,
+  });
+}
+
+/** React Query options for recent public event trades. */
+export function tradeHistoryQueryOptions(
+  eventId: string,
+  eventSlug: string,
+  limit = 20,
+) {
+  return queryOptions({
+    queryKey: ['trades', eventId, eventSlug, limit],
+    queryFn: ({ signal }) =>
+      fetchTradeHistoryClient(eventId, eventSlug, { limit, signal }),
+    staleTime: 20_000,
+    gcTime: 5 * 60_000,
+    retry: 1,
+    enabled: Boolean(eventId && eventSlug),
   });
 }

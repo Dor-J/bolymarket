@@ -20,6 +20,7 @@ describe("parseTradePayload", () => {
       outcome: undefined,
       userName: undefined,
       timestamp: undefined,
+      transactionHash: undefined,
     });
   });
 
@@ -41,6 +42,24 @@ describe("parseTradePayload", () => {
       size: 260,
       side: 'BUY',
       timestamp: 1_781_700_000,
+    });
+  });
+
+  it('parses snake_case activity fields and usdcSize', () => {
+    expect(
+      parseTradePayload({
+        asset_id: 'token-2',
+        price: '0.27',
+        event_slug: 'world-cup-winner',
+        usdcSize: 420,
+        transaction_hash: '0xtrade',
+      }),
+    ).toMatchObject({
+      asset: 'token-2',
+      price: 0.27,
+      eventSlug: 'world-cup-winner',
+      size: 420,
+      transactionHash: '0xtrade',
     });
   });
 

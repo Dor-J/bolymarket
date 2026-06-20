@@ -10,6 +10,29 @@ export interface TradePayload {
   outcome?: string;
   userName?: string;
   timestamp?: number;
+  transactionHash?: string;
+}
+
+function getString(record: Record<string, unknown>, ...keys: string[]): string | undefined {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'string') {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function getNumber(record: Record<string, unknown>, ...keys: string[]): number {
+  for (const key of keys) {
+    const value = Number(record[key]);
+    if (Number.isFinite(value)) {
+      return value;
+    }
+  }
+
+  return Number.NaN;
 }
 
 /**
@@ -17,35 +40,31 @@ export interface TradePayload {
  */
 export function parseTradePayload(payload: object): TradePayload | null {
   const record = payload as Record<string, unknown>;
-  const price = Number(record.price);
+  const price = getNumber(record, 'price');
 
   if (!Number.isFinite(price)) {
     return null;
   }
 
-  const size = Number(record.size);
-  const timestamp = Number(record.timestamp);
+  const size = getNumber(record, 'size', 'usdcSize');
+  const timestamp = getNumber(record, 'timestamp');
 
   return {
-    asset: typeof record.asset === "string" ? record.asset : undefined,
+    asset: getString(record, 'asset', 'asset_id'),
     price,
     eventSlug:
-      typeof record.eventSlug === "string" ? record.eventSlug : undefined,
-    slug: typeof record.slug === "string" ? record.slug : undefined,
+      getString(record, 'eventSlug', 'event_slug'),
+    slug: getString(record, 'slug'),
     outcomeIndex:
       typeof record.outcomeIndex === "number"
         ? record.outcomeIndex
         : undefined,
-    side: typeof record.side === "string" ? record.side : undefined,
+    side: getString(record, 'side'),
     size: Number.isFinite(size) && size > 0 ? size : undefined,
-    outcome: typeof record.outcome === "string" ? record.outcome : undefined,
-    userName:
-      typeof record.pseudonym === "string"
-        ? record.pseudonym
-        : typeof record.name === "string"
-          ? record.name
-          : undefined,
+    outcome: getString(record, 'outcome'),
+    userName: getString(record, 'pseudonym', 'name'),
     timestamp: Number.isFinite(timestamp) ? timestamp : undefined,
+    transactionHash: getString(record, 'transactionHash', 'transaction_hash'),
   };
 }
 

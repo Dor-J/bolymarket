@@ -1,7 +1,9 @@
 'use client';
 
 import { useAtomValue } from 'jotai';
+import { useQuery } from '@tanstack/react-query';
 import { tradeActivityForEventAtomFamily } from '@/lib/atoms/tradeActivity';
+import { tradeHistoryQueryOptions } from '@/lib/api/queries';
 import {
   formatTradeSizeUsd,
   getTradeNotionalUsd,
@@ -40,17 +42,47 @@ function getTradeColor(
   return outcomes[outcomeIndex]?.color ?? getOutcomeColor(outcomeIndex);
 }
 
-/**
- * Vertical list of recent trade notionals between outcomes and the featured chart.
- */
-export function FeaturedBidRail({
-  event,
-  outcomes,
-  className,
-}: FeaturedBidRailProps) {
-  const trades = useAtomValue(tradeActivityForEventAtomFamily(event.slug));
+function getTradeDedupeKey(trade: TradeActivityItem): string {
+  if (trade.transactionHash) {
+    return trade.transactionHash;
+  }
 
-  const bidItems = trades
+  return [
+    trade.assetId ?? '',
+    trade.timestamp,
+    trade.size ?? '',
+    trade.price,
+    trade.outcome ?? '',
+  ].join(':');
+}
+
+export interface FeaturedBidItem {
+  id: string;
+  color: string;
+  size: number;
+}
+
+/**
+ * Merges live trades before historical trades and formats rail-ready items.
+ */
+export function getFeaturedBidItems(
+  liveTrades: TradeActivityItem[],
+  historicalTrades: TradeActivityItem[],
+  outcomes: ChartOutcome[],
+  maxVisible = MAX_VISIBLE_BIDS,
+): FeaturedBidItem[] {
+  const seen = new Set<string>();
+
+  return [...liveTrades, ...historicalTrades]
+    .filter((trade) => {
+      const key = getTradeDedupeKey(trade);
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    })
     .map((trade) => {
       const size = getTradeNotionalUsd(trade);
 
@@ -64,9 +96,25 @@ export function FeaturedBidRail({
         size,
       };
     })
-    .filter((item): item is { id: string; color: string; size: number } => item !== null)
-    .slice(0, MAX_VISIBLE_BIDS)
+    .filter((item): item is FeaturedBidItem => item !== null)
+    .slice(0, maxVisible)
     .reverse();
+}
+
+/**
+ * Vertical list of recent trade notionals between outcomes and the featured chart.
+ */
+export function FeaturedBidRail({
+  event,
+  outcomes,
+  className,
+}: FeaturedBidRailProps) {
+  const liveTrades = useAtomValue(tradeActivityForEventAtomFamily(event.slug));
+  const { data: historicalTrades = [] } = useQuery(
+    tradeHistoryQueryOptions(event.id, event.slug),
+  );
+
+  const bidItems = getFeaturedBidItems(liveTrades, historicalTrades, outcomes);
 
   if (bidItems.length === 0) {
     return null;

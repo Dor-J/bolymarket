@@ -31,7 +31,6 @@ export function YesNoChip({
   livePrice,
 }: YesNoChipProps) {
   const label = customLabel ?? (side === "yes" ? "Yes" : "No");
-  const initialPrice = side === "no" ? Math.max(0, 1 - price) : price;
 
   return (
     <Chip
@@ -50,7 +49,7 @@ export function YesNoChip({
       <PriceDisplay
         marketId={marketId}
         outcomeId={outcomeId}
-        initialPrice={initialPrice}
+        initialPrice={price}
         side={side}
         livePrice={livePrice}
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100"
