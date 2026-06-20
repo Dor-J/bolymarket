@@ -52,7 +52,7 @@ export function WorldCupOddsCard({ className }: WorldCupOddsCardProps) {
         'relative block h-full min-h-[180px] overflow-hidden rounded-xl border',
         'border-border bg-background shadow-md shadow-black/4 transition',
         'hover:-translate-y-px hover:shadow-md hover:shadow-black/8',
-        'dark:bg-neutral-50 dark:hover:bg-neutral-100',
+        'hover:bg-surface-2',
         className,
       )}
     >
@@ -123,7 +123,7 @@ export function WorldCupOddsCard({ className }: WorldCupOddsCardProps) {
         <div
           className={cn(
             'absolute inset-x-0 bottom-0 flex items-end px-5 pt-[60px] pb-5',
-            'bg-linear-to-b from-transparent to-background dark:to-neutral-50',
+            'bg-linear-to-b from-transparent to-background',
           )}
         >
           <p className="font-sauce text-heading-2xl text-text-primary">

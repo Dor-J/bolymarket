@@ -29,9 +29,9 @@ const QUICK_AMOUNTS = [1, 5, 10, 100] as const;
 
 const quickAmountButtonClass = cn(
   'inline-flex h-7.5 cursor-pointer items-center justify-center gap-2 rounded-md',
-  'border border-border px-2.5 text-xs font-semibold whitespace-nowrap',
+  'border border-border bg-button-secondary-bg px-2.5 text-xs font-semibold whitespace-nowrap',
   'text-text-secondary transition duration-150 active:scale-[97%]',
-  'hover:bg-neutral-25 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
+  'hover:bg-button-secondary-bg-hover focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
 );
 
 const TWO_WORD_TEAM_NICKNAMES = new Set([

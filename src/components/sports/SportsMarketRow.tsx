@@ -196,6 +196,57 @@ export const SportsMarketRow = memo(function SportsMarketRow({
     });
   }
 
+  function renderMobileMoneylineButtons(market: SportsMarket | undefined) {
+    if (!market || market.outcomes.length < 2) {
+      return [0, 1].map((index) => (
+        <TradingButton
+          key={index}
+          variant="gray"
+          disabled
+          className="h-11! w-full rounded-md! opacity-50"
+        >
+          <span className="text-sm">--</span>
+        </TradingButton>
+      ));
+    }
+
+    return market.outcomes.slice(0, 2).map((outcome, index) => {
+      const colors = getMoneylineFeedColors(index, game.teams[index]?.color);
+      const abbrev = game.teams[index]?.abbreviation ?? '';
+
+      return (
+        <TradingButton
+          key={outcome.id}
+          variant="custom"
+          backgroundColor={colors.background}
+          textColor={colors.color}
+          onClick={(event) => {
+            stopClick(event);
+            handleOutcomeClick('moneyline', index);
+          }}
+          className={cn(
+            'h-11! w-full rounded-md! px-0! text-sm!',
+            isOutcomeSelected('moneyline', index) &&
+              'ring-2 ring-brand ring-offset-1',
+          )}
+        >
+          <span className="flex flex-1 items-baseline justify-center px-3">
+            <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold uppercase opacity-70">
+              {abbrev}
+            </span>
+            <PriceDisplay
+              marketId={market.id}
+              outcomeId={outcome.id}
+              initialPrice={outcome.price}
+              format="sportsCents"
+              className="ml-1 text-base font-semibold tabular-nums"
+            />
+          </span>
+        </TradingButton>
+      );
+    });
+  }
+
   function renderLineButtons(
     marketType: 'spread' | 'total',
     market: SportsMarket | undefined,
@@ -267,7 +318,7 @@ export const SportsMarketRow = memo(function SportsMarketRow({
       <div
         className={cn(
           'group relative flex w-full cursor-pointer flex-col p-3',
-          'bg-surface-1 transition-colors hover:bg-neutral-50/50',
+          'bg-surface-1 transition-colors hover:bg-surface-2/50',
         )}
         onClick={handleRowClick}
         onKeyDown={(eventKey) => {
@@ -284,7 +335,7 @@ export const SportsMarketRow = memo(function SportsMarketRow({
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <div className="flex min-w-0 flex-1 items-center gap-2">
                 {isFinal ? (
-                  <div className="flex h-5 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-sm bg-neutral-50 px-1.5">
+                  <div className="flex h-5 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-sm bg-surface-2 px-1.5">
                     <p className="text-body-sm font-medium text-text-primary">
                       FINAL
                     </p>
@@ -314,7 +365,7 @@ export const SportsMarketRow = memo(function SportsMarketRow({
                 className="max-lg:hidden"
                 aria-label="Order Book"
               >
-                <span className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-neutral-50 outline-none hover:bg-neutral-100">
+                <span className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-surface-2 outline-none hover:bg-surface-2/80">
                   <OrderBookIcon />
                 </span>
               </Link>
@@ -322,7 +373,7 @@ export const SportsMarketRow = memo(function SportsMarketRow({
           </div>
 
           <div className="flex w-full flex-col gap-3">
-            <div className="flex w-full flex-row gap-3 @max-[490px]:flex-col">
+            <div className="flex w-full flex-col gap-3 lg:flex-row">
               <div
                 className={cn(
                   'grid w-full items-center gap-x-3 gap-y-3 lg:min-w-0 lg:flex-1 lg:self-center',
@@ -339,7 +390,7 @@ export const SportsMarketRow = memo(function SportsMarketRow({
                   return (
                     <div key={team.id} className="contents">
                       {showScores ? (
-                        <div className="score-container flex h-6 items-center justify-center rounded-sm bg-neutral-100 px-1.5 text-xs font-semibold text-text-primary">
+                        <div className="score-container flex h-6 items-center justify-center rounded-sm bg-surface-2 px-1.5 text-xs font-semibold text-text-primary">
                           {score ?? '0'}
                         </div>
                       ) : null}
@@ -373,7 +424,11 @@ export const SportsMarketRow = memo(function SportsMarketRow({
               </div>
 
               <div className="mt-1.5 flex flex-1 lg:mt-0 lg:justify-end">
-                <div className="grid w-full flex-1 grid-cols-3 gap-2 lg:w-[372px] lg:@max-[490px]:w-full">
+                <div className="grid w-full grid-cols-2 gap-2 lg:hidden">
+                  {renderMobileMoneylineButtons(game.moneyline)}
+                </div>
+
+                <div className="hidden w-full flex-1 grid-cols-3 gap-2 lg:grid lg:w-[372px]">
                   <div className="flex w-full items-end justify-between lg:justify-end">
                     <div className="flex w-full flex-col gap-2">
                       {renderMoneylineButtons(game.moneyline)}

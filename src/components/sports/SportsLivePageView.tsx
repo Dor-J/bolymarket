@@ -135,6 +135,32 @@ export function SportsLivePageView() {
     [leagues],
   );
 
+  const sportsTopicRail = (
+    <MarketTopicRail
+      items={[
+        { id: 'live', label: 'Live' },
+        { id: 'futures', label: 'Futures' },
+        ...sidebarItems.map((item) => ({
+          id: item.id,
+          label: item.label,
+          count: item.count,
+        })),
+      ]}
+      selectedId={filterId === 'all' ? viewTab : filterId}
+      onSelect={(id) => {
+        if (id === 'live' || id === 'futures') {
+          setViewTab(id);
+          setFilterId('all');
+          return;
+        }
+
+        setFilterId(id);
+        setViewTab('live');
+      }}
+      showCounts
+    />
+  );
+
   if (isLoading) {
     return <EventsGridSkeleton heading="Sports Live" hideHeading />;
   }
@@ -173,37 +199,15 @@ export function SportsLivePageView() {
       }
     >
       <div className="relative h-fit w-full max-w-[756px] pt-8 max-lg:w-[calc(100vw-2rem)] max-lg:px-0 max-lg:pt-0 md:max-w-none lg:min-w-full lg:pl-8 xl:max-w-[756px]">
+        <div className="mb-2 pt-2 lg:hidden">
+          {sportsTopicRail}
+        </div>
+
         {viewTab === 'live' ? (
           <SportsWorldCupBanner onSelect={() => setFilterId('world-cup')} />
         ) : null}
 
         <SportsLiveHeader />
-
-        <div className="mb-3 lg:hidden">
-          <MarketTopicRail
-            items={[
-              { id: 'live', label: 'Live' },
-              { id: 'futures', label: 'Futures' },
-              ...sidebarItems.map((item) => ({
-                id: item.id,
-                label: item.label,
-                count: item.count,
-              })),
-            ]}
-            selectedId={filterId === 'all' ? viewTab : filterId}
-            onSelect={(id) => {
-              if (id === 'live' || id === 'futures') {
-                setViewTab(id);
-                setFilterId('all');
-                return;
-              }
-
-              setFilterId(id);
-              setViewTab('live');
-            }}
-            showCounts
-          />
-        </div>
 
         {sections.length === 0 ? (
           <p className="py-8 text-center text-sm text-neutral-500">

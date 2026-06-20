@@ -221,7 +221,7 @@ export function SportsLiveHeader() {
                       className={cn(
                         'relative flex w-full cursor-pointer select-none items-center gap-2',
                         'rounded-sm px-2.5 py-2 pr-8 text-left text-body-base font-medium',
-                        'text-text-primary outline-none hover:bg-neutral-50 focus:bg-neutral-50',
+                        'text-text-primary outline-none hover:bg-surface-2 focus:bg-surface-2',
                       )}
                       onClick={() => setOddsFormat(option)}
                     >
@@ -243,7 +243,7 @@ export function SportsLiveHeader() {
                 className={cn(
                   'relative flex w-full cursor-pointer select-none items-center gap-2',
                   'rounded-sm px-2.5 py-2 pr-8 text-left text-sm font-medium',
-                  'text-text-primary outline-none hover:bg-neutral-50 focus:bg-neutral-50',
+                  'text-text-primary outline-none hover:bg-surface-2 focus:bg-surface-2',
                 )}
                 onClick={() => setShowSpreadTotals((value) => !value)}
               >

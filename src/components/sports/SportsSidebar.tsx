@@ -234,7 +234,7 @@ function SidebarLinkRow({
             </p>
           </div>
           {!hideCount && count > 0 ? (
-            <span className="absolute top-1/2 right-3 -translate-y-1/2 text-[11px] font-bold text-text-tertiary">
+            <span className="absolute top-1/2 right-3 -translate-y-1/2 text-[11px] font-bold text-text-secondary">
               {formatMarketCount(count)}
             </span>
           ) : null}
@@ -267,7 +267,7 @@ function SidebarLinkRow({
         <p className="truncate text-[15px] font-semibold text-text">{link.label}</p>
       </div>
       {!hideCount && count > 0 ? (
-        <div className="ml-2 shrink-0 text-[11px] font-bold text-text-tertiary">
+        <div className="ml-2 shrink-0 text-[11px] font-bold text-text-secondary">
           {formatMarketCount(count)}
         </div>
       ) : null}

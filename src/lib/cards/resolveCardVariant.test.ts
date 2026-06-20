@@ -76,6 +76,49 @@ describe("resolveCardVariant", () => {
     expect(resolveCardVariant(event)).toBe("multi-outcome");
   });
 
+  it("returns sports-match for multi-market World Cup moneyline events", () => {
+    const event = createMockEvent({
+      id: "world-cup-match",
+      slug: "fifwc-bra-hai-2026-06-19",
+      title: "Brazil vs. Haiti",
+      tags: ["sports", "soccer", "world cup"],
+      markets: [
+        {
+          id: "brazil",
+          question: "Brazil to win?",
+          slug: "fifwc-bra-hai-2026-06-19-bra",
+          volume: 100,
+          outcomes: [
+            { id: "brazil-yes", name: "Yes", price: 0.89 },
+            { id: "brazil-no", name: "No", price: 0.11 },
+          ],
+        },
+        {
+          id: "draw",
+          question: "Brazil vs. Haiti end in a draw?",
+          slug: "fifwc-bra-hai-2026-06-19-draw",
+          volume: 100,
+          outcomes: [
+            { id: "draw-yes", name: "Yes", price: 0.08 },
+            { id: "draw-no", name: "No", price: 0.92 },
+          ],
+        },
+        {
+          id: "haiti",
+          question: "Haiti to win?",
+          slug: "fifwc-bra-hai-2026-06-19-hai",
+          volume: 100,
+          outcomes: [
+            { id: "haiti-yes", name: "Yes", price: 0.04 },
+            { id: "haiti-no", name: "No", price: 0.96 },
+          ],
+        },
+      ],
+    });
+
+    expect(resolveCardVariant(event)).toBe("sports-match");
+  });
+
   it("returns crypto-up-down for up/down binary markets", () => {
     const event = createMockEvent({
       id: "4",

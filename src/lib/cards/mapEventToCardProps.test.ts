@@ -250,4 +250,49 @@ describe("mapEventToCardProps", () => {
       expect(result.props.outcomes.length).toBeLessThanOrEqual(2);
     }
   });
+
+  it("routes multi-market sports matchups to the sports card", () => {
+    const event = createMockEvent({
+      id: "sports-match",
+      slug: "fifwc-usa-aus-2026-06-19",
+      title: "United States vs. Australia",
+      tags: ["sports", "soccer", "world cup"],
+      markets: [
+        {
+          id: "usa",
+          question: "United States to win?",
+          slug: "fifwc-usa-aus-2026-06-19-usa",
+          volume: 100,
+          outcomes: [
+            { id: "usa-yes", name: "Yes", price: 0.61 },
+            { id: "usa-no", name: "No", price: 0.39 },
+          ],
+        },
+        {
+          id: "draw",
+          question: "United States vs. Australia end in a draw?",
+          slug: "fifwc-usa-aus-2026-06-19-draw",
+          volume: 100,
+          outcomes: [
+            { id: "draw-yes", name: "Yes", price: 0.22 },
+            { id: "draw-no", name: "No", price: 0.78 },
+          ],
+        },
+        {
+          id: "aus",
+          question: "Australia to win?",
+          slug: "fifwc-usa-aus-2026-06-19-aus",
+          volume: 100,
+          outcomes: [
+            { id: "aus-yes", name: "Yes", price: 0.18 },
+            { id: "aus-no", name: "No", price: 0.82 },
+          ],
+        },
+      ],
+    });
+
+    const result = mapEventToCardProps(event);
+
+    expect(result.variant).toBe("sports-match");
+  });
 });

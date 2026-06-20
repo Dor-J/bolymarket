@@ -1,5 +1,5 @@
 /**
- * Normalized domain types for bolymarket.
+ * Normalized domain types for Bolymarket.
  * Components must consume these — never raw Gamma API shapes.
  */
 
