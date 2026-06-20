@@ -78,7 +78,7 @@ export const FOOTER_BRAND_SUBTITLE = "The World's Largest Prediction Market™";
 export const FOOTER_COMPANY_LINE = 'Adventure One QSS Inc. © 2026';
 
 export const FOOTER_AFFILIATION_LINE =
-  'bolymarket — not affiliated with Polymarket';
+  'Bolymarket is not affiliated with Polymarket.';
 
 /** Height of the fixed mobile bottom nav for layout padding. */
 export const MOBILE_BOTTOM_NAV_HEIGHT_PX = 56;

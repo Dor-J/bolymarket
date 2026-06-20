@@ -199,7 +199,7 @@ export function Footer() {
             </div>
 
             <p className="text-xs leading-relaxed text-text-tertiary">
-              Polymarket operates globally through separate legal entities.{' '}
+              Bolymarket operates globally through separate legal entities.{' '}
               <a
                 href="#"
                 onClick={(event) => event.preventDefault()}
@@ -207,7 +207,7 @@ export function Footer() {
               >
                 Polymarket US
               </a>{' '}
-              is operated by QCX LLC d/b/a Polymarket US, a CFTC-regulated Designated
+              is operated by QCX LLC d/b/a Bolymarket US, a CFTC-regulated Designated
               Contract Market. This international platform is not regulated by the CFTC and
               operates independently. Trading involves substantial risk of loss. See our{' '}
               <a

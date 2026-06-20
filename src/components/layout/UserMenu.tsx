@@ -228,7 +228,7 @@ export function UserMenu() {
   }
 
   return (
-    <div ref={containerRef} className="relative hidden xl:block">
+    <div ref={containerRef} className="relative hidden md:block">
       <button
         type="button"
         aria-label="Open user menu"
@@ -239,7 +239,7 @@ export function UserMenu() {
           setLanguageOpen(false);
         }}
         className={cn(
-          'group hidden cursor-pointer items-center rounded-[6px] p-2 xl:flex',
+          'group hidden cursor-pointer items-center rounded-[6px] p-2 md:flex',
           'transition-none hover:bg-surface-2',
           'focus:outline-none focus-visible:outline-none',
         )}

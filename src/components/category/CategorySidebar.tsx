@@ -50,7 +50,7 @@ export function CategorySidebar({
                 className={cn(
                   'group flex w-full cursor-pointer flex-row items-center justify-between',
                   'rounded-md px-3 py-2.5',
-                  active ? 'bg-neutral-100' : 'bg-transparent hover:bg-neutral-50',
+                  active ? 'bg-surface-2' : 'bg-transparent hover:bg-surface-2',
                 )}
               >
                 <div
@@ -63,7 +63,7 @@ export function CategorySidebar({
                   <p className="truncate text-base font-semibold text-text">{item.label}</p>
                 </div>
                 {item.count !== undefined ? (
-                  <div className="ml-2 shrink-0 text-[11px] font-bold text-neutral-300">
+                  <div className="ml-2 shrink-0 text-[11px] font-bold text-text-secondary">
                     {formatMarketCount(item.count)}
                   </div>
                 ) : null}

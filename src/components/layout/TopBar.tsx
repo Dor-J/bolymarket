@@ -28,10 +28,10 @@ const HowItWorksModal = dynamic(
 export function TopBar() {
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const searchRef = useRef<HTMLInputElement>(null);
-  const [isXlUp, setIsXlUp] = useState(() =>
+  const [isDesktopSearchVisible, setIsDesktopSearchVisible] = useState(() =>
     typeof window === 'undefined'
       ? false
-      : window.matchMedia('(min-width: 1280px)').matches,
+      : window.matchMedia('(min-width: 1024px)').matches,
   );
   const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null);
   const [howItWorksOpen, setHowItWorksOpen] = useState(false);
@@ -39,16 +39,16 @@ export function TopBar() {
   const [hasLoadedHowItWorksModal, setHasLoadedHowItWorksModal] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1280px)');
+    const mq = window.matchMedia('(min-width: 1024px)');
     function handleChange() {
-      setIsXlUp(mq.matches);
+      setIsDesktopSearchVisible(mq.matches);
     }
 
     mq.addEventListener('change', handleChange);
     return () => mq.removeEventListener('change', handleChange);
   }, []);
 
-  useSearchShortcut(searchRef, isXlUp);
+  useSearchShortcut(searchRef, isDesktopSearchVisible);
 
   function openAuthModal(mode: 'login' | 'signup') {
     setHasLoadedAuthModal(true);
@@ -72,7 +72,7 @@ export function TopBar() {
           <div className="flex min-w-0 items-center gap-3">
             <Logo className="shrink-0" />
 
-            <div className="relative hidden min-w-0 xl:block xl:w-[600px]">
+            <div className="relative hidden min-w-0 lg:block lg:w-[416px] xl:w-[600px]">
               <div className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-neutral-500">
                 <HeaderSearchIcon />
               </div>
@@ -96,7 +96,7 @@ export function TopBar() {
               />
               <kbd
                 aria-hidden
-                className="pointer-events-none absolute top-1/2 right-4 hidden -translate-y-1/2 text-sm text-neutral-400 xl:block"
+                className="pointer-events-none absolute top-1/2 right-4 hidden -translate-y-1/2 text-sm text-neutral-400 lg:block"
               >
                 /
               </kbd>
@@ -104,7 +104,7 @@ export function TopBar() {
 
             <Button
               variant="ghost-brand"
-              className="hidden h-9 shrink-0 px-3 xl:inline-flex"
+              className="hidden h-9 shrink-0 px-3 lg:inline-flex"
               aria-label="How it works"
               onClick={openHowItWorksModal}
             >
@@ -116,7 +116,7 @@ export function TopBar() {
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <Button
               variant="ghost-brand"
-              className="hidden h-9 xl:inline-flex"
+              className="hidden h-9 md:inline-flex"
               onClick={() => openAuthModal('login')}
             >
               Log In

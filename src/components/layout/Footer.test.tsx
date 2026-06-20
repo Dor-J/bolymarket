@@ -37,7 +37,7 @@ describe('Footer', () => {
     expect(screen.getByText('Terms of Service')).toBeInTheDocument();
     expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
     expect(
-      screen.getByText('bolymarket — not affiliated with Polymarket'),
+      screen.getByText('Bolymarket is not affiliated with Polymarket'),
     ).toBeInTheDocument();
   });
 });
