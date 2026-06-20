@@ -25,12 +25,6 @@ export const CategoryNav = memo(function CategoryNav() {
                   <>
                     <span
                       aria-hidden
-                      className="mx-1 text-sm text-neutral-500 select-none lg:hidden"
-                    >
-                      |
-                    </span>
-                    <span
-                      aria-hidden
                       className="mx-2 hidden h-3.5 w-0.5 shrink-0 rounded-full bg-border lg:block"
                     />
                   </>
