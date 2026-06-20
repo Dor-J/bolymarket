@@ -92,6 +92,44 @@ export const openApiSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
       description: 'Series values keyed by CLOB token id.',
     },
   },
+  TradeActivityItem: {
+    type: 'object',
+    required: ['id', 'eventSlug', 'price', 'timestamp'],
+    properties: {
+      id: {
+        type: 'string',
+        description: 'Stable trade id, preferably transaction hash.',
+        example: '0xdd22472e552920b8438158ea7238bfadfa4f736aa4cee91a6b86c39ead110917',
+      },
+      eventSlug: { type: 'string', example: 'world-cup-winner' },
+      price: {
+        type: 'number',
+        format: 'float',
+        minimum: 0,
+        maximum: 1,
+        example: 0.18,
+      },
+      side: { type: 'string', example: 'BUY' },
+      timestamp: {
+        type: 'integer',
+        format: 'int64',
+        example: 1_781_700_000,
+      },
+      assetId: {
+        type: 'string',
+        description: 'CLOB token id for the traded outcome.',
+      },
+      size: {
+        type: 'number',
+        format: 'float',
+        description: 'USDC notional when provided by the Data API.',
+        example: 260,
+      },
+      outcome: { type: 'string', example: 'France' },
+      userName: { type: 'string', example: 'polyfan' },
+      transactionHash: { type: 'string' },
+    },
+  },
   NewsArticle: {
     type: 'object',
     required: ['title', 'link', 'score'],
@@ -199,6 +237,10 @@ export function buildOpenApiSpec({
       {
         name: 'Prices',
         description: 'Historical outcome prices from the Polymarket CLOB API.',
+      },
+      {
+        name: 'Trades',
+        description: 'Recent public trade history from the Polymarket Data API.',
       },
       {
         name: 'News',
@@ -339,6 +381,81 @@ export function buildOpenApiSpec({
                 'application/json': {
                   schema: { $ref: '#/components/schemas/ErrorResponse' },
                   example: { error: 'Invalid timeframe' },
+                },
+              },
+            },
+            '500': {
+              description: 'Server error.',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/ErrorResponse' },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/trades': {
+        get: {
+          tags: ['Trades'],
+          summary: 'Get recent event trades',
+          description:
+            'Returns recent public Polymarket Data API trades for an event. ' +
+            'Used to seed featured bid rails before live websocket activity arrives.',
+          operationId: 'getRecentEventTrades',
+          parameters: [
+            {
+              name: 'eventId',
+              in: 'query',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Gamma event id used by Polymarket Data API filters.',
+              example: '903445',
+            },
+            {
+              name: 'eventSlug',
+              in: 'query',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Event slug used as a fallback when upstream omits it.',
+              example: 'world-cup-winner',
+            },
+            {
+              name: 'limit',
+              in: 'query',
+              required: false,
+              schema: {
+                type: 'integer',
+                minimum: 1,
+                maximum: 50,
+                default: 20,
+              },
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Recent event trades.',
+              headers: {
+                'Cache-Control': {
+                  schema: { type: 'string' },
+                  example: 'public, s-maxage=20, stale-while-revalidate=60',
+                },
+              },
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: { $ref: '#/components/schemas/TradeActivityItem' },
+                  },
+                },
+              },
+            },
+            '400': {
+              description: 'Missing or invalid query parameters.',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/ErrorResponse' },
+                  example: { error: 'Missing eventId or eventSlug' },
                 },
               },
             },

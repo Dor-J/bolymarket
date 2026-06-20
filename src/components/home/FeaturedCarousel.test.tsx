@@ -12,6 +12,10 @@ vi.mock('./FeaturedActivityRail', () => ({
   FeaturedActivityRail: () => <div data-testid="featured-activity" />,
 }));
 
+vi.mock('./FeaturedBidRail', () => ({
+  FeaturedBidRail: () => <div data-testid="featured-bid-rail" />,
+}));
+
 const featuredEvents = [
   createMockEvent({
     id: '1',
@@ -57,6 +61,7 @@ describe('FeaturedCarousel', () => {
     expect(screen.getByText('France')).toBeInTheDocument();
     expect(screen.getByTestId('featured-chart')).toBeInTheDocument();
     expect(screen.getByTestId('featured-activity')).toBeInTheDocument();
+    expect(screen.getByTestId('featured-bid-rail')).toBeInTheDocument();
   });
 
   it('navigates between featured slides', async () => {

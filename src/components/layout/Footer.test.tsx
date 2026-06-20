@@ -32,12 +32,12 @@ describe('Footer', () => {
     expect(screen.getByText('Adventure One QSS Inc. © 2026')).toBeInTheDocument();
     expect(screen.getByText('Privacy')).toBeInTheDocument();
     expect(screen.getByLabelText('Select language')).toBeInTheDocument();
-    expect(screen.getByText(/Polymarket operates globally/)).toBeInTheDocument();
+    expect(screen.getByText(/Bolymarket operates globally/)).toBeInTheDocument();
     expect(screen.getByText('Polymarket US')).toBeInTheDocument();
     expect(screen.getByText('Terms of Service')).toBeInTheDocument();
     expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
     expect(
-      screen.getByText('Bolymarket is not affiliated with Polymarket'),
+      screen.getByText('Bolymarket is not affiliated with Polymarket.'),
     ).toBeInTheDocument();
   });
 });
