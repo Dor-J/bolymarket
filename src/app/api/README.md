@@ -7,6 +7,7 @@ Next.js App Router route handlers under `src/app/api/`. All routes return JSON u
 | `/api/events` | GET | Open events list. Optional `?tag=crypto\|sports\|politics` |
 | `/api/events/[slug]` | GET | Single normalized event by slug |
 | `/api/prices/[tokenId]` | GET | CLOB price history. Optional `?timeframe=1d` |
+| `/api/trades` | GET | Recent public Data API trades for an event. Requires `?eventId=&eventSlug=` |
 | `/api/sports/live` | GET | Sports live games + league summaries (server-cached) |
 | `/api/related-news` | GET | Related GDELT news articles for event context, with OkSurf fallback |
 | `/api/openapi` | GET | OpenAPI 3.0 specification JSON |
@@ -17,6 +18,7 @@ Next.js App Router route handlers under `src/app/api/`. All routes return JSON u
 - **Events:** Per-tag and aggregated caches in `lib/api/eventsServerCache.ts`.
 - **Sports:** `lib/api/sportsServerCache.ts`.
 - **Prices:** ~45s TTL on CLOB history responses.
+- **Trades:** ~30s TTL on Polymarket Data API trade history responses.
 
 ## Implementation map
 
@@ -25,6 +27,7 @@ Next.js App Router route handlers under `src/app/api/`. All routes return JSON u
 | `events/` | Gamma fetch, Zod validation, normalization |
 | `events/[slug]/` | Single-event lookup |
 | `prices/[tokenId]/` | CLOB `/prices-history` proxy |
+| `trades/` | Data API `/trades` proxy for featured bid rails |
 | `sports/live/` | Sports live games aggregation |
 | `related-news/` | GDELT DOC 2.0 news proxy + ranking; OkSurf fallback after timeout/error |
 | `openapi/` | Static spec from `lib/openapi/spec.ts` |
@@ -35,6 +38,7 @@ Browser code must call these routes — never Gamma/CLOB directly:
 
 - `lib/api/eventsClient.ts`
 - `lib/api/pricesClient.ts`
+- `lib/api/tradesClient.ts`
 - `lib/api/sportsClient.ts`
 - `lib/api/relatedNewsClient.ts`
 
