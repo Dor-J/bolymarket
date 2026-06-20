@@ -1,6 +1,6 @@
 import type { OpenAPIV3 } from 'openapi-types';
 
-/** Reusable OpenAPI schema components for bolymarket API responses. */
+/** Reusable OpenAPI schema components for Bolymarket API responses. */
 export const openApiSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
   Outcome: {
     type: 'object',
@@ -160,7 +160,7 @@ export interface BuildOpenApiSpecOptions {
 }
 
 /**
- * Builds the OpenAPI 3.0 specification for bolymarket REST routes.
+ * Builds the OpenAPI 3.0 specification for Bolymarket REST routes.
  */
 export function buildOpenApiSpec({
   serverUrl,
@@ -168,13 +168,13 @@ export function buildOpenApiSpec({
   return {
     openapi: '3.0.3',
     info: {
-      title: 'bolymarket API',
+      title: 'Bolymarket API',
       version: '1.0.0',
       description: [
-        'Read-only REST API for the bolymarket Polymarket-style frontend.',
+        'Read-only REST API for the Bolymarket Polymarket-style frontend.',
         '',
         'All routes proxy and cache upstream Polymarket Gamma / CLOB data.',
-        'Responses are normalized to bolymarket domain types.',
+        'Responses are normalized to Bolymarket domain types.',
         '',
         '**Note:** Trading, wallet, and authentication are out of scope.',
       ].join('\n'),
