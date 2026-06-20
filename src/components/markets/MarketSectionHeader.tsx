@@ -40,10 +40,10 @@ export function MarketSectionHeader({ heading, className }: MarketSectionHeaderP
   }, [searchExpanded]);
 
   return (
-    <div className={cn('mb-3 flex items-center justify-between gap-3', className)}>
+    <div className={cn('mb-3 hidden items-center justify-between gap-3 lg:flex', className)}>
       <h2 className="text-xl leading-6 font-semibold text-text">{heading}</h2>
 
-      <div className="hidden items-center gap-1 xl:flex">
+      <div className="hidden items-center gap-1 lg:flex">
         {searchExpanded ? (
           <div className="relative w-[min(320px,28vw)]">
             <div className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-neutral-500">

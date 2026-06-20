@@ -327,7 +327,7 @@ function CryptoSidebarItem({
       className={cn(
         "group flex w-full cursor-pointer flex-row items-center justify-between rounded-md",
         "px-3 py-2.5 text-left transition-colors",
-        active ? "bg-neutral-100" : "bg-transparent hover:bg-neutral-50",
+        active ? "bg-surface-2" : "bg-transparent hover:bg-surface-2",
       )}
       onClick={() => onSelect(item.id)}
     >
@@ -392,7 +392,7 @@ function CryptoSidebar({
         ))}
       </div>
 
-      <div className="mb-2 w-full border-b border-neutral-100 pb-2" />
+      <div className="mb-2 w-full border-b border-border pb-2" />
 
       <div className="flex flex-col gap-0.5">
         {CRYPTO_ASSET_NAV_ITEMS.map((item) => (
@@ -406,6 +406,79 @@ function CryptoSidebar({
         ))}
       </div>
     </aside>
+  );
+}
+
+function CryptoMobileTimeRail({
+  selectedId,
+  onSelect,
+}: {
+  selectedId: string;
+  onSelect: (id: string) => void;
+}) {
+  const [moreOpen, setMoreOpen] = useState(false);
+  const visibleItems = CRYPTO_TIME_NAV_ITEMS.slice(0, 4);
+  const moreItems = CRYPTO_TIME_NAV_ITEMS.slice(4);
+  const moreActive = moreItems.some((item) => item.id === selectedId);
+
+  return (
+    <div className="pt-2 pb-2 lg:hidden">
+      <div className="scrollbar-hide -mx-1 flex gap-1 overflow-x-auto px-1">
+        {visibleItems.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onSelect(item.id)}
+            className={cn(
+              "h-8 shrink-0 rounded-md px-2.5 text-sm font-medium whitespace-nowrap",
+              selectedId === item.id
+                ? "bg-brand-subtle text-brand"
+                : "text-neutral-500 hover:bg-surface-2 hover:text-text",
+            )}
+          >
+            {item.label}
+          </button>
+        ))}
+
+        <div className="relative shrink-0">
+          <button
+            type="button"
+            onClick={() => setMoreOpen((open) => !open)}
+            className={cn(
+              "h-8 rounded-md px-2.5 text-sm font-medium whitespace-nowrap",
+              moreActive
+                ? "bg-brand-subtle text-brand"
+                : "text-neutral-500 hover:bg-surface-2 hover:text-text",
+            )}
+          >
+            More
+          </button>
+
+          {moreOpen ? (
+            <div className="absolute top-full left-0 z-40 mt-1 w-40 rounded-lg border border-border bg-background p-1.5 shadow-lg">
+              {moreItems.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    onSelect(item.id);
+                    setMoreOpen(false);
+                  }}
+                  className={cn(
+                    "block w-full rounded-sm px-2.5 py-2 text-left text-sm font-medium",
+                    selectedId === item.id
+                      ? "bg-brand-subtle text-brand"
+                      : "hover:bg-surface-2",
+                  )}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -503,10 +576,12 @@ function CryptoHeader({
 
   return (
     <>
-      <div className="mb-2 flex items-center gap-4">
-        <h1 className="shrink-0 text-heading-xl font-semibold">Crypto</h1>
+      <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-2 lg:flex-nowrap">
+        <h1 className="order-1 shrink-0 text-heading-xl font-semibold lg:order-none">
+          Crypto
+        </h1>
 
-        <div className="no-scrollbar min-w-0 flex-1 overflow-x-auto">
+        <div className="no-scrollbar order-3 w-full min-w-0 flex-none overflow-x-auto lg:order-none lg:flex-1">
           <div className="relative">
             <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-2 w-8 bg-linear-to-r from-background via-background to-transparent opacity-0 transition-opacity duration-200 md:w-16" />
             <div
@@ -520,7 +595,7 @@ function CryptoHeader({
                     aria-orientation="horizontal"
                     className={cn(
                       "relative inline-flex h-9 items-center justify-center gap-x-1 rounded-lg",
-                      "bg-transparent px-0 py-1 text-body-base font-medium text-zinc-500",
+                      "bg-transparent px-0 py-1 text-body-base font-medium text-text-secondary",
                     )}
                     tabIndex={0}
                     data-orientation="horizontal"
@@ -582,7 +657,7 @@ function CryptoHeader({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-0.5">
+        <div className="order-2 ml-auto flex shrink-0 items-center gap-0.5 lg:order-none">
           <div className="relative flex items-center">
             <div
               className={cn(
@@ -666,7 +741,7 @@ function CryptoHeader({
               className={cn(
                 "inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-full",
                 "border border-button-outline-border px-3 text-body-sm font-semibold whitespace-nowrap",
-                "text-button-outline-text transition duration-150 active:scale-[97%] hover:bg-neutral-25",
+                "text-button-outline-text transition duration-150 active:scale-[97%] hover:bg-surface-2",
                 "focus-visible:ring-0 focus-visible:outline-none",
               )}
               type="button"
@@ -700,7 +775,7 @@ function CryptoHeader({
                       className={cn(
                         "relative flex cursor-pointer items-center gap-2 rounded-sm",
                         "px-2.5 py-2 pr-8 text-left text-body-base outline-none select-none",
-                        "hover:bg-neutral-50 focus:bg-neutral-50",
+                        "hover:bg-surface-2 focus:bg-surface-2",
                       )}
                       onClick={() => {
                         onSortSelect(item.id);
@@ -727,7 +802,7 @@ function CryptoHeader({
               className={cn(
                 "inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-full",
                 "border border-button-outline-border px-3 text-body-sm font-semibold whitespace-nowrap",
-                "text-button-outline-text transition duration-150 active:scale-[97%] hover:bg-neutral-25",
+                "text-button-outline-text transition duration-150 active:scale-[97%] hover:bg-surface-2",
                 "focus-visible:ring-0 focus-visible:outline-none",
               )}
               type="button"
@@ -760,7 +835,7 @@ function CryptoHeader({
                       className={cn(
                         "relative flex cursor-pointer items-center gap-2 rounded-sm",
                         "px-2.5 py-2 pr-8 text-left text-body-base outline-none select-none",
-                        "hover:bg-neutral-50 focus:bg-neutral-50",
+                        "hover:bg-surface-2 focus:bg-surface-2",
                       )}
                       onClick={() => {
                         onTopicSelect(item.id);
@@ -896,14 +971,16 @@ export function CryptoPageView() {
 
   return (
     <div className="flex w-full justify-center">
-      <div className="flex w-full max-w-[1320px] gap-8 px-3">
+      <div className="flex w-full max-w-[1320px] flex-col px-3 lg:flex-row lg:gap-8">
+        <CryptoMobileTimeRail selectedId={topicId} onSelect={setTopicId} />
+
         <CryptoSidebar
           selectedId={topicId}
           topicCounts={topicCounts}
           onSelect={setTopicId}
         />
 
-        <section className="min-h-[calc(100vh-8rem)] min-w-0 flex-1 pt-7.5">
+        <section className="min-h-[calc(100vh-8rem)] min-w-0 flex-1 pt-3 lg:pt-7.5">
           <CryptoHeader
             selectedTypeId={typeId}
             selectedTopicId={topicId}

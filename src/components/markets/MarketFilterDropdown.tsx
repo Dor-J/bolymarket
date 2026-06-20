@@ -22,7 +22,7 @@ export interface MarketFilterDropdownProps<T extends string> {
 const pillClassName = cn(
   'inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-full border border-border',
   'px-3 text-sm font-semibold whitespace-nowrap text-text',
-  'transition duration-150 active:scale-[97%] hover:bg-neutral-25',
+  'transition duration-150 active:scale-[97%] hover:bg-surface-2',
   'focus-visible:outline-none focus-visible:ring-0',
 );
 

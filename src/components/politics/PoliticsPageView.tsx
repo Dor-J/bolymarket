@@ -84,9 +84,7 @@ export function PoliticsPageView() {
       }
     >
       <div className="flex w-full flex-col items-center gap-5 pt-3 lg:mx-auto lg:mb-4 lg:max-w-[1350px] lg:pt-5.5">
-        <h1 className="w-full px-4 text-2xl font-semibold leading-8 text-text lg:hidden">
-          Politics
-        </h1>
+        <h1 className="sr-only lg:hidden">Politics</h1>
 
         <CategoryPageHeader title="Politics" filters={filterControls} />
 

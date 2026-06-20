@@ -22,7 +22,7 @@ export function ShowMoreMarketsButton({
         className={cn(
           'inline-flex h-10 w-fit cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-full',
           'border border-border bg-surface px-4 text-sm leading-5 font-semibold text-text',
-          'transition duration-150 active:scale-[97%] hover:bg-neutral-25',
+          'transition duration-150 active:scale-[97%] hover:bg-surface-2',
           'focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
         )}
       >

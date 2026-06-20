@@ -118,7 +118,7 @@ export function FeaturedCarouselControls({
           onClick={onPrevious}
           className={cn(
             'inline-flex h-9 w-9 items-center justify-center rounded-full',
-            'bg-surface-2 text-text-secondary hover:bg-neutral-100',
+            'bg-surface-2 text-text-secondary hover:bg-surface-2/80',
             'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
           )}
         >
@@ -130,7 +130,7 @@ export function FeaturedCarouselControls({
           onClick={onNext}
           className={cn(
             'inline-flex h-9 w-9 items-center justify-center rounded-full',
-            'bg-surface-2 text-text-secondary hover:bg-neutral-100',
+            'bg-surface-2 text-text-secondary hover:bg-surface-2/80',
             'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
           )}
         >
@@ -148,9 +148,9 @@ export function FeaturedCarouselControls({
           <div
             className={cn(
               'relative flex h-10 items-center justify-center overflow-hidden rounded-full',
-              'border border-border bg-neutral-50',
+              'border border-border bg-surface-2',
               'transition-transform group-active:scale-[0.98]',
-              'group-hover:bg-neutral-100/70 dark:group-hover:bg-neutral-100',
+              'group-hover:bg-surface-2/80',
               'group-focus-visible:outline',
               'group-focus-visible:outline-offset-2 group-focus-visible:outline-text',
             )}
@@ -173,9 +173,9 @@ export function FeaturedCarouselControls({
           <div
             className={cn(
               'relative flex h-10 items-center justify-center overflow-hidden rounded-full',
-              'border border-border bg-neutral-50',
+              'border border-border bg-surface-2',
               'transition-transform group-active:scale-[0.98]',
-              'group-hover:bg-neutral-100/70 dark:group-hover:bg-neutral-100',
+              'group-hover:bg-surface-2/80',
               'group-focus-visible:outline',
               'group-focus-visible:outline-offset-2 group-focus-visible:outline-text',
             )}

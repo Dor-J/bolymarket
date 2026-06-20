@@ -43,7 +43,7 @@ export function HomeFeaturedSidebar({ className }: HomeFeaturedSidebarProps) {
             'inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2',
             'rounded-full border border-border px-8 text-base font-semibold whitespace-nowrap',
             'text-text transition duration-150 active:scale-[97%]',
-            'hover:bg-neutral-25 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none',
+            'hover:bg-surface-2 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none',
           )}
           tabIndex={-1}
         >

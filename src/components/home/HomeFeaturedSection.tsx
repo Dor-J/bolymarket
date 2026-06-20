@@ -19,7 +19,7 @@ export function HomeFeaturedSection({ events, className }: HomeFeaturedSectionPr
   return (
     <div
       className={cn(
-        'mb-6 w-full lg:mx-auto lg:mb-3 lg:max-w-[1350px] lg:px-6',
+        'mb-6 hidden w-full lg:mx-auto lg:mb-3 lg:block lg:max-w-[1350px] lg:px-6',
         className,
       )}
     >
