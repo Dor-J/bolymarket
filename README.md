@@ -18,7 +18,7 @@ cached API routes. Optional:
 | `REDIS_URL`                   | Server-side cache for Gamma responses (e.g. `redis://localhost:6379`). Without it, an in-memory fallback is used. |
 | `NEXT_PUBLIC_LIVE_PRICE_MODE` | `auto` (default) · `websocket` · `simulation`                                                                     |
 
-From the `bolymarket/` directory:
+From the repository root:
 
 ```bash
 bun install
@@ -32,9 +32,7 @@ bun run format:check
 
 ## Deploying to Vercel
 
-Use the **Next.js** framework preset and set the project root to `bolymarket/` when importing the
-broader `BoliMarket/` workspace. If this folder is imported as its own repository, leave the root
-directory as `.`.
+Use the **Next.js** framework preset with the project root directory set to `.`.
 
 - **Install command:** `bun install --frozen-lockfile`
 - **Build command:** `bun run build`
@@ -44,14 +42,17 @@ directory as `.`.
 
 ## Repository layout
 
-This app is the git repository. It lives inside the broader `BoliMarket/` workspace, which also
-contains `design-system/` and `plans/` reference material at the workspace root.
-
 ```text
-BoliMarket/           # workspace root
-├── design-system/
-├── plans/
-└── bolymarket/       # this repo — run all commands here
+.                     # repository root — run all commands here
+├── docs/             Performance notes (docs/PERFORMANCE.md)
+├── public/           Static assets
+└── src/
+    ├── app/          Routes, layout, providers, API routes (see src/app/api/README.md)
+    ├── components/   UI by feature (see src/components/README.md)
+    ├── hooks/        Data + realtime hooks (see src/hooks/README.md)
+    ├── lib/          API, atoms, prices, chart, realtime, cache (see src/lib/README.md)
+    ├── test/         Shared Vitest helpers (see src/test/README.md)
+    └── types/        Polymarket domain types
 ```
 
 ## Stack
@@ -254,18 +255,6 @@ Coverage highlights:
 
 Shared test helpers: `src/test/test-utils.tsx` (`renderHookWithProviders`, `renderWithProviders`).
 
-## Project structure
-
-```text
-src/
-├── app/              Routes, layout, providers, API routes (see app/api/README.md)
-├── components/       UI by feature (see src/components/README.md)
-├── hooks/            Data + realtime hooks — all colocated tests (src/hooks/README.md)
-├── lib/              API, atoms, prices, chart, realtime, cache (src/lib/README.md)
-├── test/             Shared Vitest helpers (src/test/README.md)
-└── types/            Polymarket domain types
-```
-
 ## Implementation progress
 
 | Phase               | Status      | Deliverable                                               |
@@ -280,20 +269,6 @@ src/
 | 7 — Home featured   | Complete    | Carousel controls, hot-topics sidebar, activity/bid rails |
 | 8 — Sports live     | In progress | `/sports/live` page, sports API, WebSocket game state     |
 
-## Planning
-
-Detailed implementation plans live in `../plans/`:
-
-- [PLAN-Phase-0-Foundation.md](../plans/PLAN-Phase-0-Foundation.md)
-- [PLAN-Phase-1-App-Shell-Category-Nav.md](../plans/PLAN-Phase-1-App-Shell-Category-Nav.md)
-- [PLAN-Phase-2-Events-Grid.md](../plans/PLAN-Phase-2-Events-Grid.md)
-- [PLAN-Phase-3-Event-Detail.md](../plans/PLAN-Phase-3-Event-Detail.md)
-- [PLAN-Phase-4-Realtime-Prices.md](../plans/PLAN-Phase-4-Realtime-Prices.md)
-- [PLAN-Phase-5-Polish-Performance-README.md](../plans/PLAN-Phase-5-Polish-Performance-README.md)
-
-Side-by-side chrome comparison notes: `../design-system/header-and-nav-side-to-side-comparison.md`,
-`../design-system/footer-side-by-side-comparison.md`.
-
 ## Further reading
 
 - [src/components/README.md](src/components/README.md) — component map and conventions
@@ -301,4 +276,3 @@ Side-by-side chrome comparison notes: `../design-system/header-and-nav-side-to-s
 - [src/lib/README.md](src/lib/README.md) — shared library layout
 - [src/test/README.md](src/test/README.md) — Vitest helpers and fixtures
 - [docs/PERFORMANCE.md](docs/PERFORMANCE.md) — profiling notes and virtualization decision
-- [../polymarket-github-repos/README.md](../polymarket-github-repos/README.md) — Polymarket OSS repo catalog
