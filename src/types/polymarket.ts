@@ -150,7 +150,7 @@ export interface SportsMetadata {
   series?: string;
 }
 
-/** Live price state for a market — used by Jotai in Phase 4. */
+/** Live price state for a market — used by Jotai. */
 export interface MarketPriceState {
   value: number;
   previousValue: number;
